@@ -10,6 +10,7 @@ body {
 }
 
 div, canvas {
+	position: absolute;
 	user-select: none;
 	touch-action: none;
 	-webkit-tap-highlight-color: transparent;
