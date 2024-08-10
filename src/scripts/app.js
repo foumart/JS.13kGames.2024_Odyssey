@@ -31,35 +31,38 @@ function toggleFullscreen(e) {
 }
 
 function onBoardZoom(event) {
-	/*if (state) {
+	if (state) {
 		if (event.deltaY < 0 && boardScale < 1) boardScale += 0.05;
 		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= 0.05;
 		dirty = 1;
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
-	}*/
+	}
 }
 
-let portrait;// orientation
 // global sizes
 let width;
 let height;
 let scale;
+let portrait;// orientation
+let offsetX = 0;
+let offsetY = 0;
+
+// game state, 0: menu, 1: in-game
 let state = 0;
+let stage = 0;
+
+let tween = { transition: 0 };
 
 // ui stuff
 let controls, upButton, leftButton, rightButton, downButton;
-let title, playButton, fullscreenButton, soundButton, closeButton, retryButton;
-//let title, genButton, clearButton, uiInfo;
+let title, playButton, fullscreenButton, soundButton;
 
 
 // Example game initialization script:
 function init() {
 	window.addEventListener("resize", resizeUI, false);
 	//document.addEventListener("keydown", onKeyDown);
-	
-	uiDiv.style.backgroundColor = "rgba(255,0,0,0.3)";
-	gameContainer.style.backgroundColor = "rgba(0,255,0,0.3)";
 
 	setupUI();
 	createUI();
@@ -113,7 +116,8 @@ function resizeUI(e) {
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.height = height + "px";
 
 		gameCanvas.style.left = gameContainer.style.left = "50%";
-		gameCanvas.style.marginLeft = gameContainer.style.marginLeft = -(height/2)+"px";
+		offsetX = width - height;
+		gameCanvas.style.marginLeft = gameContainer.style.marginLeft = - height / 2 + "px";
 		gameCanvas.style.marginTop = gameContainer.style.marginTop = gameCanvas.style.top = gameContainer.style.top = 0;
 	} else {
 		// Portrait
@@ -122,7 +126,8 @@ function resizeUI(e) {
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.width = width + "px";
 
 		gameCanvas.style.top = gameContainer.style.top = "50%";
-		gameCanvas.style.marginTop = gameContainer.style.marginTop = -(width/2)+"px";
+		offsetY = height - width;
+		gameCanvas.style.marginTop = gameContainer.style.marginTop = - width / 2 + "px";
 		gameCanvas.style.marginLeft = gameContainer.style.marginLeft = gameCanvas.style.left = gameContainer.style.left = 0;
 	}
 
@@ -144,18 +149,24 @@ function resizeUI(e) {
 	//if (game) drawBoard();
 
 	// Fullscreen button
-	fullscreenButton.style = `float:right;line-height:${99*scale}px;font-size:${72*scale}px`;
+	updateStyleUI(fullscreenButton, `float:right`);
 	// Sound button
-	soundButton.style = `float:right;line-height:${99*scale}px;font-size:${72*scale}px;text-align:right;border-bottom-left-radius:1rem;margin-right:3px`;
+	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:1rem;margin-right:3px`);
 	// Play and Settings buttons
 	if (playButton) {
-		playButton.style = `top:${portrait?72:65}%;line-height:${99*scale}px;font-size:${72*scale}px;text-align:right`;
+		updateStyleUI(playButton, `position:absolute;top:65%;left:50%;transform:translateX(-50%);width:50%;border-radius:1rem`);
+		updateStyleUI(title, `position:absolute;top:25%;left:50%;transform:translateX(-50%)`);
 	}
+}
+
+function updateStyleUI(element, style) {
+	element.style = `line-height:${99*scale}px;font-size:${72*scale}px;`+style;
 }
 
 function switchState(event) {
 	console.log("switchState", event);
 	state = 1;
+	gameInit(stage);
 	createUI();
 	resizeUI(1);
 }
@@ -165,35 +176,32 @@ function act(x, y, z) {
 }
 
 function getIcon(size) {
-	return `<img src=ico.svg height=${size * scale} width=${size * scale} style=margin-bottom:-${size / 6 * scale}px>`;
+	return `<img src=ico.svg height=${size * scale} width=${size * scale}>`;
 }
 
 function createUI() {
 	uiDiv.innerHTML = '';
-	
-	//gameInit(stage);
+	uiDiv.style = "pointer-events:none";
 
 	if (!state) {
-		title = document.createElement("div");
-		uiDiv.append(title);
-		title.className = "css_title css_icon";
+		title = generateUIButton(uiDiv, `${getIcon(240)}`, switchState);
 	} else {
 		controls = document.createElement('div');
 		uiDiv.append(controls);
 	}
 
 	// Fullscreen and Sound buttons
-	fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen);
-	soundButton = generateUIButton(uiDiv, '', toggleSound);
+	fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen, "css_space");
+	soundButton = generateUIButton(uiDiv, '', toggleSound, "css_space");
 
 	if (!state) {
 		// Create Play Button
-		playButton = generateUIButton(uiDiv, `${getIcon(60)} Play`, switchState);
+		playButton = generateUIButton(uiDiv, `Play`, switchState, "css_space");
 	} else {
-		upButton = generateUIButton(controls, '&#9650', e => act(0, -1), "css_button css_icon css_controls");   // ^
-		leftButton = generateUIButton(controls, '&#9664', e => act(-1, 0), "css_button css_icon css_controls"); // <
-		rightButton = generateUIButton(controls, '&#9654', e => act(1, 0), "css_button css_icon css_controls"); // >
-		downButton = generateUIButton(controls, '&#9660', e => act(0, 1), "css_button css_icon css_controls");  // v
+		upButton = generateUIButton(controls, '&#9650', e => act(0, -1), "css_controls");   // ^
+		leftButton = generateUIButton(controls, '&#9664', e => act(-1, 0), "css_controls"); // <
+		rightButton = generateUIButton(controls, '&#9654', e => act(1, 0), "css_controls"); // >
+		downButton = generateUIButton(controls, '&#9660', e => act(0, 1), "css_controls");  // v
 
 		upButton.style = "margin:2% auto 0";
 		leftButton.style = "float:left;margin:2%";
@@ -204,11 +212,12 @@ function createUI() {
 	toggleSound();
 }
 
-function generateUIButton(div, code, handler, className = "css_button css_icon css_space") {
+function generateUIButton(div, code, handler, className) {
 	const button = document.createElement('div');
-	button.addEventListener(eventName, handler.bind(this));
 	button.innerHTML = code;
-	button.className = className;
+	button.addEventListener(eventName, handler.bind(this));
+	button.className = "css_button css_icon " + className;
+	
 	div.append(button);
 	return button;
 }

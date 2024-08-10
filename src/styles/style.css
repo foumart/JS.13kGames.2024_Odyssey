@@ -5,7 +5,7 @@
 }
 
 body {
-	background-color: #012;
+	background-color: #111;
 	color: #fff;
 }
 
@@ -25,6 +25,7 @@ div, canvas {
 	background-color: rgba(0,255,255,0.5);
 	position: relative;
 	cursor: pointer;
+	pointer-events: auto;
 }
 
 .css_icon {
