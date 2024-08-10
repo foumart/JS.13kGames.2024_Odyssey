@@ -34,7 +34,6 @@ function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 1) boardScale += 0.05;
 		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= 0.05;
-		dirty = 1;
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}

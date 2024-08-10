@@ -1,5 +1,6 @@
 // game vars
-let gameLoop;
+let gameLoop, step;
+
 const obj = [
 	{
 		size: 8, x: 4, y: 4,

@@ -1,7 +1,16 @@
 // board vars
-let stageData, boardWidth, boardScale, transitionScale, units, dirty, tilt, mapData, unitsData;
-
-let currentButton, currentButtonX, currentButtonY;
+let stageData,
+	boardWidth,
+	boardScale,
+	buttonsArr,
+	units,
+	field,
+	mapData,
+	unitsData,
+	currentButtonX,
+	currentButtonY,
+	tilt,
+	player;
 
 // Used for map data compression
 // TODO: should use binary => hex, ex: "A8030600" instead of "9580033c000c"
@@ -93,7 +102,6 @@ function rollButton(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 	currentButtonX = target.clientX;
 	currentButtonY = target.clientY;
-	currentButton = event.target;
 	console.log("rollButton", target, currentButtonX, currentButtonY);
 
 	if (mobile) {
