@@ -17,11 +17,11 @@ class Tile extends GameElement {
 	}
 
 	getX() {
-		return this.getOffsetX() + this.x * this.width;
+		return this.getOffsetX() + (this.x - playerX + screenSide) * this.width;
 	}
 
 	getY() {
-		return this.getOffsetY() + this.y * this.height;
+		return this.getOffsetY() + (this.y - playerY + screenSide) * this.height;
 	}
 
 	resize() {
@@ -40,7 +40,7 @@ class Tile extends GameElement {
 	}
 
 	getColor() {
-		return ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"][this.type];
+		return ["#0033cc", "#00cc00", "#0000ff", "#ffff00", "#ff00ff", "#ff00ff"][this.type];
 	}
 
 }

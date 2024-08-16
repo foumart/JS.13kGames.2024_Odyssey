@@ -1,23 +1,18 @@
 // game vars
-let gameLoop, step;
+let gameLoop, step, islandGenerator;
 
-const obj = [
-	{
-		size: 8, x: 4, y: 4,
-		map: "000000000ff00ff00ff00ff000000000",
-		data: "00000000000001"
-	},
-	{
-		size: 8, x: 4, y: 4,
-		map: "000000fff",
-		data: "000f"
-	}
-];
-
-function gameInit(_stage) {
+async function gameInit(_stage) {
 	stage = _stage;
 	step = 0;
-	stageData = getStageData(stage);
+	
+	let data = await getStageData(stage);
+	console.log(data);
+	stageData = {
+		size: data[0][0], x: data[0][2], y: data[0][3],
+		map: data[0][6],
+		data: data[0][5]
+	}
+	
 	initBoard();
 	gameStart();
 }
@@ -46,5 +41,12 @@ function gameStop() {
 }
 
 function getStageData(id) {
-	return obj[id];
+	return new Promise((resolve, reject) => {
+		islandGenerator = new IslandGenerator(this, 40, 40, {
+			type: 1,
+			debug: null,
+			startX: 20,
+			startY: 20
+		}, resolve)
+	});
 }
