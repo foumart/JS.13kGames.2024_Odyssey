@@ -3,11 +3,11 @@ class IslandGenerator {
 		this.main = _this;
 		this.type = details.type;
 		this.debug = details.debug;
-		this.startX = details.startX || 0;
-		this.startY = details.startY || 0;
+		this.offset = details.offset;
+		this.startX = details.startX;
+		this.startY = details.startY;
 		this.resolve = resolve;
 		this.destroyed = false;
-		this.offset = 3;
 		this.startTime = performance.now();
 		this.map = [];
 
@@ -22,6 +22,9 @@ class IslandGenerator {
 	generateIslands(width, height) {
 		this.width = width;
 		this.height = height;
+		if (!this.startX) this.startX = this.width/2|0;
+		if (!this.startY) this.startY = this.height/2|0;
+		if (!this.offset) this.offset = this.height/10|0;
 		
 		this.map = this.initArray();
 		
@@ -31,12 +34,12 @@ class IslandGenerator {
 		this.relief = this.initArray();
 
 		this.visited = this.initArray();
-		this.visited.forEach((row, indexY) => {
+		/*this.visited.forEach((row, indexY) => {
 			row.forEach((cell, indexX) => {
 				this.visited[indexY][indexX] = indexX < 1 || indexY < 1 ||
 					indexY >= this.visited.length - 1 || indexX >= this.visited[indexY].length - 1 ? 1 : 0;
 			});
-		});
+		});*/
 
 		this.islands = [];
 
@@ -55,8 +58,8 @@ class IslandGenerator {
 			this.checkAjacentIslands(this.startX, this.startY, 3 - (attempt/33|0)) &&
 			attempt < 99
 		) {
-			this.startY = this.rand(this.offset*2, this.height-this.offset*2);
-			this.startX = this.rand(this.offset*2, this.width-this.offset*2);
+			this.startY = this.rand(this.offset, this.height-this.offset);
+			this.startX = this.rand(this.offset, this.width-this.offset);
 			attempt ++;
 			if (attempt == 99) {
 				console.warn("start location "+this.startX+"x"+this.startY);
@@ -94,7 +97,7 @@ class IslandGenerator {
 	}
 
 	checkAjacentIslands(posX, posY, num = 3) {
-		if (posX < this.offset || posX >= this.width - this.offset || posY < this.offset || posY >= this.height - this.offset) {
+		if (posX < this.offset/3 || posX > this.width - this.offset/3 || posY < this.offset/3 || posY > this.height - this.offset/3) {
 			return true;
 		}
 		//if (posX == this.startX && posY == this.startY && !this.i && !this.n) return false;

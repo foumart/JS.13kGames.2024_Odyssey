@@ -139,7 +139,7 @@ function app(callback) {
 			closureCompiler({
 				compilation_level: 'ADVANCED_OPTIMIZATIONS',
 				warning_level: 'QUIET',
-				language_in: 'ECMASCRIPT6',
+				language_in: 'ECMASCRIPT_2017',
 				language_out: 'ECMASCRIPT6',
 				externs: 'resources/externs.js'
 			})

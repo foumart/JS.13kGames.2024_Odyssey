@@ -44,9 +44,7 @@ function getStageData(id) {
 	return new Promise((resolve, reject) => {
 		islandGenerator = new IslandGenerator(this, 40, 40, {
 			type: 1,
-			debug: null,
-			startX: 20,
-			startY: 20
+			offset: 8
 		}, resolve)
 	});
 }

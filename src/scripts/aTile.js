@@ -17,11 +17,16 @@ class Tile extends GameElement {
 	}
 
 	getX() {
-		return this.getOffsetX() + (this.x - playerX + screenSide) * this.width;
+		return this.getOffsetX() + this.x * this.width;
 	}
 
 	getY() {
-		return this.getOffsetY() + (this.y - playerY + screenSide) * this.height;
+		return this.getOffsetY() + this.y * this.height;
+	}
+
+	update(type) {
+		this.type = type;
+		this.resize();
 	}
 
 	resize() {
@@ -31,16 +36,18 @@ class Tile extends GameElement {
 
 	draw() {
 		gameContext.fillStyle = this.getColor();
+		gameContext.beginPath();
 		gameContext.fillRect(
 			this.getX(),
 			this.getY(),
 			this.width,
 			this.height
 		);
+		gameContext.closePath();
 	}
 
 	getColor() {
-		return ["#0033cc", "#00cc00", "#0000ff", "#ffff00", "#ff00ff", "#ff00ff"][this.type];
+		return ["#0033cc", "#009900", "#000099", "#999900", "#990099", "#009999", "#990000"][this.type];
 	}
 
 }
