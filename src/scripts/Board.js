@@ -1,7 +1,7 @@
 const
 	screenWidth = 9,
 	screenSide = 4,
-	screenOffset = 6,// how many outside tiles total
+	screenOffset = 8,// how many outside tiles total to draw on both sides on the mobile screen
 	tilt = 1,
 	jump = 2;
 
@@ -88,92 +88,83 @@ function initBoard() {
 }
 
 function addButtonListeners(button) {
-	if (mobile) {
-		button.addEventListener(eventName, buttonDown);
-	} else {
-		button.addEventListener("mousedown", buttonDown);
-	}
+	button.addEventListener(mobile ? eventName : "mousedown", buttonDown);
 }
 
 function buttonDown(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 	currentButtonX = target.clientX;
 	currentButtonY = target.clientY;
-	//console.log("buttonDown", target, currentButtonX, currentButtonY);
-
-	if (mobile) {
-		window.addEventListener("touchend", clickButton);
-	} else {
-		window.addEventListener(eventName, clickButton);
-	}
+	console.log("buttonDown", target, currentButtonX, currentButtonY);
+	window.addEventListener(mobile ? "touchend" : eventName, clickButton);
+	//target.target.removeEventListener(eventIn, buttonDown);
+	//window.addEventListener(eventRelease, clickButton);
 }
 
 function clickButton(event) {
-	if (mobile) {
-		window.removeEventListener("touchend", clickButton);
-	} else {
-		window.removeEventListener(eventName, clickButton);
-	}
-
+	window.removeEventListener(mobile ? "touchend" : eventName, clickButton);
 	// determine clicks and swipes
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
 	// is it a swipe or click ?
 	currentButtonX = Math.round((target.clientX - currentButtonX) / player.width);
 	currentButtonY = Math.round((target.clientY - currentButtonY) / player.width);
-	//console.log("swipe("+currentButtonX + "x" + currentButtonY+")");
 
 	// clicked index (x/y)
-	currentButtonX = ((target.x-offsetX/2)/player.width|0);
-	currentButtonY = ((target.y-offsetY/2)/player.width|0);
-	//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
+	currentButtonX = target.target.x;
+	currentButtonY = target.target.y;
+	console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
 
 	if (state == 1) {
 		let direction = determineDirection(currentButtonX, currentButtonY);
-		switch (direction) {
-			case 1: // Up
-				playerY --;
-				player.y --;
-				if (playerY < jump) {
-					playerY = boardWidth-1;
-					player.y += boardWidth-jump;
-				}
-				player.resize(playerX - screenSide, playerY - screenSide);
-				break;
-			case 2: // Right
-				playerX ++;
-				player.x ++;
-				if (playerX > boardWidth-1) {
-					playerX = jump;
-					player.x -= boardWidth-jump;
-				}
-				player.resize(playerX - screenSide, playerY - screenSide);
-				break;
-			case 3: // Down
-				playerY ++;
-				player.y ++;
-				if (playerY > boardWidth-1) {
-					playerY = jump;
-					player.y -= boardWidth-jump;
-				}
-				player.resize(playerX - screenSide, playerY - screenSide);
-				break;
-			case 4: // Left
-				playerX --;
-				player.x --;
-				if (playerX < jump) {
-					playerX = boardWidth-1;
-					player.x += boardWidth-jump;
-				}
-				player.resize(playerX - screenSide, playerY - screenSide);
-				break;
-			case 5: // Center
-				console.log("GG");
-				break;
-			default: // Corners
+		action(direction);
+	}
+}
 
-				break;
-		}
+function action(direction) {
+	switch (direction) {
+		case 1: // Up
+			playerY --;
+			player.y --;
+			if (playerY < jump) {
+				playerY = boardWidth-1;
+				player.y += boardWidth-jump;
+			}
+			player.resize(playerX - screenSide, playerY - screenSide);
+			break;
+		case 2: // Right
+			playerX ++;
+			player.x ++;
+			if (playerX > boardWidth-1) {
+				playerX = jump;
+				player.x -= boardWidth-jump;
+			}
+			player.resize(playerX - screenSide, playerY - screenSide);
+			break;
+		case 3: // Down
+			playerY ++;
+			player.y ++;
+			if (playerY > boardWidth-1) {
+				playerY = jump;
+				player.y -= boardWidth-jump;
+			}
+			player.resize(playerX - screenSide, playerY - screenSide);
+			break;
+		case 4: // Left
+			playerX --;
+			player.x --;
+			if (playerX < jump) {
+				playerX = boardWidth-1;
+				player.x += boardWidth-jump;
+			}
+			player.resize(playerX - screenSide, playerY - screenSide);
+			break;
+		case 5: // Center
+			console.log("GG");
+			break;
+		default: // Corners
+
+			break;
 	}
 }
 
@@ -231,7 +222,7 @@ function drawBoard() {
 					_y = y + playerY - (portrait ? screenSide + screenOffset/2 : screenSide);
 					if (mapData[_y]) {
 						if (mapData[_y].length > _x) {
-							tileField[y][x].update(mapData[_y][_x]);
+							tileField[y][x].update(mapData[_y][_x], playerX - screenSide, playerY - screenSide);
 						}
 					}
 				}
@@ -244,7 +235,7 @@ function drawBoard() {
 		}
 	}
 
-	player.resize(playerX - screenSide, playerY - screenSide);
+	let tileWidth = player.resize(playerX - screenSide, playerY - screenSide);
 
 	if (screenButtons) for (_y = 0; _y < screenButtons.length; _y ++) {
 		for (_x = 0; _x < screenButtons[_y].length; _x ++) {
@@ -252,14 +243,20 @@ function drawBoard() {
 		}
 	}
 
-	gameContext.fillStyle = "#00ff00";
+	gameContext.fillStyle = "#0078d7";
+	gameContext.globalAlpha = 0.4;
 	gameContext.beginPath();
-	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height/10);
-	//gameContext.fillRect(0, gameCanvas.height - gameCanvas.height/10, gameCanvas.width, gameCanvas.height/10);
-	//gameContext.fillRect(0, 0, gameCanvas.width/10, gameCanvas.height);
-	//gameContext.fillRect(gameCanvas.width - gameCanvas.width/10, 0, gameCanvas.width/10, gameCanvas.height);
-	gameContext.closePath();
-	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
+	for (let i = 0; i < screenOffset/2; i ++) {
+		if (portrait) {
+			gameContext.fillRect(0, 0, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
+			gameContext.fillRect(0, width + (gameCanvas.height - width)/2 + i*tileWidth, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
+		} else {
+			gameContext.fillRect(0, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
+			gameContext.fillRect(height + (gameCanvas.width - height)/2 + i*tileWidth, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
+		}
+	}
+	gameContext.closePath();
+	gameContext.globalAlpha = 1;
 }
 

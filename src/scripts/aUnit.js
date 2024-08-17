@@ -12,7 +12,7 @@ class Unit extends Tile {
 		this._offsetX = offsetX;
 		this._offsetY = offsetY;
 		super.resize();
-		//this.draw();
+		return this.width;
 	}
 	
 	draw() {

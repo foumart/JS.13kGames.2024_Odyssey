@@ -12,22 +12,16 @@ const eventName = mobile ? "touchstart" : "click";
 const rollOver = mobile ? 0 : "mouseover";
 const rollOut = mobile ? 0 : "mouseout";
 function isTouchDevice() {
-	//return ("ontouchstart" in window && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 	return navigator.userAgent.search('Mobile') > 0;
 }
 
-// board zooming
-mainDiv.onwheel = onBoardZoom;
-
 // toggle fullscreen mode
 function toggleFullscreen(e) {
-	setTimeout(() => {
-		if (!document.fullscreenElement) {
-			document.documentElement.requestFullscreen();
-		} else if (document.exitFullscreen) {
-			document.exitFullscreen();
-		}
-	}, 99);
+	if (!document.fullscreenElement) {
+		document.documentElement.requestFullscreen();
+	} else if (document.exitFullscreen) {
+		document.exitFullscreen();
+	}
 }
 
 function onBoardZoom(event) {
@@ -59,13 +53,17 @@ let title, playButton, fullscreenButton, soundButton;
 
 
 // Example game initialization script:
-let resizeTimeout;
 function init() {
+	// resizing
 	window.addEventListener("resize", () => {
-		clearTimeout(resizeTimeout);
-		resizeTimeout = setTimeout(resizeUI, 17); // Adjust the delay as needed
+		resizeUI();
 	});
-	//document.addEventListener("keydown", onKeyDown);
+
+	// keyboard
+	document.addEventListener("keydown", onKeyDown);
+
+	// board zooming
+	mainDiv.onwheel = onBoardZoom;
 
 	createUI();
 	resizeUI(1);
@@ -118,26 +116,18 @@ function resizeUI(e) {
 		
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.height = height + "px";
 		gameContainer.style.left = "50%";
-		//gameCanvas.style.left = gameContainer.style.left = "50%";
 		offsetX = width - height;
 		offsetY = 0;
-		//gameCanvas.style.marginLeft = gameContainer.style.marginLeft = - height / 2 + "px";
-		//gameCanvas.style.marginTop = gameContainer.style.marginTop = gameCanvas.style.top = gameContainer.style.top = 0;
 		gameContainer.style.marginLeft = - height / 2 + "px";
 		gameContainer.style.marginTop = gameContainer.style.top = 0;
 	} else {
 		// Portrait
 		portrait = true;
-		//gameCanvas.width = width;
-		//gameCanvas.height = height;
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.width = width + "px";
 		gameContainer.style.top = "50%";
 
-		//gameCanvas.style.top = gameContainer.style.top = "50%";
 		offsetX = 0;
 		offsetY = height - width;
-		//gameCanvas.style.marginTop = gameContainer.style.marginTop = - width / 2 + "px";
-		//gameCanvas.style.marginLeft = gameContainer.style.marginLeft = gameCanvas.style.left = gameContainer.style.left = 0;
 		gameContainer.style.marginTop = - width / 2 + "px";
 		gameContainer.style.marginLeft = gameContainer.style.left = 0;
 	}
@@ -182,10 +172,6 @@ function switchState(event) {
 	resizeUI(1);
 }
 
-function act(x, y, z) {
-	console.log("act", x, y, z);
-}
-
 function getIcon(size) {
 	return `<img src=ico.svg height=${size * scale} width=${size * scale}>`;
 }
@@ -209,10 +195,10 @@ function createUI() {
 		// Create Play Button
 		playButton = generateUIButton(uiDiv, `Play`, switchState, "css_space");
 	} else {
-		upButton = generateUIButton(controls, '&#9650', e => act(0, -1), "css_controls");   // ^
-		leftButton = generateUIButton(controls, '&#9664', e => act(-1, 0), "css_controls"); // <
-		rightButton = generateUIButton(controls, '&#9654', e => act(1, 0), "css_controls"); // >
-		downButton = generateUIButton(controls, '&#9660', e => act(0, 1), "css_controls");  // v
+		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_controls");   // ^
+		leftButton = generateUIButton(controls, '&#9664', e => action(4), "css_controls"); // <
+		rightButton = generateUIButton(controls, '&#9654', e => action(2), "css_controls"); // >
+		downButton = generateUIButton(controls, '&#9660', e => action(3), "css_controls");  // v
 
 		upButton.style = "margin:2% auto 0";
 		leftButton.style = "float:left;margin:2%";

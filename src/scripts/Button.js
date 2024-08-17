@@ -19,7 +19,7 @@ class Button extends Tile {
 
 	draw() {
 		if (this.btn) {
-			this.btn.style = `width:${
+			this.btn.style = (_debug?'border:1px dashed black;box-sizing:content-box;':'')+`width:${
 				this.width
 			}px;height:${
 				this.height

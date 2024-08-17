@@ -9,22 +9,24 @@ class Tile extends GameElement {
 	}
 
 	getOffsetX() {
-		return portrait ? - offsetX/2 : offsetX/2 - this.width*screenOffset/2;//(gameCanvas.width - gameCanvas.width * boardScale * tween.transition) / 2;
+		return portrait ? - offsetX/2 : offsetX/2 - this.width*screenOffset/2;
 	}
 	
 	getOffsetY() {
-		return portrait ? offsetY/2 - this.height*screenOffset/2 : -offsetY/2;//(gameCanvas.height - gameCanvas.height * boardScale * tween.transition) / 2;
+		return portrait ? offsetY/2 - this.height*screenOffset/2 : -offsetY/2;
 	}
 
 	getX() {
-		return this.getOffsetX() + this.x * this.width;
+		return this.getOffsetX() + (this.x) * this.width / boardScale;
 	}
 
 	getY() {
-		return this.getOffsetY() + this.y * this.height;
+		return this.getOffsetY() + (this.y) * this.height / boardScale;// - this._offsetY
 	}
 
-	update(type) {
+	update(type, offsetX, offsetY) {
+		this._offsetX = offsetX;
+		this._offsetY = offsetY;
 		this.type = type;
 		this.resize();
 	}
