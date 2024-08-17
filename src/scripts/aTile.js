@@ -26,9 +26,10 @@ class Tile extends GameElement {
 		return this.getOffsetY() + this.y * this.height;
 	}
 
-	update(type, offsetX, offsetY) {
+	update(type, offsetX, offsetY, alpha) {
 		this._offsetX = offsetX;// used by units
 		this._offsetY = offsetY;
+		this._alpha = alpha;
 		this.type = type;
 		this.resize();
 	}
@@ -40,6 +41,7 @@ class Tile extends GameElement {
 
 	draw() {
 		gameContext.fillStyle = this.getColor();
+		gameContext.globalAlpha = (screenOffset - this._alpha) / screenOffset;
 		gameContext.beginPath();
 		gameContext.fillRect(
 			this.getX(),
@@ -48,6 +50,7 @@ class Tile extends GameElement {
 			this.height
 		);
 		gameContext.closePath();
+		gameContext.globalAlpha = 1;
 	}
 
 	getColor() {

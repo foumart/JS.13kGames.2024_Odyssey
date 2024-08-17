@@ -1,7 +1,7 @@
 const
 	screenWidth = 9,// must be odd number, so there will be a central tile where player will reside
-	screenSide = 4,// screenWidth / 2 | 0
-	screenOffset = 6,// how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
+	screenSide = 4,// must be even, screenWidth / 2 | 0
+	screenOffset = 8,// must be even, how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
 	tilt = 1,
 	jump = 3;// how many tiles to jump when wrapping from map sides
 
@@ -170,15 +170,17 @@ function action(direction) {
 
 function determineDirection(x, y) {
     let arr = [
-		[0, 1, 1, 1, 1, 1, 1, 1, 0],
-		[4, 0, 1, 1, 1, 1, 1, 0, 2],
-		[4, 4, 0, 1, 1, 1, 0, 2, 2],
-		[4, 4, 4, 0, 1, 0, 2, 2, 2],
-		[4, 4, 4, 4, 5, 2, 2, 2, 2],
-		[4, 4, 4, 0, 3, 0, 2, 2, 2],
-		[4, 4, 0, 3, 3, 3, 0, 2, 2],
-		[4, 0, 3, 3, 3, 3, 3, 0, 2],
-		[0, 3, 3, 3, 3, 3, 3, 3, 0]
+		[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+		[1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+		[4, 4, 0, 1, 1, 1, 1, 1, 2, 0, 2],
+		[4, 4, 4, 0, 1, 1, 1, 0, 2, 2, 2],
+		[4, 4, 4, 4, 0, 1, 0, 2, 2, 2, 2],
+		[4, 4, 4, 4, 4, 5, 2, 2, 2, 2, 2],
+		[4, 4, 4, 4, 0, 3, 0, 2, 2, 2, 2],
+		[4, 4, 4, 0, 3, 3, 3, 0, 2, 2, 2],
+		[4, 4, 0, 3, 3, 3, 3, 3, 0, 2, 2],
+		[4, 0, 3, 3, 3, 3, 3, 3, 3, 0, 2],
+		[0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
 	];
 
     return arr[y][x];
@@ -213,7 +215,7 @@ function drawBoard() {
 	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	let _x, _y,
-		_ox = portrait ? screenSide : screenSide + screenOffset/2;
+		_ox = portrait ? screenSide : screenSide + screenOffset/2,
 		_oy = !portrait ? screenSide : screenSide + screenOffset/2;
 
 	for(let y = 0; y < screenWidth + screenOffset; y++) {
@@ -228,7 +230,9 @@ function drawBoard() {
 							[_y - (!portrait?screenOffset/2:0)]
 							[_x - (portrait?screenOffset/2:0)],
 						playerX - _ox,
-						playerY - _oy
+						playerY - _oy,
+						(x < screenOffset/2 ? screenOffset/2 - x : x >= screenWidth + screenOffset/2 ? x - screenWidth + 1 - screenOffset/2 : 0) +
+						(y < screenOffset/2 ? screenOffset/2 - y : y >= screenWidth + screenOffset/2 ? y - screenWidth + 1 - screenOffset/2 : 0)
 					);
 				}
 			}
@@ -250,20 +254,27 @@ function drawBoard() {
 		}
 	}
 
-	gameContext.fillStyle = "#0078d7";
+	/*gameContext.fillStyle = "#0078d7";
 	gameContext.globalAlpha = 0.4;
 	gameContext.beginPath();
 
-	/*for (let i = 0; i < screenOffset/2; i ++) {
+	for (let i = 0; i < screenOffset/2; i ++) {
 		if (portrait) {
-			gameContext.fillRect(0, 0, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
-			gameContext.fillRect(0, width + (gameCanvas.height - width)/2 + i*tileWidth, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
+			gameContext.fillRect(0, 0, gameCanvas.width, (gameCanvas.height - width*boardScale*tween.transition) / 2 - i*tileWidth);
+			gameContext.fillRect(0, width*boardScale*tween.transition + (gameCanvas.height - width*boardScale*tween.transition)/2 + i*tileWidth, gameCanvas.width, (gameCanvas.height - width*boardScale*tween.transition) / 2 - i*tileWidth);
+			gameContext.fillRect(0, 0, (width - width*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.height);
+			gameContext.fillRect(
+				width - (width - width*boardScale*tween.transition) / 2 + i*tileWidth,
+				0,
+				(width - width*boardScale*tween.transition) / 2 + (screenOffset/2-i)*tileWidth,
+				gameCanvas.height
+			);
 		} else {
-			gameContext.fillRect(0, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
-			gameContext.fillRect(height + (gameCanvas.width - height)/2 + i*tileWidth, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
+			gameContext.fillRect(0, 0, (gameCanvas.width - height*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.width);
+			gameContext.fillRect(height*boardScale*tween.transition + (gameCanvas.width - height*boardScale*tween.transition)/2 + i*tileWidth, 0, (gameCanvas.width - height*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.width);
 		}
-	}*/
+	}
 	gameContext.closePath();
-	gameContext.globalAlpha = 1;
+	gameContext.globalAlpha = 1;*/
 }
 

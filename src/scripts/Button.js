@@ -23,9 +23,9 @@ class Button extends Tile {
 			}px;height:${
 				this.height
 			}px;top:${
-				this.getY()// + (this.height * screenWidth/2) - (this.height * screenWidth/2) * boardScale * tween.transition
+				this.getY()
 			}px;left:${
-				this.getX()// + (this.width * screenWidth/2) - (this.width * screenWidth/2) * boardScale * tween.transition
+				this.getX()
 			}px;${
 				this.type ? 'cursor:pointer;pointer-events:auto' : ''
 			}`;

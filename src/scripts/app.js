@@ -27,7 +27,7 @@ function toggleFullscreen(e) {
 function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 0.5) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 1 - screenOffset/16) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}
