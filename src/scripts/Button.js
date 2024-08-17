@@ -9,11 +9,11 @@ class Button extends Tile {
 	}
 
 	getOffsetX() {
-		return - ((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.transition)
+		return GameElement.prototype.getOffsetX.call(this);
 	}
 	
 	getOffsetY() {
-		return - ((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.transition)
+		return GameElement.prototype.getOffsetY.call(this);
 	}
 
 	draw() {
