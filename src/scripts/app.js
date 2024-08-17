@@ -32,7 +32,7 @@ function toggleFullscreen(e) {
 
 function onBoardZoom(event) {
 	if (state) {
-		if (event.deltaY < 0 && boardScale < 1) boardScale += 0.05;
+		if (event.deltaY < 0 && boardScale < 3) boardScale += 0.05;
 		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= 0.05;
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
@@ -59,11 +59,14 @@ let title, playButton, fullscreenButton, soundButton;
 
 
 // Example game initialization script:
+let resizeTimeout;
 function init() {
-	window.addEventListener("resize", resizeUI, false);
+	window.addEventListener("resize", () => {
+		clearTimeout(resizeTimeout);
+		resizeTimeout = setTimeout(resizeUI, 17); // Adjust the delay as needed
+	});
 	//document.addEventListener("keydown", onKeyDown);
 
-	setupUI();
 	createUI();
 	resizeUI(1);
 }
@@ -107,27 +110,36 @@ function resizeUI(e) {
 	// Set HTML positionings
 	mainDiv.style.width = uiDiv.style.width = width + 'px';
 	mainDiv.style.height = uiDiv.style.height = height + 'px';
-
+	gameCanvas.width = width;
+	gameCanvas.height = height;
 	if (width > height) {
 		// Landscape
 		portrait = false;
-		gameCanvas.width = gameCanvas.height = height;
+		
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.height = height + "px";
-
-		gameCanvas.style.left = gameContainer.style.left = "50%";
+		gameContainer.style.left = "50%";
+		//gameCanvas.style.left = gameContainer.style.left = "50%";
 		offsetX = width - height;
-		gameCanvas.style.marginLeft = gameContainer.style.marginLeft = - height / 2 + "px";
-		gameCanvas.style.marginTop = gameContainer.style.marginTop = gameCanvas.style.top = gameContainer.style.top = 0;
+		offsetY = 0;
+		//gameCanvas.style.marginLeft = gameContainer.style.marginLeft = - height / 2 + "px";
+		//gameCanvas.style.marginTop = gameContainer.style.marginTop = gameCanvas.style.top = gameContainer.style.top = 0;
+		gameContainer.style.marginLeft = - height / 2 + "px";
+		gameContainer.style.marginTop = gameContainer.style.top = 0;
 	} else {
 		// Portrait
 		portrait = true;
-		gameCanvas.width = gameCanvas.height = width;
+		//gameCanvas.width = width;
+		//gameCanvas.height = height;
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.width = width + "px";
+		gameContainer.style.top = "50%";
 
-		gameCanvas.style.top = gameContainer.style.top = "50%";
+		//gameCanvas.style.top = gameContainer.style.top = "50%";
+		offsetX = 0;
 		offsetY = height - width;
-		gameCanvas.style.marginTop = gameContainer.style.marginTop = - width / 2 + "px";
-		gameCanvas.style.marginLeft = gameContainer.style.marginLeft = gameCanvas.style.left = gameContainer.style.left = 0;
+		//gameCanvas.style.marginTop = gameContainer.style.marginTop = - width / 2 + "px";
+		//gameCanvas.style.marginLeft = gameContainer.style.marginLeft = gameCanvas.style.left = gameContainer.style.left = 0;
+		gameContainer.style.marginTop = - width / 2 + "px";
+		gameContainer.style.marginLeft = gameContainer.style.left = 0;
 	}
 
 	// Resize in-game UI elements
@@ -183,7 +195,7 @@ function createUI() {
 	uiDiv.style = "pointer-events:none";
 
 	if (!state) {
-		title = generateUIButton(uiDiv, `${getIcon(240)}`, switchState);
+		title = generateUIButton(uiDiv, `${getIcon(320)}`, switchState);
 	} else {
 		controls = document.createElement('div');
 		uiDiv.append(controls);

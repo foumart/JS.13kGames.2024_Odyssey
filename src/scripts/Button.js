@@ -8,6 +8,15 @@ class Button extends Tile {
 		gameContainer.append(this.btn);
 	}
 
+	// No offsets for the buttons because they occupy a squared space in the center
+	getOffsetX() {
+		return 0;
+	}
+
+	getOffsetY() {
+		return 0;
+	}
+
 	draw() {
 		if (this.btn) {
 			this.btn.style = `width:${

@@ -9,11 +9,11 @@ class Tile extends GameElement {
 	}
 
 	getOffsetX() {
-		return (gameCanvas.width - gameCanvas.width * boardScale * tween.transition) / 2;
+		return portrait ? - offsetX/2 : offsetX/2 - this.width*screenOffset/2;//(gameCanvas.width - gameCanvas.width * boardScale * tween.transition) / 2;
 	}
 	
 	getOffsetY() {
-		return (gameCanvas.height - gameCanvas.height * boardScale * tween.transition) / 2;
+		return portrait ? offsetY/2 - this.height*screenOffset/2 : -offsetY/2;//(gameCanvas.height - gameCanvas.height * boardScale * tween.transition) / 2;
 	}
 
 	getX() {
@@ -47,7 +47,7 @@ class Tile extends GameElement {
 	}
 
 	getColor() {
-		return ["#0033cc", "#009900", "#000099", "#999900", "#990099", "#009999", "#990000"][this.type];
+		return ["#0078d7", "#00cc00", "#000099", "#999900", "#990099", "#009999", "#990000"][this.type];
 	}
 
 }

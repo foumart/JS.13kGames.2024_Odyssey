@@ -19,8 +19,8 @@ class Unit extends Tile {
 		gameContext.beginPath();
 		gameContext.fillStyle = this.getColor();
 		gameContext.arc(
-			(this.x - this._offsetX + 0.5) * this.width / boardScale / tween.transition,
-			(this.y - this._offsetY + 0.5) * this.height / boardScale / tween.transition,
+			offsetX/2 + (this.x - this._offsetX + 0.5) * this.width / boardScale / tween.transition,
+			offsetY/2 + (this.y - this._offsetY + 0.5) * this.height / boardScale / tween.transition / tilt,
 			this.width/2,
 			0, 7
 		);

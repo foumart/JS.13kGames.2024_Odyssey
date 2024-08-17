@@ -1,6 +1,7 @@
 const
 	screenWidth = 9,
 	screenSide = 4,
+	screenOffset = 6,// how many outside tiles total
 	tilt = 1,
 	jump = 2;
 
@@ -23,7 +24,7 @@ let stageData,
 function initBoard() {
 	boardWidth = stageData.size;
 
-	boardScale = portrait ? width > 600 ? 0.9 : 1 : height > 900 ? 0.8 : height > 600 ? 0.9 : 1;
+	boardScale = 1;//portrait ? width > 600 ? 0.9 : 1 : height > 900 ? 0.8 : height > 600 ? 0.9 : 1;
 	tween.transition = 0.01;
 
 	mapData = [];
@@ -55,11 +56,11 @@ function initBoard() {
 	units = [];// list, units[getUnit(x, y)]
 
 	let fieldArr, tileType, unitType, button, btnArr;
-	for(y = 0; y < screenWidth; y++) {
+	for(y = 0; y < screenWidth+screenOffset; y++) {
 		fieldArr = [];
 		btnArr = [];
-		// itterating screen tiles - a 9x9 window inside the 50x50 map
-		for(x = 0; x < screenWidth; x++) {
+		// itterating screen tiles - a 9x9 (11x11) window inside the 50x50 map
+		for(x = 0; x < screenWidth+screenOffset; x++) {
 			// get the screen tiles actual position on the larger map
 			let _x = playerX - screenSide + x;
 			let _y = playerY - screenSide + y;
@@ -135,7 +136,7 @@ function clickButton(event) {
 				player.y --;
 				if (playerY < jump) {
 					playerY = boardWidth-1;
-					player.y += boardWidth-jump;//screenSide * 2 + 1;
+					player.y += boardWidth-jump;
 				}
 				player.resize(playerX - screenSide, playerY - screenSide);
 				break;
@@ -144,7 +145,7 @@ function clickButton(event) {
 				player.x ++;
 				if (playerX > boardWidth-1) {
 					playerX = jump;
-					player.x -= boardWidth-jump;// - screenSide * 2 + 1;
+					player.x -= boardWidth-jump;
 				}
 				player.resize(playerX - screenSide, playerY - screenSide);
 				break;
@@ -153,7 +154,7 @@ function clickButton(event) {
 				player.y ++;
 				if (playerY > boardWidth-1) {
 					playerY = jump;
-					player.y -= boardWidth-jump;// - screenSide * 2 + 1;
+					player.y -= boardWidth-jump;
 				}
 				player.resize(playerX - screenSide, playerY - screenSide);
 				break;
@@ -162,7 +163,7 @@ function clickButton(event) {
 				player.x --;
 				if (playerX < jump) {
 					playerX = boardWidth-1;
-					player.x += boardWidth-jump;// - screenSide * 2 + 1;
+					player.x += boardWidth-jump;
 				}
 				player.resize(playerX - screenSide, playerY - screenSide);
 				break;
@@ -217,17 +218,17 @@ function getUnit(x, y) {
 
 // Draw the board
 function drawBoard() {
-
-	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-	let __x, y;
-	for(let y = 0; y < screenWidth; y++) {
-		for(let x = 0; x < screenWidth; x++) {
+	//gameContext.fillStyle = "#0078d7";
+	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+	let _x, _y;
+	for(let y = 0; y < screenWidth + screenOffset; y++) {
+		for(let x = 0; x < screenWidth + screenOffset; x++) {
 			// Update base tiles
 			if (tileField[y]) {
 				if (tileField[y][x]) {
-					_x = x + playerX - screenSide;
-					_y = y + playerY - screenSide;
+					_x = x + playerX - (portrait ? screenSide : screenSide + screenOffset/2);
+					_y = y + playerY - (portrait ? screenSide + screenOffset/2 : screenSide);
 					if (mapData[_y]) {
 						if (mapData[_y].length > _x) {
 							tileField[y][x].update(mapData[_y][_x]);
@@ -250,5 +251,15 @@ function drawBoard() {
 			screenButtons[_y][_x].resize();
 		}
 	}
+
+	gameContext.fillStyle = "#00ff00";
+	gameContext.beginPath();
+	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height/10);
+	//gameContext.fillRect(0, gameCanvas.height - gameCanvas.height/10, gameCanvas.width, gameCanvas.height/10);
+	//gameContext.fillRect(0, 0, gameCanvas.width/10, gameCanvas.height);
+	//gameContext.fillRect(gameCanvas.width - gameCanvas.width/10, 0, gameCanvas.width/10, gameCanvas.height);
+	gameContext.closePath();
+	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
 }
 
