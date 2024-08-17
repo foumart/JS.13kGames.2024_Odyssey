@@ -8,13 +8,12 @@ class Button extends Tile {
 		gameContainer.append(this.btn);
 	}
 
-	// No offsets for the buttons because they occupy a squared space in the center
 	getOffsetX() {
-		return 0;
+		return - ((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.transition)
 	}
-
+	
 	getOffsetY() {
-		return 0;
+		return - ((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.transition)
 	}
 
 	draw() {
@@ -24,9 +23,9 @@ class Button extends Tile {
 			}px;height:${
 				this.height
 			}px;top:${
-				this.getY()
+				this.getY()// + (this.height * screenWidth/2) - (this.height * screenWidth/2) * boardScale * tween.transition
 			}px;left:${
-				this.getX()
+				this.getX()// + (this.width * screenWidth/2) - (this.width * screenWidth/2) * boardScale * tween.transition
 			}px;${
 				this.type ? 'cursor:pointer;pointer-events:auto' : ''
 			}`;

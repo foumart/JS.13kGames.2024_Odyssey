@@ -9,4 +9,5 @@ class GameElement {
 		this.width = this.elementSize * boardScale * tween.transition;
 		this.height = this.elementSize * boardScale * tilt * tween.transition;
 	}
+
 }

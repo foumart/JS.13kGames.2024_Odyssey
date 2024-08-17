@@ -26,8 +26,8 @@ function toggleFullscreen(e) {
 
 function onBoardZoom(event) {
 	if (state) {
-		if (event.deltaY < 0 && boardScale < 3) boardScale += 0.05;
-		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= 0.05;
+		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 0.5) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}
@@ -155,8 +155,8 @@ function resizeUI(e) {
 	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:1rem;margin-right:3px`);
 	// Play and Settings buttons
 	if (playButton) {
-		updateStyleUI(playButton, `position:absolute;top:65%;left:50%;transform:translateX(-50%);width:50%;border-radius:1rem`);
-		updateStyleUI(title, `position:absolute;top:25%;left:50%;transform:translateX(-50%)`);
+		updateStyleUI(playButton, `position:absolute;top:75%;left:50%;transform:translateX(-50%);width:50%;border-radius:1rem`);
+		updateStyleUI(title, `position:absolute;top:15%;left:50%;transform:translateX(-50%) scale(${width<600?1:(width<height?width:height)/600})`);
 	}
 }
 
@@ -173,7 +173,7 @@ function switchState(event) {
 }
 
 function getIcon(size) {
-	return `<img src=ico.svg height=${size * scale} width=${size * scale}>`;
+	return `<img src=ico.svg height=${size} width=${size}>`;
 }
 
 function createUI() {
@@ -181,7 +181,7 @@ function createUI() {
 	uiDiv.style = "pointer-events:none";
 
 	if (!state) {
-		title = generateUIButton(uiDiv, `${getIcon(320)}`, switchState);
+		title = generateUIButton(uiDiv, `${getIcon(220)}`, switchState);
 	} else {
 		controls = document.createElement('div');
 		uiDiv.append(controls);

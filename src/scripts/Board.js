@@ -1,9 +1,9 @@
 const
-	screenWidth = 9,
-	screenSide = 4,
-	screenOffset = 8,// how many outside tiles total to draw on both sides on the mobile screen
+	screenWidth = 9,// must be odd number, so there will be a central tile where player will reside
+	screenSide = 4,// screenWidth / 2 | 0
+	screenOffset = 6,// how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
 	tilt = 1,
-	jump = 2;
+	jump = 3;// how many tiles to jump when wrapping from map sides
 
 // board vars
 let stageData,
@@ -59,7 +59,7 @@ function initBoard() {
 	for(y = 0; y < screenWidth+screenOffset; y++) {
 		fieldArr = [];
 		btnArr = [];
-		// itterating screen tiles - a 9x9 (11x11) window inside the 50x50 map
+		// itterating screen tiles - a 9x9 (+screenOffset) window inside the 50x50 map
 		for(x = 0; x < screenWidth+screenOffset; x++) {
 			// get the screen tiles actual position on the larger map
 			let _x = playerX - screenSide + x;
@@ -212,19 +212,24 @@ function drawBoard() {
 	//gameContext.fillStyle = "#0078d7";
 	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-	let _x, _y;
+	let _x, _y,
+		_ox = portrait ? screenSide : screenSide + screenOffset/2;
+		_oy = !portrait ? screenSide : screenSide + screenOffset/2;
+
 	for(let y = 0; y < screenWidth + screenOffset; y++) {
 		for(let x = 0; x < screenWidth + screenOffset; x++) {
 			// Update base tiles
-			if (tileField[y]) {
-				if (tileField[y][x]) {
-					_x = x + playerX - (portrait ? screenSide : screenSide + screenOffset/2);
-					_y = y + playerY - (portrait ? screenSide + screenOffset/2 : screenSide);
-					if (mapData[_y]) {
-						if (mapData[_y].length > _x) {
-							tileField[y][x].update(mapData[_y][_x], playerX - screenSide, playerY - screenSide);
-						}
-					}
+			_x = x + playerX - _ox;
+			_y = y + playerY - _oy;
+			if (mapData[_y]) {
+				if (mapData[_y].length > _x) {
+					tileField[y][x].update(
+						mapData
+							[_y - (!portrait?screenOffset/2:0)]
+							[_x - (portrait?screenOffset/2:0)],
+						playerX - _ox,
+						playerY - _oy
+					);
 				}
 			}
 			
@@ -237,9 +242,11 @@ function drawBoard() {
 
 	let tileWidth = player.resize(playerX - screenSide, playerY - screenSide);
 
-	if (screenButtons) for (_y = 0; _y < screenButtons.length; _y ++) {
-		for (_x = 0; _x < screenButtons[_y].length; _x ++) {
-			screenButtons[_y][_x].resize();
+	if (screenButtons) {
+		for (_y = 0; _y < screenButtons.length; _y ++) {
+			for (_x = 0; _x < screenButtons[_y].length; _x ++) {
+				screenButtons[_y][_x].update(1, playerX - _ox, playerY - _oy);
+			}
 		}
 	}
 
@@ -247,7 +254,7 @@ function drawBoard() {
 	gameContext.globalAlpha = 0.4;
 	gameContext.beginPath();
 
-	for (let i = 0; i < screenOffset/2; i ++) {
+	/*for (let i = 0; i < screenOffset/2; i ++) {
 		if (portrait) {
 			gameContext.fillRect(0, 0, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
 			gameContext.fillRect(0, width + (gameCanvas.height - width)/2 + i*tileWidth, gameCanvas.width, (gameCanvas.height - width) / 2 - i*tileWidth);
@@ -255,7 +262,7 @@ function drawBoard() {
 			gameContext.fillRect(0, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
 			gameContext.fillRect(height + (gameCanvas.width - height)/2 + i*tileWidth, 0, (gameCanvas.width - height) / 2 - i*tileWidth, gameCanvas.width);
 		}
-	}
+	}*/
 	gameContext.closePath();
 	gameContext.globalAlpha = 1;
 }
