@@ -1,7 +1,7 @@
 const
 	screenWidth = 9,// must be odd number, so there will be a central tile where player will reside
 	screenSide = 4,// must be even, screenWidth / 2 | 0
-	screenOffset = 8,// must be even, how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
+	screenOut = 8,// must be even, how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
 	tilt = 1,
 	jump = 3;// how many tiles to jump when wrapping from map sides
 
@@ -9,39 +9,47 @@ const
 let stageData,
 	boardWidth,
 	boardScale,
-	units,
-	tileField,
+	unitsList,
+	tileScreen,
+	unitScreen,
+	buttonScreen,
 	mapData,
+	idsData,
 	unitsData,
 	currentButtonX,
 	currentButtonY,
-	player,
+	oddDirectionalArray,
+	touchX, touchY, touchZ;
+let boardPlayer,
 	playerX,
-	playerY,
-	screenButtons,
-	touchX, touchY, touchZ;//
+	playerY;
 
 
 function initBoard() {
-	boardWidth = stageData.size;
+	boardWidth = stageData.size;//defined in Game.js getStageData
 
 	boardScale = 1;
 	tween.transition = 0.01;
 
 	oddDirectionalArray = generateOddArray();
 
-	mapData = [];
-	unitsData = [];
-	idsData = [];
+	let x, y, renderedScreenSize = screenWidth + screenOut;
 
-	let x, y;
+	mapData = stageData.map;// 2d array of 0 (empty) and 1 (occupied)
+	idsData = stageData.ids;// 2d array of 0 (water) 1-13 (isle ids)
+	unitsData = islandGenerator.initArray();// 2d array of 0 (empty) - 1,2,3.. (unit ids)
+	unitsList = [];
 
-	mapData = stageData.map;
-	idsData = stageData.ids;
-	//unitsData = stageData.data;
+	playerX = stageData.x;
+	playerY = stageData.y;
 
-	for(let y = 0; y < boardWidth; y++) {
-		for(let x = 0; x < boardWidth; x++) {
+	boardPlayer = createPlayer(x, y, 1)
+	unitsList.push(boardPlayer);
+	unitsData[playerY][playerX] = 1;
+
+	// combine data and relief into tile ids and create some random units
+	for(y = 0; y < boardWidth; y++) {
+		for(x = 0; x < boardWidth; x++) {
 			// Update base tiles
 			if (mapData[y][x] == 1) {
 				if (stageData.data[y][x] > 1) {
@@ -50,54 +58,51 @@ function initBoard() {
 			} else if (stageData.data[y][x]) {
 				mapData[y][x] = 7 + stageData.data[y][x];
 			}
-			/*if (units[getUnit(x, y)]) {
-			}*/
+
+			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
+				unitsList.push(createUnit(x, y, 3));
+				unitsData[y][x] = 3;
+			}
 		}
 	}
 
-	playerX = stageData.x;
-	playerY = stageData.y;
-
-	console.log(mapData);
-	console.log(unitsData);
-	createPlayer(playerX, playerY);
+	//console.log(mapData);
+	//console.log(unitsData);
+	//console.log(unitsList);
+	// data initialization completed
 
 	gameContainer.innerHTML = "";
 
-	tileField = [];// 2d array
-	screenButtons = [];// 2d array
-	units = [];// list, units[getUnit(x, y)]
+	// now preparing to render only what is visible inside the game window
+	tileScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
+	unitScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
+	buttonScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
 
-	let fieldArr, tileType, unitType, button, btnArr;
-	for(y = 0; y < screenWidth+screenOffset; y++) {
-		fieldArr = [];
+	let tileArr, unitArr, btnArr, tileType, unitType, button;
+	for(y = 0; y < renderedScreenSize; y++) {
+		tileArr = [];
 		btnArr = [];
-		// itterating screen tiles - a 9x9 (+screenOffset) window inside the 50x50 map
-		for(x = 0; x < screenWidth+screenOffset; x++) {
+		unitArr = [];
+		// itterating screen tiles - a 9x9 (screenWidth+screenOut) window inside the 40x40 (boardWidth) map
+		for(x = 0; x < renderedScreenSize; x++) {
 			// get the screen tiles actual position on the larger map
 			let _x = playerX - screenSide + x;
 			let _y = playerY - screenSide + y;
 			tileType = mapData[_y][_x];
-			fieldArr.push(new Tile(x, y, tileType));
+			tileArr.push(new BoardTile(x, y, tileType));
+			unitType = unitsData[_y][_x];
+			unitArr.push(new BoardUnit(x, y, unitType));
 
 			if (state && x < screenWidth && y < screenWidth) {
-				button = new Button(x, y, determineDirection(x, y));
+				button = new BoardButton(x, y, determineDirection(x, y));
 				addButtonListeners(button.btn);
 				btnArr.push(button);
 			}
 		}
-		screenButtons.push(btnArr);
-		tileField.push(fieldArr);
+		buttonScreen.push(btnArr);
+		tileScreen.push(tileArr);
+		unitScreen.push(unitArr);
 	}
-
-	/*for(y = 0; y < boardWidth; y++) {
-		for(x = 0; x < boardWidth; x++) {
-			unitType = unitsData[y][x];
-			if (unitType > 0) {
-				units.push(new Unit(x, y, unitType));
-			}
-		}
-	}*/
 }
 
 function addButtonListeners(button) {
@@ -141,8 +146,8 @@ function clickButton(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
 	// is it a swipe or click ?
-	currentButtonX = Math.round((target.clientX - currentButtonX) / player.width);
-	currentButtonY = Math.round((target.clientY - currentButtonY) / player.width);
+	currentButtonX = Math.round((target.clientX - currentButtonX) / boardPlayer.width);
+	currentButtonY = Math.round((target.clientY - currentButtonY) / boardPlayer.width);
 	if (currentButtonX || currentButtonY) {
 		//console.log("swipe: "+currentButtonX+"x"+currentButtonY);
 		if (state == 1) {
@@ -169,53 +174,6 @@ function clickButton(event) {
 			let direction = determineDirection(currentButtonX, currentButtonY);
 			action(direction);
 		}
-	}
-}
-
-function action(direction) {
-	switch (direction) {
-		case 1: // Up
-			playerY --;
-			player.y --;
-			if (playerY < jump) {
-				playerY = boardWidth-1;
-				player.y += boardWidth-jump;
-			}
-			player.resize(playerX - screenSide, playerY - screenSide);
-			break;
-		case 2: // Right
-			playerX ++;
-			player.x ++;
-			if (playerX > boardWidth-1) {
-				playerX = jump;
-				player.x -= boardWidth-jump;
-			}
-			player.resize(playerX - screenSide, playerY - screenSide);
-			break;
-		case 3: // Down
-			playerY ++;
-			player.y ++;
-			if (playerY > boardWidth-1) {
-				playerY = jump;
-				player.y -= boardWidth-jump;
-			}
-			player.resize(playerX - screenSide, playerY - screenSide);
-			break;
-		case 4: // Left
-			playerX --;
-			player.x --;
-			if (playerX < jump) {
-				playerX = boardWidth-1;
-				player.x += boardWidth-jump;
-			}
-			player.resize(playerX - screenSide, playerY - screenSide);
-			break;
-		case 5: // Center
-			console.log("Ship");
-			break;
-		default: // Corners
-
-			break;
 	}
 }
 
@@ -248,21 +206,71 @@ function generateOddArray() {
 	return array;
 }
 
-function createPlayer(x, y) {
-	player = new Player(x, y);
+// Draw the board
+function drawBoard() {
+	gameContext.fillStyle = "#0078d7";
+	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+	let _x, _y, _z,
+		_ox = portrait ? screenSide : screenSide + screenOut/2,
+		_oy = !portrait ? screenSide : screenSide + screenOut/2;
+
+	for(let y = 0; y < screenWidth + screenOut; y++) {
+		for(let x = 0; x < screenWidth + screenOut; x++) {
+			// Update base tiles
+			if (tileScreen[y]) {
+				if (tileScreen[y][x]) {
+					_x = x + playerX - _ox - (portrait?screenOut/2:0);
+					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
+					_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
+					tileScreen[y][x].update(
+						_z,
+						(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
+						(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
+					)
+					//if (unitScreen[y][x]) unitScreen[y][x].update();
+				}
+			}
+		}
+	}
+
+	for(let y = 0; y < screenWidth + screenOut; y++) {
+		for(let x = 0; x < screenWidth + screenOut; x++) {
+			if (unitScreen[y]) {
+				if (unitScreen[y][x]) {
+					_x = x + playerX - _ox - (portrait?screenOut/2:0);
+					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
+					_z = unitsData[_y] && unitsData[_y].length > _x ? unitsData[_y][_x] : 0;
+					unitScreen[y][x].update(
+						_z,
+						(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
+						(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
+					)
+				}
+			}
+		}
+	}
+
+	if (buttonScreen) {
+		for (_y = 0; _y < buttonScreen.length; _y ++) {
+			for (_x = 0; _x < buttonScreen[_y].length; _x ++) {
+				buttonScreen[_y][_x].update(1, playerX - _ox, playerY - _oy);
+			}
+		}
+	}
 }
 
-/*function isPassable(x, y) {
-	return mapData[y][x] < 2 && unitsData[y][x] < 3;
+function isPassable(x, y) {
+	if (player.onFoot) {
+		return unitsData[y][x] < 2 && mapData[y][x]
+	}
+	return unitsData[y][x] < 2 && !mapData[y][x]
 }
 
-function isMoveable(x, y) {
-	return mapData[y][x] < 2 && unitsData[y][x] < 1;
-}*/
 
 function getUnit(x, y) {
 	let id = -1;
-	units.forEach((unit, index) => {
+	unitsList.forEach((unit, index) => {
 		if (unit.x == x && unit.y == y) {
 			id = index;
 		}
@@ -270,49 +278,3 @@ function getUnit(x, y) {
 
 	return id;
 }
-
-// Draw the board
-function drawBoard() {
-	gameContext.fillStyle = "#0078d7";
-	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-	let _x, _y, _z,
-		_ox = portrait ? screenSide : screenSide + screenOffset/2,
-		_oy = !portrait ? screenSide : screenSide + screenOffset/2;
-
-	for(let y = 0; y < screenWidth + screenOffset; y++) {
-		for(let x = 0; x < screenWidth + screenOffset; x++) {
-			// Update base tiles
-			if (tileField[y]) {
-				if (tileField[y][x]) {
-					_x = x + playerX - _ox - (portrait?screenOffset/2:0);
-					_y = y + playerY - _oy - (!portrait?screenOffset/2:0);
-					_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
-					tileField[y][x].update(
-						_z,
-						playerX - _ox,
-						playerY - _oy,
-						(x < screenOffset/2 ? screenOffset/2 - x : x >= screenWidth + screenOffset/2 ? x - screenWidth + 1 - screenOffset/2 : 0) +
-						(y < screenOffset/2 ? screenOffset/2 - y : y >= screenWidth + screenOffset/2 ? y - screenWidth + 1 - screenOffset/2 : 0)
-					)
-				}
-			}
-
-			/*let unit = units[getUnit(x + playerX - screenSide, y + playerY - screenSide)];
-			if (unit) {
-				unit.resize(playerX - screenSide, playerY - screenSide);
-			}*/
-		}
-	}
-
-	let tileWidth = player.resize(playerX - screenSide, playerY - screenSide);
-
-	if (screenButtons) {
-		for (_y = 0; _y < screenButtons.length; _y ++) {
-			for (_x = 0; _x < screenButtons[_y].length; _x ++) {
-				screenButtons[_y][_x].update(1, playerX - _ox, playerY - _oy);
-			}
-		}
-	}
-}
-

@@ -1,30 +1,40 @@
-class Unit extends Tile {
+class BoardUnit extends BoardTile {
 
 	constructor(x, y, type) {
 		super(x, y, type);
 	}
 
-	getColor() {
-		return ["#000000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#ff00ff", "#ffff00"][this.type];
+	getX() {
+		return this.width/2 + super.getX();
 	}
 
-	resize(offsetX, offsetY) {
-		this._offsetX = offsetX;
-		this._offsetY = offsetY;
-		super.resize();
-		return this.width;
+	getY() {
+		return this.width/2 + super.getY();
 	}
 	
 	draw() {
-		gameContext.beginPath();
-		gameContext.fillStyle = this.getColor();
-		gameContext.arc(
-			offsetX/2 + (this.x - this._offsetX + 0.5) * this.width / boardScale / tween.transition,
-			offsetY/2 + (this.y - this._offsetY + 0.5) * this.height / boardScale / tween.transition / tilt,
-			this.width/2,
-			0, 7
-		);
-		gameContext.fill();
-		gameContext.closePath();
+		if (this.type) {
+			gameContext.beginPath();
+			gameContext.fillStyle = this.getColor();
+			gameContext.arc(
+				this.getX(),
+				this.getY(),
+				this.width/2,
+				0, 7
+			);
+			gameContext.fill();
+			gameContext.closePath();
+			gameContext.fillStyle = "#000000";
+			gameContext.font = `${20 * boardScale * tween.transition}px Arial`;
+			gameContext.fillText(
+				this.type,
+				this.getX(),
+				this.getY()+5
+			);
+		}
+	}
+
+	getColor() {
+		return ["#00cc00", "#ff3300", "#ff6600", "#ff9900", "#ffff00", "#ff00ff", "#ff00ff", "#ff00ff"][this.type];
 	}
 }

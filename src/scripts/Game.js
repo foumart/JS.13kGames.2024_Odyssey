@@ -1,51 +1,79 @@
-// game vars
-let gameLoop, step, islandGenerator;
+let unit, player;
 
-async function gameInit(_stage) {
-	stage = _stage;
-	step = 0;
-	
-	let data = await getStageData(stage);
-	//console.log(data);
-	stageData = {
-		size: data[0][0], x: data[0][2], y: data[0][3],
-		map: data[0][6],// visited
-		data: data[0][5],// relief
-		ids: data[0][4]// isle ids
+function createUnit(x, y) {
+	unit = new Unit(x, y);
+	return unit;
+}
+
+function createPlayer(x, y) {
+	player = new Player(x, y);
+	return player;
+}
+
+function action(direction) {
+	switch (direction) {
+		case 1: // Up
+			// check collision
+			if (isPassable(playerX, playerY-1)) {
+				unitsData[playerY][playerX] = 0;
+				playerY --;
+				player.y --;
+				if (playerY < jump) {
+					playerY = boardWidth-1;
+					boardPlayer.y += boardWidth-jump;
+				}
+				unitsData[playerY][playerX] = 1;
+				//player.resize();
+			}
+			
+			break;
+		case 2: // Right
+			// check collision
+			if (isPassable(playerX+1, playerY)) {
+				unitsData[playerY][playerX] = 0;
+				playerX ++;
+				boardPlayer.x ++;
+				if (playerX > boardWidth-1) {
+					playerX = jump;
+					boardPlayer.x -= boardWidth-jump;
+				}
+				unitsData[playerY][playerX] = 1;
+				//player.resize();
+			}
+			break;
+		case 3: // Down
+			// check collision
+			if (isPassable(playerX, playerY+1)) {
+				unitsData[playerY][playerX] = 0;
+				playerY ++;
+				boardPlayer.y ++;
+				if (playerY > boardWidth-1) {
+					playerY = jump;
+					boardPlayer.y -= boardWidth-jump;
+				}
+				unitsData[playerY][playerX] = 1;
+				//player.resize();
+			}
+			break;
+		case 4: // Left
+			// check collision
+			if (isPassable(playerX-1, playerY)) {
+				unitsData[playerY][playerX] = 0;
+				playerX --;
+				boardPlayer.x --;
+				if (playerX < jump) {
+					playerX = boardWidth-1;
+					boardPlayer.x += boardWidth-jump;
+				}
+				unitsData[playerY][playerX] = 1;
+				//player.resize();
+			}
+			break;
+		case 5: // Center
+			console.log("Ship");
+			break;
+		default: // Corners
+
+			break;
 	}
-	
-	initBoard();
-	gameStart();
-}
-
-function gameStart() {
-	gameStop();
-	gameLoop = setInterval(e => {
-		// gameplay
-		step ++;
-		if (step == 1) {
-			TweenFX.to(tween, 60, {transition: 1}, e => {
-				// level zoomed in
-			});
-		}
-		drawBoard();
-		// level has actually ended
-		if (state > 1) {
-			gameStop();
-			console.log("stage complete");
-		}
-	}, 17);
-}
-
-function gameStop() {
-	clearInterval(gameLoop);
-}
-
-function getStageData(id) {
-	return new Promise((resolve, reject) => {
-		islandGenerator = new IslandGenerator(this, 40, 40, {
-			type: 1,
-			offset: 10
-		}, resolve)
-	});
 }

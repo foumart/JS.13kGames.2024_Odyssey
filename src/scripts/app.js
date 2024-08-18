@@ -30,7 +30,7 @@ function toggleFullscreen(e) {
 function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 1 - screenOffset/16) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 1 - screenOut/16) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}
@@ -41,8 +41,8 @@ let width;
 let height;
 let scale;
 let portrait;// orientation
-let offsetX = 0;
-let offsetY = 0;
+let screenOffsetX = 0;
+let screenOffsetY = 0;
 
 // game state, 0: menu, 1: in-game
 let state = 0;
@@ -116,11 +116,10 @@ function resizeUI(e) {
 	if (width > height) {
 		// Landscape
 		portrait = false;
-		
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.height = height + "px";
 		gameContainer.style.left = "50%";
-		offsetX = width - height;
-		offsetY = 0;
+		screenOffsetX = (width - height)/2;
+		screenOffsetY = 0;
 		gameContainer.style.marginLeft = - height / 2 + "px";
 		gameContainer.style.marginTop = gameContainer.style.top = 0;
 	} else {
@@ -128,9 +127,8 @@ function resizeUI(e) {
 		portrait = true;
 		gameContainer.style.width = gameContainer.style.height = uiDiv.style.width = width + "px";
 		gameContainer.style.top = "50%";
-
-		offsetX = 0;
-		offsetY = height - width;
+		screenOffsetX = 0;
+		screenOffsetY = (height - width)/2;
 		gameContainer.style.marginTop = - width / 2 + "px";
 		gameContainer.style.marginLeft = gameContainer.style.left = 0;
 	}
@@ -149,8 +147,6 @@ function resizeUI(e) {
 	gameContext.strokeStyle = 'black';
     gameContext.lineWidth = 12 * getScale();
 	gameContext.lineJoin = 'round';
-
-	//if (game) drawBoard();
 
 	// Fullscreen button
 	updateStyleUI(fullscreenButton, `float:right`);

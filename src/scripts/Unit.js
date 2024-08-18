@@ -1,9 +1,7 @@
-class Player {
+class Unit {
 	
 	constructor(x, y, type) {
 		//super(x, y);
-		this.ship = {};
-		this.onFoot = true;
 	}
 
 	/*draw() {

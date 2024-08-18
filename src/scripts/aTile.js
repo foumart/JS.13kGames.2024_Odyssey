@@ -1,4 +1,4 @@
-class Tile extends GameElement {
+class BoardTile extends GameElement {
 	
 	constructor(x, y, type) {
 		super();
@@ -9,12 +9,12 @@ class Tile extends GameElement {
 	}
 
 	getOffsetX() {
-		return (portrait ? - offsetX/2 : offsetX/2) - this.width*screenOffset/2 -
+		return (portrait ? - screenOffsetX : screenOffsetX) - this.width*screenOut/2 -
 			((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.transition);
 	}
 	
 	getOffsetY() {
-		return (portrait ? offsetY/2 : -offsetY/2) - this.height*screenOffset/2 -
+		return (portrait ? screenOffsetY : -screenOffsetY) - this.height*screenOut/2 -
 			((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.transition);
 	}
 
@@ -26,11 +26,9 @@ class Tile extends GameElement {
 		return this.getOffsetY() + this.y * this.height;
 	}
 
-	update(type, offsetX, offsetY, alpha) {
-		this._offsetX = offsetX;// used by units
-		this._offsetY = offsetY;
-		this._alpha = alpha;
+	update(type, alpha) {
 		this.type = type;
+		this._alpha = alpha;
 		this.resize();
 	}
 
@@ -41,7 +39,7 @@ class Tile extends GameElement {
 
 	draw() {
 		gameContext.fillStyle = this.getColor();
-		gameContext.globalAlpha = (screenOffset - this._alpha) / screenOffset;
+		gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
 		gameContext.beginPath();
 		gameContext.fillRect(
 			this.getX(),

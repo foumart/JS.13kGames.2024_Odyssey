@@ -1,4 +1,4 @@
-class Button extends Tile {
+class BoardButton extends BoardTile {
 	
 	constructor(x, y, type) {
 		super(x, y, type);
