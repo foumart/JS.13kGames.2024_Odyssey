@@ -54,7 +54,11 @@ class Tile extends GameElement {
 	}
 
 	getColor() {
-		return ["#0078d7", "#00cc00", "#000099", "#999900", "#990099", "#009999", "#990000"][this.type];
+		return [
+			"#0078d7", "#00cc00", "#00ff00",
+			"#999900", "#66cc33", "#ccffcc", "#ddffdd", "#ffffff",
+			"#0088ee", "#00aaee", "#00bbff", "#00ddff", "#00ffff"
+		][this.type];
 	}
 
 }

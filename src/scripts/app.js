@@ -8,7 +8,10 @@ const gameContext = gameCanvas.getContext("2d");
 
 // global vars
 const mobile = isTouchDevice();
-const eventName = mobile ? "touchstart" : "click";
+const interactionDown = mobile ? "touchstart" : "mousedown";
+const interactionUp = mobile ? "touchend" : "mouseup";
+const interactionMove = mobile ? "touchmove" : "mousemove";
+const interactionTap = mobile ? "touchstart" : "click";
 const rollOver = mobile ? 0 : "mouseover";
 const rollOut = mobile ? 0 : "mouseout";
 function isTouchDevice() {
@@ -212,7 +215,7 @@ function createUI() {
 function generateUIButton(div, code, handler, className) {
 	const button = document.createElement('div');
 	button.innerHTML = code;
-	button.addEventListener(eventName, handler.bind(this));
+	button.addEventListener(interactionTap, handler.bind(this));
 	button.className = "css_button css_icon " + className;
 	
 	div.append(button);

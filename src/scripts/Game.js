@@ -6,11 +6,12 @@ async function gameInit(_stage) {
 	step = 0;
 	
 	let data = await getStageData(stage);
-	console.log(data);
+	//console.log(data);
 	stageData = {
 		size: data[0][0], x: data[0][2], y: data[0][3],
-		map: data[0][6],
-		data: data[0][5]
+		map: data[0][6],// visited
+		data: data[0][5],// relief
+		ids: data[0][4]// isle ids
 	}
 	
 	initBoard();
@@ -44,7 +45,7 @@ function getStageData(id) {
 	return new Promise((resolve, reject) => {
 		islandGenerator = new IslandGenerator(this, 40, 40, {
 			type: 1,
-			offset: 8
+			offset: 10
 		}, resolve)
 	});
 }

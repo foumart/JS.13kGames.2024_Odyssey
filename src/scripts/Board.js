@@ -18,30 +18,43 @@ let stageData,
 	player,
 	playerX,
 	playerY,
-	screenButtons;
+	screenButtons,
+	touchX, touchY, touchZ;//
 
 
 function initBoard() {
 	boardWidth = stageData.size;
 
-	boardScale = 1;//portrait ? width > 600 ? 0.9 : 1 : height > 900 ? 0.8 : height > 600 ? 0.9 : 1;
+	boardScale = 1;
 	tween.transition = 0.01;
+
+	oddDirectionalArray = generateOddArray();
 
 	mapData = [];
 	unitsData = [];
+	idsData = [];
 
 	let x, y;
 
-	/*for (y = 0; y < boardWidth; y++) {
-		mapData.push([]);
-		unitsData.push([]);
-		for (x = 0; x < boardWidth; x++) {
-			mapData[y].push(0);
-			unitsData[y].push(0);
-		}
-	}*/
 	mapData = stageData.map;
-	unitsData = stageData.data;
+	idsData = stageData.ids;
+	//unitsData = stageData.data;
+
+	for(let y = 0; y < boardWidth; y++) {
+		for(let x = 0; x < boardWidth; x++) {
+			// Update base tiles
+			if (mapData[y][x] == 1) {
+				if (stageData.data[y][x] > 1) {
+					mapData[y][x] = stageData.data[y][x];
+				}
+			} else if (stageData.data[y][x]) {
+				mapData[y][x] = 7 + stageData.data[y][x];
+			}
+			/*if (units[getUnit(x, y)]) {
+			}*/
+		}
+	}
+
 	playerX = stageData.x;
 	playerY = stageData.y;
 
@@ -88,36 +101,74 @@ function initBoard() {
 }
 
 function addButtonListeners(button) {
-	button.addEventListener(mobile ? eventName : "mousedown", buttonDown);
+	button.addEventListener(interactionDown, buttonDown);
 }
 
 function buttonDown(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 	currentButtonX = target.clientX;
 	currentButtonY = target.clientY;
-	console.log("buttonDown", target, currentButtonX, currentButtonY);
-	window.addEventListener(mobile ? "touchend" : eventName, clickButton);
-	//target.target.removeEventListener(eventIn, buttonDown);
-	//window.addEventListener(eventRelease, clickButton);
+	touchZ = false;
+	//console.log("buttonDown", target, currentButtonX, currentButtonY);
+	window.addEventListener(interactionUp, clickButton);
+	window.addEventListener(interactionMove, moveButton);
+}
+
+function moveButton(event) {
+	if (/touch/.test(event.type)) {
+		let touches = event.touches;
+		//[{pageX:event.touches[0].pageX,pageY:event.touches[0].pageY},{pageX:width/2,pageY:height*0.75}];// simulate
+
+		touchZ = touches.length > 1;
+		if (touchZ) {
+			let offX = touches[1].pageX > touches[0].pageX ? touches[1].pageX - touches[0].pageX : touches[0].pageX - touches[1].pageX;
+			let offY = touches[1].pageY > touches[0].pageY ? touches[1].pageY - touches[0].pageY : touches[0].pageY - touches[1].pageY;
+			if (portrait) {
+				onBoardZoom({deltaY: touchY - offY});
+			} else {
+				onBoardZoom({deltaY: touchX - offX});
+			}
+			touchX = offX;
+			touchY = offY;
+		}
+	}
 }
 
 function clickButton(event) {
-	window.removeEventListener(mobile ? "touchend" : eventName, clickButton);
+	window.removeEventListener(interactionUp, clickButton);
+	window.removeEventListener(interactionMove, moveButton);
 	// determine clicks and swipes
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
 	// is it a swipe or click ?
 	currentButtonX = Math.round((target.clientX - currentButtonX) / player.width);
 	currentButtonY = Math.round((target.clientY - currentButtonY) / player.width);
+	if (currentButtonX || currentButtonY) {
+		//console.log("swipe: "+currentButtonX+"x"+currentButtonY);
+		if (state == 1) {
+			if (Math.abs(currentButtonX) > Math.abs(currentButtonY)) {
+				action(currentButtonX > 0 ? 4 : 2);
+				return;
+			} else if (Math.abs(currentButtonY) > Math.abs(currentButtonX)) {
+				action(currentButtonY > 0 ? 1 : 3);
+				return;
+			}
+		}
+	}
 
-	// clicked index (x/y)
-	currentButtonX = target.target.x;
-	currentButtonY = target.target.y;
-	console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
+	// were we zooming the map by double touch?
+	if (touchZ) {
 
-	if (state == 1) {
-		let direction = determineDirection(currentButtonX, currentButtonY);
-		action(direction);
+	} else {
+		// clicked index (x/y)
+		currentButtonX = target.target.x;
+		currentButtonY = target.target.y;
+		//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
+
+		if (state == 1) {
+			let direction = determineDirection(currentButtonX, currentButtonY);
+			action(direction);
+		}
 	}
 }
 
@@ -160,7 +211,7 @@ function action(direction) {
 			player.resize(playerX - screenSide, playerY - screenSide);
 			break;
 		case 5: // Center
-			console.log("GG");
+			console.log("Ship");
 			break;
 		default: // Corners
 
@@ -169,21 +220,32 @@ function action(direction) {
 }
 
 function determineDirection(x, y) {
-    let arr = [
-		[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-		[1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-		[4, 4, 0, 1, 1, 1, 1, 1, 2, 0, 2],
-		[4, 4, 4, 0, 1, 1, 1, 0, 2, 2, 2],
-		[4, 4, 4, 4, 0, 1, 0, 2, 2, 2, 2],
-		[4, 4, 4, 4, 4, 5, 2, 2, 2, 2, 2],
-		[4, 4, 4, 4, 0, 3, 0, 2, 2, 2, 2],
-		[4, 4, 4, 0, 3, 3, 3, 0, 2, 2, 2],
-		[4, 4, 0, 3, 3, 3, 3, 3, 0, 2, 2],
-		[4, 0, 3, 3, 3, 3, 3, 3, 3, 0, 2],
-		[0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0]
-	];
+	return oddDirectionalArray[y][x];
+}
 
-    return arr[y][x];
+function generateOddArray() {
+	// Initialize the 2D array with all elements as 0
+	const array = islandGenerator.initArray(0, screenWidth);
+	// Array.from({ length: n }, () => Array(n).fill(0));
+
+	// Fill the directional regions around the center
+	for (let i = 0; i < screenWidth; i++) {
+		for (let j = 0; j < screenWidth; j++) {
+			if (i === screenSide && j === screenSide) {
+				array[i][j] = 5; // Center element
+			} else if (i < j && i + j < screenWidth - 1) {
+				array[i][j] = 1; // Top region
+			} else if (i < j && i + j > screenWidth - 1) {
+				array[i][j] = 2; // Right region
+			} else if (i > j && i + j > screenWidth - 1) {
+				array[i][j] = 3; // Bottom region
+			} else if (i > j && i + j < screenWidth - 1) {
+				array[i][j] = 4; // Left region
+			}
+		}
+	}
+
+	return array;
 }
 
 function createPlayer(x, y) {
@@ -211,32 +273,31 @@ function getUnit(x, y) {
 
 // Draw the board
 function drawBoard() {
-	//gameContext.fillStyle = "#0078d7";
-	//gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-	let _x, _y,
+	gameContext.fillStyle = "#0078d7";
+	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+	let _x, _y, _z,
 		_ox = portrait ? screenSide : screenSide + screenOffset/2,
 		_oy = !portrait ? screenSide : screenSide + screenOffset/2;
 
 	for(let y = 0; y < screenWidth + screenOffset; y++) {
 		for(let x = 0; x < screenWidth + screenOffset; x++) {
 			// Update base tiles
-			_x = x + playerX - _ox;
-			_y = y + playerY - _oy;
-			if (mapData[_y]) {
-				if (mapData[_y].length > _x) {
+			if (tileField[y]) {
+				if (tileField[y][x]) {
+					_x = x + playerX - _ox - (portrait?screenOffset/2:0);
+					_y = y + playerY - _oy - (!portrait?screenOffset/2:0);
+					_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
 					tileField[y][x].update(
-						mapData
-							[_y - (!portrait?screenOffset/2:0)]
-							[_x - (portrait?screenOffset/2:0)],
+						_z,
 						playerX - _ox,
 						playerY - _oy,
 						(x < screenOffset/2 ? screenOffset/2 - x : x >= screenWidth + screenOffset/2 ? x - screenWidth + 1 - screenOffset/2 : 0) +
 						(y < screenOffset/2 ? screenOffset/2 - y : y >= screenWidth + screenOffset/2 ? y - screenWidth + 1 - screenOffset/2 : 0)
-					);
+					)
 				}
 			}
-			
+
 			/*let unit = units[getUnit(x + playerX - screenSide, y + playerY - screenSide)];
 			if (unit) {
 				unit.resize(playerX - screenSide, playerY - screenSide);
@@ -253,28 +314,5 @@ function drawBoard() {
 			}
 		}
 	}
-
-	/*gameContext.fillStyle = "#0078d7";
-	gameContext.globalAlpha = 0.4;
-	gameContext.beginPath();
-
-	for (let i = 0; i < screenOffset/2; i ++) {
-		if (portrait) {
-			gameContext.fillRect(0, 0, gameCanvas.width, (gameCanvas.height - width*boardScale*tween.transition) / 2 - i*tileWidth);
-			gameContext.fillRect(0, width*boardScale*tween.transition + (gameCanvas.height - width*boardScale*tween.transition)/2 + i*tileWidth, gameCanvas.width, (gameCanvas.height - width*boardScale*tween.transition) / 2 - i*tileWidth);
-			gameContext.fillRect(0, 0, (width - width*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.height);
-			gameContext.fillRect(
-				width - (width - width*boardScale*tween.transition) / 2 + i*tileWidth,
-				0,
-				(width - width*boardScale*tween.transition) / 2 + (screenOffset/2-i)*tileWidth,
-				gameCanvas.height
-			);
-		} else {
-			gameContext.fillRect(0, 0, (gameCanvas.width - height*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.width);
-			gameContext.fillRect(height*boardScale*tween.transition + (gameCanvas.width - height*boardScale*tween.transition)/2 + i*tileWidth, 0, (gameCanvas.width - height*boardScale*tween.transition) / 2 - i*tileWidth, gameCanvas.width);
-		}
-	}
-	gameContext.closePath();
-	gameContext.globalAlpha = 1;*/
 }
 
