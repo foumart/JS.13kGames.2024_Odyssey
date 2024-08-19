@@ -21,8 +21,11 @@ let stageData,
 	oddDirectionalArray,
 	touchX, touchY, touchZ;
 let boardPlayer,
+	boardShip,
 	playerX,
-	playerY;
+	playerY,
+	shipX,
+	shipY;
 
 
 function initBoard() {
@@ -35,33 +38,54 @@ function initBoard() {
 
 	let x, y, renderedScreenSize = screenWidth + screenOut;
 
-	mapData = stageData.map;// 2d array of 0 (empty) and 1 (occupied)
+	mapData = stageData.visited;// 2d array of 0 (empty) and 1 (occupied)
 	idsData = stageData.ids;// 2d array of 0 (water) 1-13 (isle ids)
 	unitsData = islandGenerator.initArray();// 2d array of 0 (empty) - 1,2,3.. (unit ids)
 	unitsList = [];
 
-	playerX = stageData.x;
-	playerY = stageData.y;
+	// starting town position
+	playerX = shipX = stageData.x;
+	playerY = shipY = stageData.y;
+	// setting player next to the town
+	if (mapData[playerY+1][playerX]) {
+		playerY ++;
+	} else if (mapData[playerY][playerX+1]) {
+		playerX ++;
+	} else if (mapData[playerY][playerX-1]) {
+		playerX --;
+	} else if (mapData[playerY-1][playerX]) {
+		playerY --;
+	}
+	// setting the ship around on a water tile
+	while (mapData[shipY][shipX]) {
+		if (Math.random() < .5) shipX ++;
+		else shipY ++;
+	}
 
-	boardPlayer = createPlayer(x, y, 1)
+	boardPlayer = createPlayer(playerX, playerY, 1);
 	unitsList.push(boardPlayer);
 	unitsData[playerY][playerX] = 1;
+
+	boardShip = createShip(shipX, shipY, 2);
+	unitsList.push(boardShip);
+	unitsData[shipY][shipX] = 2;
+
 
 	// combine data and relief into tile ids and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
 			// Update base tiles
 			if (mapData[y][x] == 1) {
-				if (stageData.data[y][x] > 1) {
-					mapData[y][x] = stageData.data[y][x];
+				if (stageData.relief[y][x] > 1) {
+					mapData[y][x] = 2;//stageData.relief[y][x];
 				}
-			} else if (stageData.data[y][x]) {
-				mapData[y][x] = 7 + stageData.data[y][x];
+			} else if (stageData.relief[y][x]) {
+				mapData[y][x] = 8;// + stageData.relief[y][x];
 			}
 
 			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
-				unitsList.push(createUnit(x, y, 3));
-				unitsData[y][x] = 3;
+				unitsList.push(createUnit(x, y, 4));
+				unitsData[y][x] = 4;
 			}
 		}
 	}
@@ -259,14 +283,6 @@ function drawBoard() {
 		}
 	}
 }
-
-function isPassable(x, y) {
-	if (player.onFoot) {
-		return unitsData[y][x] < 2 && mapData[y][x]
-	}
-	return unitsData[y][x] < 2 && !mapData[y][x]
-}
-
 
 function getUnit(x, y) {
 	let id = -1;

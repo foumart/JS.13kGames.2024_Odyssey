@@ -11,8 +11,8 @@ async function gameInit(_stage) {
 	//console.log(data);
 	stageData = {
 		size: data[0][0], x: data[0][2], y: data[0][3],
-		map: data[0][6],// visited
-		data: data[0][5],// relief
+		visited: data[0][6],// visited
+		relief: data[0][5],// relief
 		ids: data[0][4]// isle ids
 	}
 	
