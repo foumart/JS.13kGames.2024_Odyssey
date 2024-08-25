@@ -4,6 +4,8 @@ class Player {
 		//super(x, y);
 		this.ship = {};
 		this.onFoot = true;
+		//this.boarding = false;
+		//this.landing = false;
 	}
 
 	/*draw() {

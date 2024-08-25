@@ -62,13 +62,13 @@ function initBoard() {
 		else shipY ++;
 	}
 
-	boardPlayer = createPlayer(playerX, playerY, 1);
+	boardPlayer = createPlayer(playerX, playerY, UnitType.PLAYER);
 	unitsList.push(boardPlayer);
-	unitsData[playerY][playerX] = 1;
+	unitsData[playerY][playerX] = UnitType.PLAYER;
 
-	boardShip = createShip(shipX, shipY, 2);
+	boardShip = createShip(shipX, shipY, UnitType.SHIP);
 	unitsList.push(boardShip);
-	unitsData[shipY][shipX] = 2;
+	unitsData[shipY][shipX] = UnitType.SHIP;
 
 
 	// combine data and relief into tile ids and create some random units
@@ -77,15 +77,15 @@ function initBoard() {
 			// Update base tiles
 			if (mapData[y][x] == 1) {
 				if (stageData.relief[y][x] > 1) {
-					mapData[y][x] = 2;//stageData.relief[y][x];
+					mapData[y][x] = TileType.FOREST;//stageData.relief[y][x];
 				}
 			} else if (stageData.relief[y][x]) {
-				mapData[y][x] = 8;// + stageData.relief[y][x];
+				mapData[y][x] = TileType.TILE8;// + stageData.relief[y][x];
 			}
 
 			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
-				unitsList.push(createUnit(x, y, 4));
-				unitsData[y][x] = 4;
+				unitsList.push(createUnit(x, y, UnitType.ENEMY1));
+				unitsData[y][x] = UnitType.ENEMY1;
 			}
 		}
 	}
