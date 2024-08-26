@@ -82,7 +82,9 @@ function action(direction) {
 			console.log("Ship");
 			break;
 		case 6: // Action
-			console.log("Action");
+			//console.log("Action");
+			paused = true;
+			updateMap();
 			break;
 		default: // Corners
 

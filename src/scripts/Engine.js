@@ -2,6 +2,7 @@ let islandGenerator;
 
 // game loop vars
 let gameLoop, step, fps, frame, startTime = Date.now();
+let paused = false;
 
 async function gameInit(_stage) {
 	stage = _stage;
@@ -9,16 +10,25 @@ async function gameInit(_stage) {
 	frame = 0;
 	
 	let data = await getStageData(stage);
-	//console.log(data);
+	populateStageData(data);
+	
+	initBoard();
+	gameStart();
+}
+
+async function updateMap() {
+	let data = await updateStageData();
+	populateStageData(data);
+	paused = false;
+}
+
+function populateStageData(data) {
 	stageData = {
 		size: data[0][0], x: data[0][2], y: data[0][3],
 		visited: data[0][6],// visited
 		relief: data[0][5],// relief
 		ids: data[0][4]// isle ids
 	}
-	
-	initBoard();
-	gameStart();
 }
 
 function gameStart() {
@@ -65,7 +75,20 @@ function getStageData(id) {
 	return new Promise((resolve, reject) => {
 		islandGenerator = new IslandGenerator(this, 40, 40, {
 			type: 1,
-			offset: 10
+			offset: 10,
+			debug: {feedback: true}
 		}, resolve)
+	});
+}
+
+function updateStageData() {
+	return new Promise((resolve, reject) => {
+		islandGenerator.resolve = resolve;
+		islandGenerator.regenerate(
+			playerX - screenSide - (portrait ? 0 : screenOut/2),
+			playerY - screenSide - (portrait ? screenOut/2 : 0),
+			playerX + screenWidth + (portrait ? 0 : screenOut),
+			playerY + screenWidth + (portrait ? screenOut : 0)
+		);
 	});
 }
