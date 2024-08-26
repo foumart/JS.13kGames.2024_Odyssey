@@ -66,9 +66,9 @@ function initBoard() {
 	unitsList.push(boardPlayer);
 	unitsData[playerY][playerX] = UnitType.PLAYER;
 
-	boardShip = createShip(shipX, shipY, UnitType.SHIP);
+	boardShip = createShip(shipX, shipY, UnitType.SHIPUP);
 	unitsList.push(boardShip);
-	unitsData[shipY][shipX] = UnitType.SHIP;
+	unitsData[shipY][shipX] = UnitType.SHIPUP;
 
 
 	// combine data and relief into tile ids and create some random units
@@ -232,7 +232,7 @@ function generateOddArray() {
 
 // Draw the board
 function drawBoard() {
-	gameContext.fillStyle = "#0078d7";
+	gameContext.fillStyle = "#4d4de8";
 	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	let _x, _y, _z,

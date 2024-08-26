@@ -38,8 +38,9 @@ class BoardTile extends GameElement {
 	}
 
 	draw() {
-		gameContext.fillStyle = this.getColor();
 		gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
+
+		/*gameContext.fillStyle = this.getColor();
 		gameContext.beginPath();
 		gameContext.fillRect(
 			this.getX(),
@@ -47,7 +48,65 @@ class BoardTile extends GameElement {
 			this.width,
 			this.height
 		);
-		gameContext.closePath();
+		gameContext.closePath();*/
+		let C = [
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"2db22d32db323d963d7070ef898995c6c6d4835426",
+			"2db22d32db323d963d7070ef898995c6c6d4835426",
+			"2db22d32db323d963d7070ef898995c6c6d4835426",
+			"4d4de88585f54343de7070ef898995c6c6d4835426",
+			"4d4de87070ef4343de7070ef898995c6c6d4835426",
+			"2db22d32db323d963d7070ef898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426",
+			"4d4de84343deeb9753544434898995c6c6d4835426"
+		][this.type||0]
+		let px=[]
+		let P=[
+				"IRJRQJRRQJRRQJRQRI",
+				"IJYIIIKQIIIQQYIIII",
+				"IJYIIIKQIIIQQYIIII",
+				"IJYIIIKQIIIQQYIIII",
+				"IZIaaKIIIIIZKaaIII",
+				"IJIKIIIIJIKIJIIIIK",
+				"IJYIIIKQIIIQQYIIII",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI",
+				"IRJRQJRRQJRRQJRQRI"
+			][this.type||0].replace(/./g,a=>{
+			let z=a.charCodeAt()
+			px.push(z&7)
+			px.push((z>>3)&7)
+		})
+		let W=6
+		let H=6
+		for(let j=0;j<H;j++){
+			for(let i=0;i<W;i++){
+				if(px[j*W+i]){
+					gameContext.fillStyle="#"+C.substr(6*(px[j*W+i]-1),6)
+					gameContext.fillRect(this.getX() + i*this.width/6, this.getY() + j*this.width/6, this.width/6, this.width/6)
+				}
+			}
+		}
+
 		gameContext.globalAlpha = 1;
 	}
 

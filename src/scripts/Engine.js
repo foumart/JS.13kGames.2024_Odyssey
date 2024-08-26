@@ -1,11 +1,12 @@
 let islandGenerator;
 
 // game loop vars
-let gameLoop, step;
+let gameLoop, step, fps, frame, startTime = Date.now();
 
 async function gameInit(_stage) {
 	stage = _stage;
 	step = 0;
+	frame = 0;
 	
 	let data = await getStageData(stage);
 	//console.log(data);
@@ -35,6 +36,23 @@ function gameStart() {
 		if (state > 1) {
 			gameStop();
 			console.log("stage complete");
+		}
+
+		if (_debug) {
+			if (!fps) {
+				fps = document.createElement('div');
+				uiDiv.appendChild(fps);
+				fps.style.fontFamily = "Arial";
+				fps.style.fontSize = "16px";
+				fps.style.pointerEvents = "none";
+			}
+			var time = Date.now();
+			frame++;
+			if (time - startTime > 1000) {
+				fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
+				startTime = time;
+				frame = 0;
+			}
 		}
 	}, 17);
 }

@@ -137,7 +137,7 @@ function resizeUI(e) {
 	if (upButton) {
 		controls.style = portrait ? "bottom:0;width:54%" : "bottom:0;width:28%";
 		actButton.style = `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px`;
-		infoTab.style = `position:absolute;width:${controls.offsetWidth}px;height:${controls.offsetHeight}px;background-color:rgba(255,255,255,0.25);`;
+		infoTab.style = `position:absolute;width:${controls.offsetWidth/2}px;height:${controls.offsetHeight/4}px;background-color:rgba(128,255,255,0.25)`;
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -189,6 +189,7 @@ function createUI() {
 		uiDiv.append(controls);
 		actButton = generateUIButton(uiDiv, '&#9974', e => action(6), "css_controls");
 		infoTab = document.createElement('div');
+		infoTab.innerHTML = "<br>Welcome Corsair!"
 		uiDiv.append(infoTab);
 	}
 
