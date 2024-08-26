@@ -81,6 +81,9 @@ function action(direction) {
 		case 5: // Center
 			console.log("Ship");
 			break;
+		case 6: // Action
+			console.log("Action");
+			break;
 		default: // Corners
 
 			break;
@@ -97,6 +100,7 @@ function finalizeMove() {
 		shipX = playerX; shipY = playerY;
 	}
 	unitsData[playerY][playerX] = boarding || !player.onFoot ? UnitType.PLAYERSHIP : UnitType.PLAYER;
+	infoTab.innerHTML = `position: ${playerX}x${playerY}`;
 }
 
 function isPassable(x, y) {

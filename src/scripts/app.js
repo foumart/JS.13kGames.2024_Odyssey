@@ -51,11 +51,11 @@ let stage = 0;
 let tween = { transition: 0 };
 
 // ui stuff
-let controls, upButton, leftButton, rightButton, downButton;
+let controls, actButton, infoTab, upButton, leftButton, rightButton, downButton;
 let title, playButton, fullscreenButton, soundButton;
 
 
-// Example game initialization script:
+// Game initialization
 function init() {
 	// resizing
 	window.addEventListener("resize", () => {
@@ -135,11 +135,14 @@ function resizeUI(e) {
 
 	// Resize in-game UI elements
 	if (upButton) {
-		controls.style = portrait ? "bottom:0;width:50%" : "bottom:0;width:30%";
+		controls.style = portrait ? "bottom:0;width:54%" : "bottom:0;width:28%";
+		actButton.style = `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px`;
+		infoTab.style = `position:absolute;width:${controls.offsetWidth}px;height:${controls.offsetHeight}px;background-color:rgba(255,255,255,0.25);`;
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
+		actButton.style.fontSize = 200 * scale + 'px';
 	}
 
 	gameContext.imageSmoothingEnabled = false;
@@ -184,6 +187,9 @@ function createUI() {
 	} else {
 		controls = document.createElement('div');
 		uiDiv.append(controls);
+		actButton = generateUIButton(uiDiv, '&#9974', e => action(6), "css_controls");
+		infoTab = document.createElement('div');
+		uiDiv.append(infoTab);
 	}
 
 	// Fullscreen and Sound buttons
@@ -206,6 +212,7 @@ function createUI() {
 	}
 
 	toggleSound();
+	resizeUI();
 }
 
 function generateUIButton(div, code, handler, className) {
