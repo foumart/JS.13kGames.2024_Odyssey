@@ -46,7 +46,6 @@ let screenOffsetY = 0;
 
 // game state, 0: menu, 1: in-game
 let state = 0;
-let stage = 0;
 
 let tween = { transition: 0, transitionX: 0, transitionY: 0 };
 
@@ -169,7 +168,7 @@ function updateStyleUI(element, style) {
 function switchState(event) {
 	console.log("switchState", event);
 	state = 1;
-	gameInit(stage);
+	gameInit();
 	createUI();
 	resizeUI(1);
 }

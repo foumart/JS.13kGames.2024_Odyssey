@@ -16,6 +16,7 @@ let stageData,
 	visitedData,
 	mapData,
 	idsData,
+	islesData,
 	unitsData,
 	currentButtonX,
 	currentButtonY,
@@ -43,6 +44,7 @@ function initBoard() {
 	mapData = visitedData.map(row => [...row]);// 2d array of concrete map data (TileType + coastal edges 11-25)
 	idsData = stageData.ids.map(row => [...row]);// 2d array of 0 (water) 1-13 (isle ids)
 	unitsData = islandGenerator.initArray();// 2d array of 0 (empty) - 1,2,3.. (unit ids)
+	islesData = stageData.islands.splice(0);// start location and directions of consecutive generation
 	unitsList = [];
 
 	// starting town position
@@ -72,57 +74,80 @@ function initBoard() {
 	unitsList.push(boardShip);
 	unitsData[shipY][shipX] = UnitType.SHIPUP;
 
-	//console.log(mapData);
 	islandGenerator.debugInfo();
-	console.log(mapData);
+
 	// combine data and relief into tile ids and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
 			// Update base tiles
-			if (mapData[y][x] == 1) {
-				// TODO: tree
-				/*if (stageData.relief[y][x] > 1) {
-					mapData[y][x] = TileType.FOREST;//stageData.relief[y][x];
-				}*/
-
-				/*if (y < boardWidth - 1 && idsData[y+1][x] != idsData[y][x]) {
-					mapData[y][x] = mapData[y][x] == 1 ? 12 : 1;
-				}*/
-
-				if (y && !visitedData[y-1][x] ) {// ^|| idsData[y-1][x] != idsData[y][x]
-					mapData[y][x] = mapData[y][x] == 1 ? 14 : 1;
+			if (mapData[y][x]) {
+				
+				if (stageData.relief[y][x] > 1) {
+					// tree
+					unitsList.push(createUnit(x, y, stageData.relief[y][x] > 2 ? UnitType.MOUNT : UnitType.TREE));
+					unitsData[y][x] = stageData.relief[y][x] > 2 ? UnitType.MOUNT : UnitType.TREE;
 				}
 
-				if (x && !visitedData[y][x-1] ) {// <|| idsData[y][x-1] != idsData[y][x]
-					mapData[y][x] = mapData[y][x] == 1 ? 13 : mapData[y][x] == 14 ? 18 : 1;
+				islesData.forEach((data, index) => {
+					if (x == data[0] && y == data[1]) {
+						// castle or shrine
+						unitsList.push(createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE));
+						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
+					}
+				});
+
+				if (mapData[y][x] == 1) {
+					mapData[y][x] = TileType.LAND;
 				}
 
-				if (x < boardWidth-1 && !visitedData[y][x+1] ) {// >|| idsData[y][x+1] != idsData[y][x]
-					mapData[y][x] = mapData[y][x] == 1 ? 11 : mapData[y][x] == 14 ? 15 : mapData[y][x] == 18 ? 19 : 1;
+				if (y && !visitedData[y-1][x] ) {// ^
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? 14 : TileType.LAND;
 				}
 
-				if (y < boardWidth-1 && !visitedData[y+1][x] ) {// v|| idsData[y+1][x] != idsData[y][x]
-					mapData[y][x] = mapData[y][x] == 1 ? 12 : mapData[y][x] == 11 ? 16 : mapData[y][x] == 13 ? 17 : mapData[y][x] == 23 ? 21 : mapData[y][x] == 19 ? 25 : 25;
+				if (x && !visitedData[y][x-1] ) {// <
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 18 : TileType.LAND;
+				}
+
+				if (x < boardWidth-1 && !visitedData[y][x+1] ) {// >
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? 11 :
+					mapData[y][x] == 12 ? 16 :
+					mapData[y][x] == 13 ? 23 :
+					mapData[y][x] == 14 ? 15 :
+					mapData[y][x] == 17 ? 21 :
+					mapData[y][x] == 18 ? 19 :
+					mapData[y][x] == 22 ? 25 :
+					mapData[y][x] == 24 ? 20 : TileType.LAND;
+				}
+
+				if (y < boardWidth-1 && !visitedData[y+1][x] ) {// v
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? 12 :
+					mapData[y][x] == 11 ? 16 :
+					mapData[y][x] == 13 ? 17 :
+					mapData[y][x] == 14 ? 24 :
+					mapData[y][x] == 15 ? 20 :
+					mapData[y][x] == 18 ? 22 :
+					mapData[y][x] == 19 ? 25 :
+					mapData[y][x] == 23 ? 21 : mapData[y][x];
 				}
 
 				
 
 			} else if (stageData.relief[y][x]) {
 				// riffs
-				mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF3 : TileType.RIFF2;
+				mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : stageData.relief[y][x] > 2 ? TileType.RIFF3 : TileType.RIFF2;
 			}
 
 			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
-				unitsList.push(createUnit(x, y, UnitType.ENEMY1));
-				unitsData[y][x] = UnitType.ENEMY1;
+				unitsList.push(createUnit(x, y, UnitType.GOLD));
+				unitsData[y][x] = UnitType.GOLD;
 			}
 		}
 	}
 
-	//console.log(mapData);
-	//console.log(stageData.relief);
-	//console.log(unitsData);
-	//console.log(unitsList);
+	console.log(
+		"map:\n"+mapData.map(arr => arr.map(num => (num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
+	);
+
 	// data initialization completed
 
 	gameContainer.innerHTML = "";

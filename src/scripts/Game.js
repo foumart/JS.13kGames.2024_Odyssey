@@ -118,7 +118,9 @@ function finalizeMove(dir) {
 
 function isPassable(x, y) {
 	if (player.onFoot) {
-		return unitsData[y][x] < 2 && (mapData[y][x] == 1 || mapData[y][x] == 2 || mapData[y][x] > 9)
+		return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= UnitType.CASTLE) &&
+			(mapData[y][x] >= TileType.LAND)
 	}
-	return unitsData[y][x] < 2 && (!mapData[y][x] || mapData[y][x] > 6 && mapData[y][x] <= 10)
+	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] == UnitType.GOLD) &&
+		mapData[y][x] < TileType.LAND
 }

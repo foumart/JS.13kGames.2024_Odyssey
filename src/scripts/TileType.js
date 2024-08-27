@@ -1,17 +1,19 @@
 class TileType {
 	
+
 	static get WATER() {
 		return 0;
 	}
-	static get GRASS() {
+	static get RIFF1() {
 		return 1;
 	}
-	static get FOREST() {
+	static get RIFF2() {
 		return 2;
 	}
-	static get MOUNTINE() {
+	static get RIFF3() {
 		return 3;
 	}
+
 	static get TILE4() {
 		return 4;
 	}
@@ -21,13 +23,20 @@ class TileType {
 	static get TILE6() {
 		return 6;
 	}
-	static get RIFF1() {
+	static get TILE7() {
 		return 7;
 	}
-	static get RIFF2() {
+	static get TILE8() {
 		return 8;
 	}
-	static get RIFF3() {
+	static get TILE9() {
 		return 9;
 	}
+	
+	static get LAND() {
+		return 10;
+	}
+
+	// LAND 11 - 25
+	
 }

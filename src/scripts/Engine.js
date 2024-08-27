@@ -4,12 +4,11 @@ let islandGenerator;
 let gameLoop, step, fps, frame, startTime = Date.now();
 let paused = false;
 
-async function gameInit(_stage) {
-	stage = _stage;
+async function gameInit() {
 	step = 0;
 	frame = 0;
 	
-	let data = await getStageData(stage);
+	let data = await getStageData();
 	populateStageData(data);
 	
 	initBoard();
@@ -27,7 +26,8 @@ function populateStageData(data) {
 		size: data[0][0], x: data[0][2], y: data[0][3],
 		visited: data[0][6],// visited
 		relief: data[0][5],// relief
-		ids: data[0][4]// isle ids
+		ids: data[0][4],// isle ids
+		islands: data.splice(1)
 	}
 }
 
@@ -71,7 +71,7 @@ function gameStop() {
 	clearInterval(gameLoop);
 }
 
-function getStageData(id) {
+function getStageData() {
 	return new Promise((resolve, reject) => {
 		islandGenerator = new IslandGenerator(this, 40, 40, {
 			type: 1,

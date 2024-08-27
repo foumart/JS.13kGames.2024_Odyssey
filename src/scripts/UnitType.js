@@ -14,6 +14,7 @@ class UnitType {
 	static get SHIPRIGHT() {
 		return 4;
 	}
+
 	static get ENEMY1() {
 		return 5;
 	}
@@ -30,56 +31,19 @@ class UnitType {
 		return 9;
 	}
 
-	/*static get class(){
-		return [Grunt, Jumpship, Tank, Hunter, Drone, Raptor, Dreadnought, Commandunit, Obstacle, Destructable];
-	}*/
-	/*static getClass(id){
-		if(!id) return this.class;
-		return this.class[id-1];
-	}*/
-
-	/*static get names(){
-		return ["Grunt", "Jumpship", "Tank", "Hunter", "Drone", "Raptor", "Dreadnought", "Commandunit", "Obstacle", "Destructable"];
-	}*/
-	/*static getUnitName(id){
-		if(!id) return this.names;
-		return this.names[id-1];
-	}*/
-
-	// default unit stats
-	// these could be overriden in StageData
-	// individually for each unit, example: {x:2, y:2, class:Jumpship, health:6, damage:5}
-	/*static get health(){
-		return [, 5, 4, 3, 2, 3, 5, 5, 1, 1];
-	}*/
-	/*static getUnitHealth(id){
-		return this.health[id-1];
-	}*/
-	
-	/*static get damage(){
-		return [1, 2, 2, 2, 1, 2, 2, 0, 0, 0];
-	}*/
-	/*static getUnitDamage(id){
-		return this.damage[id-1];
-	}*/
-
-	/*static get ranged(){
-		return [true, false, true, true, true, true, false, false, undefined, undefined];
-	}*/
-	/*static isUnitRanged(id){
-		return this.ranged[id-1];
-	}*/
-
-	static get enemy(){
-		return [false, false, false, false, true, true, true, true, true, true];
+	static get CASTLE() {
+		return 10;
 	}
-	static isUnitEnemy(id){
-		return this.enemy[id-1];
+	static get SHRINE() {
+		return 11;
 	}
-
-	/*static get playerRange(){
-		for(let i = 0; i < this.enemy.length; i++){
-			if(this.enemy[i]) return i;
-		}
-	}*/
+	static get TREE() {
+		return 12;
+	}
+	static get GOLD() {
+		return 13;
+	}
+	static get MOUNT() {
+		return 14;
+	}
 }
