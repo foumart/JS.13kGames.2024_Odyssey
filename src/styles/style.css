@@ -22,7 +22,7 @@ div, canvas {
 	padding: 0 2vw;
 }
 .css_button {
-	background-color: rgba(0,255,255,0.5);
+	background-color: rgba(232,240,255,0.5);
 	position: relative;
 	cursor: pointer;
 	pointer-events: auto;

@@ -76,7 +76,7 @@ function getStageData() {
 		islandGenerator = new IslandGenerator(this, 40, 40, {
 			type: 1,
 			offset: 10,
-			debug: {feedback: true}
+			debug: _debug ? {feedback: true} : 0
 		}, resolve)
 	});
 }

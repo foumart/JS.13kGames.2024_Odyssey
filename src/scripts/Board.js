@@ -70,13 +70,13 @@ function initBoard() {
 	unitsList.push(boardPlayer);
 	unitsData[playerY][playerX] = UnitType.PLAYER;
 
-	boardShip = createShip(shipX, shipY, UnitType.SHIPUP);
+	boardShip = createShip(shipX, shipY, UnitType.SHIPLEFT);
 	unitsList.push(boardShip);
-	unitsData[shipY][shipX] = UnitType.SHIPUP;
+	unitsData[shipY][shipX] = UnitType.SHIPLEFT;
 
-	islandGenerator.debugInfo();
+	if (_debug) islandGenerator.debugInfo();
 
-	// combine data and relief into tile ids and create some random units
+	// determine tiles and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
 			// Update base tiles
@@ -100,15 +100,15 @@ function initBoard() {
 					mapData[y][x] = TileType.LAND;
 				}
 
-				if (y && !visitedData[y-1][x] ) {// ^
+				if (y && (!visitedData[y-1][x] || idsData[y-1][x] != idsData[y][x]) || !y) {// ^
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 14 : TileType.LAND;
 				}
 
-				if (x && !visitedData[y][x-1] ) {// <
+				if (x && (!visitedData[y][x-1] || idsData[y][x-1] != idsData[y][x]) || !x) {// <
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 18 : TileType.LAND;
 				}
 
-				if (x < boardWidth-1 && !visitedData[y][x+1] ) {// >
+				if (x < boardWidth-1 && (!visitedData[y][x+1] || idsData[y][x+1] != idsData[y][x]) || x == boardWidth-1) {// >
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 11 :
 					mapData[y][x] == 12 ? 16 :
 					mapData[y][x] == 13 ? 23 :
@@ -119,7 +119,7 @@ function initBoard() {
 					mapData[y][x] == 24 ? 20 : TileType.LAND;
 				}
 
-				if (y < boardWidth-1 && !visitedData[y+1][x] ) {// v
+				if (y < boardWidth-1 && (!visitedData[y+1][x] || idsData[y+1][x] != idsData[y][x]) || y == boardWidth-1) {// v
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 12 :
 					mapData[y][x] == 11 ? 16 :
 					mapData[y][x] == 13 ? 17 :
@@ -137,14 +137,17 @@ function initBoard() {
 				mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : stageData.relief[y][x] > 2 ? TileType.RIFF3 : TileType.RIFF2;
 			}
 
-			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
+			if (
+				Math.random()<.1 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9 &&
+				getUnit(x-1, y) == -1 && getUnit(x+1, y) == -1 && getUnit(x, y-1) == -1 && getUnit(x, y+1) == -1
+			) {
 				unitsList.push(createUnit(x, y, UnitType.GOLD));
 				unitsData[y][x] = UnitType.GOLD;
 			}
 		}
 	}
 
-	console.log(
+	if (_debug) console.log(
 		"map:\n"+mapData.map(arr => arr.map(num => (num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
 	);
 
@@ -257,6 +260,7 @@ function clickButton(event) {
 }
 
 function determineDirection(x, y) {
+	if (!x && !y) return -1;
 	return oddDirectionalArray[y][x];
 }
 
@@ -313,6 +317,7 @@ function drawBoard() {
 		}
 	}
 
+	// Update units
 	for(let y = 0; y < screenWidth + screenOut; y++) {
 		for(let x = 0; x < screenWidth + screenOut; x++) {
 			if (unitScreen[y]) {
@@ -320,6 +325,7 @@ function drawBoard() {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
 					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
 					_z = unitsData[_y] && unitsData[_y].length > _x ? unitsData[_y][_x] : 0;
+					
 					unitScreen[y][x].update(
 						_z,
 						(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +

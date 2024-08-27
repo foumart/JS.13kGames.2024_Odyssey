@@ -1,29 +1,11 @@
-class Player {
+class Player extends Unit {
 	
 	constructor(x, y, type) {
-		//super(x, y);
-		this.ship = {};
+		super(x, y, type);
 		this.onFoot = true;
+		this.overlay = UnitType.EMPTY;
 		//this.boarding = false;
 		//this.landing = false;
 	}
 
-	/*draw() {
-		gameContext.fillStyle = "#333";
-		gameContext.beginPath();
-		gameContext.fillRect(
-			this.getX()-9,
-			this.getY()-3,
-			6,
-			6
-		);
-		gameContext.fillRect(
-			this.getX()+3,
-			this.getY()-3,
-			6,
-			6
-		);
-		gameContext.closePath();
-	}*/
-	
 }

@@ -1,22 +1,26 @@
 class TileType {
 	
 
-	static get WATER() {
+	static get DEPTHS() {
 		return 0;
 	}
-	static get RIFF1() {
+	static get WATER() {
 		return 1;
 	}
-	static get RIFF2() {
+	static get RIFF1() {
 		return 2;
 	}
-	static get RIFF3() {
+	static get RIFF2() {
 		return 3;
 	}
-
-	static get TILE4() {
+	static get RIFF3() {
 		return 4;
 	}
+	static get SHINE() {
+		return 5;
+	}
+
+	
 	static get TILE5() {
 		return 5;
 	}
