@@ -21,13 +21,13 @@ class TileType {
 	static get TILE6() {
 		return 6;
 	}
-	static get TILE7() {
+	static get RIFF1() {
 		return 7;
 	}
-	static get TILE8() {
+	static get RIFF2() {
 		return 8;
 	}
-	static get TILE9() {
+	static get RIFF3() {
 		return 9;
 	}
 }

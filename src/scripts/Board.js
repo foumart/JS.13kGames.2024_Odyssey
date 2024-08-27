@@ -13,6 +13,7 @@ let stageData,
 	tileScreen,
 	unitScreen,
 	buttonScreen,
+	visitedData,
 	mapData,
 	idsData,
 	unitsData,
@@ -38,8 +39,9 @@ function initBoard() {
 
 	let x, y, renderedScreenSize = screenWidth + screenOut;
 
-	mapData = stageData.visited;// 2d array of 0 (empty) and 1 (occupied)
-	idsData = stageData.ids;// 2d array of 0 (water) 1-13 (isle ids)
+	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied)
+	mapData = visitedData.map(row => [...row]);// 2d array of concrete map data (TileType + coastal edges 11-25)
+	idsData = stageData.ids.map(row => [...row]);// 2d array of 0 (water) 1-13 (isle ids)
 	unitsData = islandGenerator.initArray();// 2d array of 0 (empty) - 1,2,3.. (unit ids)
 	unitsList = [];
 
@@ -70,17 +72,44 @@ function initBoard() {
 	unitsList.push(boardShip);
 	unitsData[shipY][shipX] = UnitType.SHIPUP;
 
-
+	//console.log(mapData);
+	islandGenerator.debugInfo();
+	console.log(mapData);
 	// combine data and relief into tile ids and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
 			// Update base tiles
 			if (mapData[y][x] == 1) {
-				if (stageData.relief[y][x] > 1) {
+				// TODO: tree
+				/*if (stageData.relief[y][x] > 1) {
 					mapData[y][x] = TileType.FOREST;//stageData.relief[y][x];
+				}*/
+
+				/*if (y < boardWidth - 1 && idsData[y+1][x] != idsData[y][x]) {
+					mapData[y][x] = mapData[y][x] == 1 ? 12 : 1;
+				}*/
+
+				if (y && !visitedData[y-1][x] ) {// ^|| idsData[y-1][x] != idsData[y][x]
+					mapData[y][x] = mapData[y][x] == 1 ? 14 : 1;
 				}
+
+				if (x && !visitedData[y][x-1] ) {// <|| idsData[y][x-1] != idsData[y][x]
+					mapData[y][x] = mapData[y][x] == 1 ? 13 : mapData[y][x] == 14 ? 18 : 1;
+				}
+
+				if (x < boardWidth-1 && !visitedData[y][x+1] ) {// >|| idsData[y][x+1] != idsData[y][x]
+					mapData[y][x] = mapData[y][x] == 1 ? 11 : mapData[y][x] == 14 ? 15 : mapData[y][x] == 18 ? 19 : 1;
+				}
+
+				if (y < boardWidth-1 && !visitedData[y+1][x] ) {// v|| idsData[y+1][x] != idsData[y][x]
+					mapData[y][x] = mapData[y][x] == 1 ? 12 : mapData[y][x] == 11 ? 16 : mapData[y][x] == 13 ? 17 : mapData[y][x] == 23 ? 21 : mapData[y][x] == 19 ? 25 : 25;
+				}
+
+				
+
 			} else if (stageData.relief[y][x]) {
-				mapData[y][x] = TileType.TILE8;// + stageData.relief[y][x];
+				// riffs
+				mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF3 : TileType.RIFF2;
 			}
 
 			if (Math.random()<.05 && unitsList.length < 10 && x > 9 && x < boardWidth-9 && y > 9 && y < boardWidth-9) {
@@ -91,6 +120,7 @@ function initBoard() {
 	}
 
 	//console.log(mapData);
+	//console.log(stageData.relief);
 	//console.log(unitsData);
 	//console.log(unitsList);
 	// data initialization completed

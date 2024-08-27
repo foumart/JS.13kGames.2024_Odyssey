@@ -48,7 +48,7 @@ let screenOffsetY = 0;
 let state = 0;
 let stage = 0;
 
-let tween = { transition: 0 };
+let tween = { transition: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
 let controls, actButton, infoTab, upButton, leftButton, rightButton, downButton;

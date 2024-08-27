@@ -30,6 +30,8 @@ function action(direction) {
 					playerY = boardWidth-1;
 					boardPlayer.y += boardWidth-jump;
 				}
+				tween.transitionY = -1;
+				TweenFX.to(tween, 6, {transitionY: 0}, e => { });
 			}
 			finalizeMove(1);
 			break;
@@ -45,6 +47,8 @@ function action(direction) {
 					playerX = jump;
 					boardPlayer.x -= boardWidth-jump;
 				}
+				tween.transitionX = 1;
+				TweenFX.to(tween, 6, {transitionX: 0}, e => { });
 			}
 			finalizeMove(2);
 			break;
@@ -60,6 +64,8 @@ function action(direction) {
 					playerY = jump;
 					boardPlayer.y -= boardWidth-jump;
 				}
+				tween.transitionY = 1;
+				TweenFX.to(tween, 6, {transitionY: 0}, e => { });
 			}
 			finalizeMove(3);
 			break;
@@ -75,6 +81,8 @@ function action(direction) {
 					playerX = boardWidth-1;
 					boardPlayer.x += boardWidth-jump;
 				}
+				tween.transitionX = -1;
+				TweenFX.to(tween, 6, {transitionX: 0}, e => { });
 			}
 			finalizeMove(4);
 			break;
@@ -110,7 +118,7 @@ function finalizeMove(dir) {
 
 function isPassable(x, y) {
 	if (player.onFoot) {
-		return unitsData[y][x] < 2 && (mapData[y][x] == 1 || mapData[y][x] == 2)
+		return unitsData[y][x] < 2 && (mapData[y][x] == 1 || mapData[y][x] == 2 || mapData[y][x] > 9)
 	}
-	return unitsData[y][x] < 2 && (!mapData[y][x] || mapData[y][x] == 8)
+	return unitsData[y][x] < 2 && (!mapData[y][x] || mapData[y][x] > 6 && mapData[y][x] <= 10)
 }
