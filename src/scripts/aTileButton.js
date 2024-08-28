@@ -3,8 +3,9 @@ class BoardButton extends BoardTile {
 	constructor(x, y, type) {
 		super(x, y, type);
 		this.btn = document.createElement("div");
-		this.btn.x = x;
-		this.btn.y = y;
+		this.btn.className = "css_uibtn";
+		this.btn.x = x + screenOut/2;
+		this.btn.y = y + screenOut/2;
 		gameContainer.append(this.btn);
 	}
 
@@ -18,7 +19,7 @@ class BoardButton extends BoardTile {
 
 	draw() {
 		if (this.btn) {
-			this.btn.style = (_debug&&false?'border:1px dashed rgba(99,99,99,0.5);box-sizing:content-box;':'')+`width:${
+			this.btn.style = (_debug&&false?'opacity:1;border:1px dashed rgba(255,255,255,0.5);box-sizing:content-box;':'')+`width:${
 				this.width
 			}px;height:${
 				this.height
@@ -26,9 +27,7 @@ class BoardButton extends BoardTile {
 				this.getY()
 			}px;left:${
 				this.getX()
-			}px;${
-				this.type ? 'cursor:pointer;pointer-events:auto' : ''
-			}`;
+			}px`;
 		}
 	}
 }

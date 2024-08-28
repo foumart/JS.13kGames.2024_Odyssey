@@ -41,7 +41,7 @@ class BoardTile extends GameElement {
 		gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
 
 		gameContext.drawImage(
-			offscreenBitmaps[(this.type||0)+16], 0, 0, tileWidth, tileWidth,
+			offscreenBitmaps[(this.type || 0) + 16], 0, 0, tileWidth, tileWidth,
 			this.getX(),
 			this.getY(),
 			this.width,

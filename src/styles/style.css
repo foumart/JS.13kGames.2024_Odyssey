@@ -15,6 +15,7 @@ div, canvas {
 	touch-action: none;
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
+	image-rendering: pixelated;
 }
 
 
@@ -43,3 +44,13 @@ div, canvas {
 	overflow: unset;
 	text-align: center;
 }
+
+.css_uibtn {
+	cursor: pointer;
+	pointer-events: auto;
+	/* background-color: rgba(255,255,255,0.1); */
+	/* opacity: 0; */
+}
+/*.css_uibtn:hover {
+	opacity: 1;
+}*/

@@ -22,7 +22,7 @@ function action(direction) {
 		case 1: // Up
 			// check collision
 			boarding = playerX == shipX && playerY-1 == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX, playerY-1);
+			landing = !player.onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : player.overlay;
 				playerY --;
@@ -40,7 +40,7 @@ function action(direction) {
 		case 2: // Right
 			// check collision
 			boarding = playerX+1 == shipX && playerY == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX+1, playerY);
+			landing = !player.onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : player.overlay;
 				playerX ++;
@@ -58,7 +58,7 @@ function action(direction) {
 		case 3: // Down
 			// check collision
 			boarding = playerX == shipX && playerY+1 == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX, playerY+1);
+			landing = !player.onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : player.overlay;
 				playerY ++;
@@ -76,7 +76,7 @@ function action(direction) {
 		case 4: // Left
 			// check collision
 			boarding = playerX-1 == shipX && playerY == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX-1, playerY);
+			landing = !player.onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : player.overlay;
 				playerX --;
@@ -125,11 +125,11 @@ function finalizeMove(dir) {
 	infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
 }
 
-function isPassable(x, y) {
+function isPassable(x, y, tileId = TileType.RIFF2) {
 	if (player.onFoot) {
 		return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= UnitType.CASTLE) &&
 			(mapData[y][x] >= TileType.LAND)
 	}
 	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] == UnitType.GOLD) &&
-		mapData[y][x] < TileType.LAND
+		mapData[y][x] < tileId
 }

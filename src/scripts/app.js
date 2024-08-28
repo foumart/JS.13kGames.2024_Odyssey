@@ -30,7 +30,7 @@ function toggleFullscreen(e) {
 function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 1 - screenOut/16) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 1 - screenOut/(12+screenOut*.8)) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}
@@ -50,7 +50,7 @@ let state = 0;
 let tween = { transition: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, actButton, infoTab, upButton, leftButton, rightButton, downButton;
+let controls, actButton, infoTab, actionTab, upButton, leftButton, rightButton, downButton;
 let title, playButton, fullscreenButton, soundButton;
 
 
@@ -135,8 +135,9 @@ function resizeUI(e) {
 	// Resize in-game UI elements
 	if (upButton) {
 		controls.style = portrait ? "bottom:0;width:54%" : "bottom:0;width:28%";
-		actButton.style = `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px`;
-		infoTab.style = `position:absolute;width:${controls.offsetWidth/2}px;height:${controls.offsetHeight/4}px;background-color:rgba(128,255,255,0.25)`;
+		actButton.style = `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px;min-width:${controls.offsetHeight*0.7}px;`;
+		infoTab.style = `width:${portrait?width:controls.offsetWidth}px;height:${portrait?controls.offsetHeight:height}px;background:linear-gradient(${!portrait?'90deg,':''}rgba(55,55,209,1),rgba(0,120,215,0));`;
+		actionTab.style = `bottom:0;right:0;width:${portrait?width:controls.offsetWidth}px;height:${portrait?controls.offsetHeight:height}px;background:linear-gradient(${!portrait?'90deg,':''}rgba(0,120,215,0),rgba(55,55,209,1));`;
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -184,12 +185,16 @@ function createUI() {
 	if (!state) {
 		title = generateUIButton(uiDiv, `${getIcon(220)}`, switchState);
 	} else {
+		infoTab = document.createElement('div');
+		infoTab.innerHTML = "<br>Welcome Corsair!";
+		uiDiv.append(infoTab);
+
+		actionTab = document.createElement('div');
+		uiDiv.append(actionTab);
+		actButton = generateUIButton(actionTab, '&#9974', e => action(6), "css_controls");
+
 		controls = document.createElement('div');
 		uiDiv.append(controls);
-		actButton = generateUIButton(uiDiv, '&#9974', e => action(6), "css_controls");
-		infoTab = document.createElement('div');
-		infoTab.innerHTML = "<br>Welcome Corsair!"
-		uiDiv.append(infoTab);
 	}
 
 	// Fullscreen and Sound buttons

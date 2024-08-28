@@ -1,13 +1,13 @@
 const
 	screenWidth = 9,// must be odd number, so there will be a central tile where player will reside
 	screenSide = 4,// must be even, screenWidth / 2 | 0
-	screenOut = 8,// must be even, how many total outside tiles to draw on both sides on the wider mobile screen [3(9)3]
+	screenOut = 6,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
 	tilt = 1,
 	jump = 3;// how many tiles to jump when wrapping from map sides
 
 // board vars
 let stageData,
-	boardWidth,
+	boardWidth,// map total width x height
 	boardScale,
 	unitsList,
 	tileScreen,
@@ -36,9 +36,8 @@ function initBoard() {
 	boardScale = 1;
 	tween.transition = 0.01;
 
-	oddDirectionalArray = generateOddArray();
-
 	let x, y, renderedScreenSize = screenWidth + screenOut;
+	oddDirectionalArray = generateOddArray(renderedScreenSize);
 
 	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied)
 	mapData = visitedData.map(row => [...row]);// 2d array of concrete map data (TileType + coastal edges 11-25)
@@ -79,36 +78,36 @@ function initBoard() {
 	// determine tiles and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
-			// Update base tiles
+			// Update base land tiles (0: water, 1: land)
 			if (mapData[y][x]) {
-				
+
+				// place trees and mountains if there is relief data on land
 				if (stageData.relief[y][x] > 1) {
-					// tree
 					unitsList.push(createUnit(x, y, stageData.relief[y][x] > 2 ? UnitType.MOUNT : UnitType.TREE));
 					unitsData[y][x] = stageData.relief[y][x] > 2 ? UnitType.MOUNT : UnitType.TREE;
 				}
 
+				// walk through all islands to place castles and shrines
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
-						// castle or shrine
 						unitsList.push(createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE));
 						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
 					}
 				});
 
-				if (mapData[y][x] == 1) {
+				if (mapData[y][x] == TileType.WATER) {// convert all initial tiles to land
 					mapData[y][x] = TileType.LAND;
 				}
 
-				if (y && (!visitedData[y-1][x] || idsData[y-1][x] != idsData[y][x]) || !y) {// ^
+				if (!visitedData[y-1][x] || idsData[y-1][x] != idsData[y][x]) {// ^
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 14 : TileType.LAND;
 				}
 
-				if (x && (!visitedData[y][x-1] || idsData[y][x-1] != idsData[y][x]) || !x) {// <
+				if (!visitedData[y][x-1] || idsData[y][x-1] != idsData[y][x]) {// <
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 18 : TileType.LAND;
 				}
 
-				if (x < boardWidth-1 && (!visitedData[y][x+1] || idsData[y][x+1] != idsData[y][x]) || x == boardWidth-1) {// >
+				if (!visitedData[y][x+1] || idsData[y][x+1] != idsData[y][x]) {// >
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 11 :
 					mapData[y][x] == 12 ? 16 :
 					mapData[y][x] == 13 ? 23 :
@@ -119,7 +118,7 @@ function initBoard() {
 					mapData[y][x] == 24 ? 20 : TileType.LAND;
 				}
 
-				if (y < boardWidth-1 && (!visitedData[y+1][x] || idsData[y+1][x] != idsData[y][x]) || y == boardWidth-1) {// v
+				if (!visitedData[y+1][x] || idsData[y+1][x] != idsData[y][x]) {// v
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 12 :
 					mapData[y][x] == 11 ? 16 :
 					mapData[y][x] == 13 ? 17 :
@@ -130,11 +129,31 @@ function initBoard() {
 					mapData[y][x] == 23 ? 21 : mapData[y][x];
 				}
 
-				
+			} else {
+				// convert depths to water based on the adjacent tiles and relief
+				if (
+					y && x && mapData[y-1][x-1] > TileType.WATER ||
+					y < boardWidth-1 && x < boardWidth-1 && (mapData[y+1][x+1] || stageData.relief[y+1][x+1]) ||
+					
+					y && x < boardWidth-1 && mapData[y-1][x+1] > TileType.WATER ||
+					y < boardWidth-1 && x && (mapData[y+1][x-1] || stageData.relief[y+1][x]) ||
+					
+					y && mapData[y-1][x] > TileType.WATER ||
+					y>1 && mapData[y-2][x] > TileType.WATER ||
+					y < boardWidth-1 && (mapData[y+1][x] || stageData.relief[y+1][x]) ||
+					y < boardWidth-2 && mapData[y+2][x] ||
+					x && mapData[y][x-1] > TileType.WATER ||
+					x>1 && mapData[y][x-2] > TileType.WATER ||
+					x < boardWidth-1 && (mapData[y][x+1] || stageData.relief[y][x+1]) ||
+					x < boardWidth-2 && mapData[y][x+2]
+				) {
+					mapData[y][x] = TileType.WATER;
+				}
 
-			} else if (stageData.relief[y][x]) {
-				// riffs
-				mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : stageData.relief[y][x] > 2 ? TileType.RIFF3 : TileType.RIFF2;
+				// convert water tiles to riffs based on relief data
+				if (stageData.relief[y][x]) {
+					mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : stageData.relief[y][x] > 2 ? TileType.RIFF3 : TileType.RIFF2;
+				}
 			}
 
 			if (
@@ -157,8 +176,8 @@ function initBoard() {
 
 	// now preparing to render only what is visible inside the game window
 	tileScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
-	unitScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
-	buttonScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
+	unitScreen = [];// 2d array
+	buttonScreen = [];// 2d array
 
 	let tileArr, unitArr, btnArr, tileType, unitType, button;
 	for(y = 0; y < renderedScreenSize; y++) {
@@ -175,8 +194,8 @@ function initBoard() {
 			unitType = unitsData[_y][_x];
 			unitArr.push(new BoardUnit(x, y, unitType));
 
-			if (state && x < screenWidth && y < screenWidth) {
-				button = new BoardButton(x, y, determineDirection(x, y));
+			if (state) {
+				button = new BoardButton(x - screenOut/2, y - screenOut/2, determineDirection(x, y));
 				addButtonListeners(button.btn);
 				btnArr.push(button);
 			}
@@ -264,43 +283,42 @@ function determineDirection(x, y) {
 	return oddDirectionalArray[y][x];
 }
 
-function generateOddArray() {
-	// Initialize the 2D array with all elements as 0
-	const array = islandGenerator.initArray(0, screenWidth);
-	// Array.from({ length: n }, () => Array(n).fill(0));
+function generateOddArray(size) {
+	const array = islandGenerator.initArray(0, size);
 
 	// Fill the directional regions around the center
-	for (let i = 0; i < screenWidth; i++) {
-		for (let j = 0; j < screenWidth; j++) {
-			if (i === screenSide && j === screenSide) {
-				array[i][j] = 5; // Center element
-			} else if (i < j && i + j < screenWidth - 1) {
+	for (let i = 0; i < size; i++) {
+		for (let j = 0; j < size; j++) {
+			if (i < j && i + j < size - 1) {
 				array[i][j] = 1; // Top region
-			} else if (i < j && i + j > screenWidth - 1) {
+			} else if (i < j && i + j > size - 1) {
 				array[i][j] = 2; // Right region
-			} else if (i > j && i + j > screenWidth - 1) {
+			} else if (i > j && i + j > size - 1) {
 				array[i][j] = 3; // Bottom region
-			} else if (i > j && i + j < screenWidth - 1) {
+			} else if (i > j && i + j < size - 1) {
 				array[i][j] = 4; // Left region
 			}
 		}
 	}
+
+	// Set the central tile to 5
+	array[size/2|0][size/2|0] = 5;
 
 	return array;
 }
 
 // Draw the board
 function drawBoard() {
-	gameContext.fillStyle = "#4d4de8";
+	gameContext.fillStyle = "#4848e3";
 	gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	let _x, _y, _z,
 		_ox = portrait ? screenSide : screenSide + screenOut/2,
 		_oy = !portrait ? screenSide : screenSide + screenOut/2;
 
+	// Update base tiles
 	for(let y = 0; y < screenWidth + screenOut; y++) {
 		for(let x = 0; x < screenWidth + screenOut; x++) {
-			// Update base tiles
 			if (tileScreen[y]) {
 				if (tileScreen[y][x]) {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
@@ -311,7 +329,6 @@ function drawBoard() {
 						(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
 						(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
 					)
-					//if (unitScreen[y][x]) unitScreen[y][x].update();
 				}
 			}
 		}
