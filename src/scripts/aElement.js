@@ -1,4 +1,4 @@
-class GameElement {
+class BoardElement {
 
 	constructor() {
 		this.resize();

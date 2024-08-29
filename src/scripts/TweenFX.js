@@ -19,7 +19,7 @@ class TweenFX {
 			if (count < duration) {
 				count ++;
 				tweenedKeys.forEach((key, i) => {
-					const eased = duration * .5 * (Math.sin((count / duration - .5) * Math.PI) + 1);
+					const eased = duration * Math.pow(count / duration, 1.675);
 					if (tweenedStart[i] > tweenedEnd[i]) {
 						element[key] = tweenedEnd[i] + (tweenedStart[i] - tweenedEnd[i]) / duration * (duration - eased);
 					} else {

@@ -1,5 +1,5 @@
 let unit, player, ship;
-let boarding, landing;
+let boarding, landing, onFoot = true;
 
 function createUnit(x, y, z) {
 	unit = new Unit(x, y, z);
@@ -21,78 +21,83 @@ function action(direction) {
 	switch (direction) {
 		case 1: // Up
 			// check collision
-			boarding = playerX == shipX && playerY-1 == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
+			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
+			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : player.overlay;
 				playerY --;
 				player.y --;
+				if (!onFoot && !landing) boardShip.y --;
 				if (playerY < jump) {// TODO: fix wrapping
 					playerY = boardWidth-1;
 					boardPlayer.y += boardWidth-jump;
 				}
 				tween.transitionY = -1;
-				TweenFX.to(tween, 6, {transitionY: 0}, e => { paused = false; });
-				finalizeMove(1);
+				TweenFX.to(tween, 6, {transitionY: 0}, null, finalizeMove.bind(this));
+				prepareToMove(1);
 			}
 
 			break;
 		case 2: // Right
 			// check collision
-			boarding = playerX+1 == shipX && playerY == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
+			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
+			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : player.overlay;
 				playerX ++;
 				boardPlayer.x ++;
+				if (!onFoot && !landing) boardShip.x ++;
 				if (playerX > boardWidth-1) {
 					playerX = jump;
 					boardPlayer.x -= boardWidth-jump;
 				}
 				tween.transitionX = 1;
-				TweenFX.to(tween, 6, {transitionX: 0}, e => { paused = false; });
-				finalizeMove(2);
+				TweenFX.to(tween, 6, {transitionX: 0}, null, finalizeMove.bind(this));
+				prepareToMove(2);
 			}
 
 			break;
 		case 3: // Down
 			// check collision
-			boarding = playerX == shipX && playerY+1 == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
+			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
+			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : player.overlay;
 				playerY ++;
 				boardPlayer.y ++;
+				if (!onFoot && !landing) boardShip.y ++;
 				if (playerY > boardWidth-1) {
 					playerY = jump;
 					boardPlayer.y -= boardWidth-jump;
 				}
 				tween.transitionY = 1;
-				TweenFX.to(tween, 6, {transitionY: 0}, e => { paused = false; });
-				finalizeMove(3);
+				TweenFX.to(tween, 6, {transitionY: 0}, null, finalizeMove.bind(this));
+				prepareToMove(3);
 			}
 
 			break;
 		case 4: // Left
 			// check collision
-			boarding = playerX-1 == shipX && playerY == shipY && player.onFoot;
-			landing = !player.onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
+			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
+			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : player.overlay;
 				playerX --;
 				boardPlayer.x --;
+				if (!onFoot && !landing) boardShip.x --;
 				if (playerX < jump) {
 					playerX = boardWidth-1;
 					boardPlayer.x += boardWidth-jump;
 				}
 				tween.transitionX = -1;
-				TweenFX.to(tween, 6, {transitionX: 0}, e => { paused = false; });
-				finalizeMove(4);
+				TweenFX.to(tween, 6, {transitionX: 0}, null, finalizeMove.bind(this));
+				prepareToMove(4);
 			}
 
 			break;
 		case 5: // Center
-			console.log("Ship");
+			player.selection = player.selection ? 0 : 1;
+
 			break;
 		case 6: // Action
 			//console.log("Action");
@@ -105,20 +110,26 @@ function action(direction) {
 	}
 }
 
+function finalizeMove() {
+	paused = false;
+	//console.log(getUnit(playerX, playerY), idsData[playerY][playerX]);
+}
 
-function finalizeMove(dir) {
+
+function prepareToMove(dir) {
 	paused = true;
 	player.overlay = unitsData[playerY][playerX];
 	if (boarding) {
-		player.onFoot = false;
+		onFoot = false;
+		ship.origin = 1;
 		player.overlay = UnitType.EMPTY;
 	} else if (landing) {
-		player.onFoot = true;
-	} else if (!player.onFoot) {
+		onFoot = true;
+	} else if (!onFoot) {
 		shipX = playerX; shipY = playerY;
 	}
 
-	unitsData[playerY][playerX] = boarding || !player.onFoot
+	unitsData[playerY][playerX] = boarding || !onFoot
 		? dir % 2 ? UnitType.SHIPUP : dir == 2 ? UnitType.SHIPLEFT : UnitType.SHIPRIGHT
 		: UnitType.PLAYER;
 
@@ -126,7 +137,7 @@ function finalizeMove(dir) {
 }
 
 function isPassable(x, y, tileId = TileType.RIFF2) {
-	if (player.onFoot) {
+	if (onFoot) {
 		return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= UnitType.CASTLE) &&
 			(mapData[y][x] >= TileType.LAND)
 	}
