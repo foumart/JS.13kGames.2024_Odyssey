@@ -21,9 +21,13 @@ const timestamp = getDateString();
 
 // Data taken directly from package.json
 const name = packageJson.name;
-const title = packageJson.title;
-const id_name = `${name.replace(/\s/g, '')}`;//_${getDateString(true)}
 const version = packageJson.version;
+const id_name = `${name.replace(/\s/g, '')}`;//_${getDateString(true)}
+const title = packageJson.title || name;
+const descr = packageJson.description || name + " description";
+const link = packageJson.link || "index.html";
+const keywords = packageJson.keywords || "";
+const author = packageJson.author.name || "";
 const iconExtension = packageJson.iconExtension;
 const iconType = packageJson.iconType;
 const iconSize = packageJson.iconSize;
@@ -55,12 +59,12 @@ const mobile = argv.mobile != undefined || argv.all != undefined ? `
 // TODO: quotes should not be removed for content that has space characters
 const social = argv.social != undefined || argv.all != undefined ? `
 <meta name="application-name" content="${title}"/>
-<meta name="description" content="${packageJson.description}"/>
-<meta name="keywords" content="${packageJson.keywords}"/>
-<meta name="author" content="${packageJson.author.name}"/>
+<meta name="description" content="${descr}"/>
+<meta name="keywords" content="${keywords}"/>
+<meta name="author" content="${author}"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="${title}"/>
-<meta name="twitter:description" content="${packageJson.description}"/>
+<meta name="twitter:description" content="${descr}"/>
 <meta name="twitter:image" content="ico.${iconExtension}"/>` : false;
 
 // Prepare a web icon to be used by html and pwa
@@ -164,6 +168,7 @@ function mf(callback) {
 		src('resources/mf.webmanifest', { allowEmpty: true })
 			.pipe(replace('service_worker', 'sw', replaceOptions))
 			.pipe(replace('{TITLE}', title, replaceOptions))
+			.pipe(replace('{LINK}', debug ? "index.html" : link, replaceOptions))
 			.pipe(replace('{ICON_EXTENSION}', iconExtension, replaceOptions))
 			.pipe(replace('{ICON_TYPE}', iconType, replaceOptions))
 			.pipe(replace('{ICON_SIZE}', iconSize, replaceOptions))

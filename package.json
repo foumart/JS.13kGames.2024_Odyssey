@@ -1,14 +1,11 @@
 {
 	"name": "js13k_template",
-	"version": "0.0.1",
-	"title": "JS13K Template",
+	"version": "0.0.2",
+
+	"title": "The Cursed Island",
 	"description": "js13k progressive web app starter pack",
-	"keywords": [
-		"js13kgames",
-		"js13k",
-		"pwa",
-		"template"
-	],
+	"keywords": ["js13kgames", "js13k", "pwa", "template"],
+	"link": "https://drafts.js13kgames.com/the-cursed-island/",
 	"orientation": "any",
 	"iconExtension": "svg",
 	"iconType": "image/svg+xml",

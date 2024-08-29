@@ -1,6 +1,6 @@
 {
 	"name": "{TITLE}",
-	"start_url": "index.html",
+	"start_url": "{LINK}",
 	"serviceworker": {
 		"src": "service_worker.js"
 	},
