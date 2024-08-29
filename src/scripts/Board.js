@@ -21,10 +21,8 @@ let stageData,
 	currentButtonX,
 	currentButtonY,
 	oddDirectionalArray,
-	touchX, touchY, touchZ;
-let boardPlayer,
-	boardShip,
-	playerX,
+	touchX, touchY, touchZ;// are we trying to zoom map
+let playerX,
 	playerY,
 	shipX,
 	shipY;
@@ -63,7 +61,7 @@ function initBoard() {
 				// walk through all islands to place castles and shrines
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
-						unit = createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE)
+						unit = createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
 						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
 						// set castle origin color flag (0:none, 1:red player, 2:blue neutral, 3: black enemy)
@@ -165,11 +163,11 @@ function initBoard() {
 		else shipY ++;
 	}
 
-	boardPlayer = createPlayer(playerX, playerY, UnitType.PLAYER);
+	boardPlayer = createUnit(playerX, playerY, UnitType.PLAYER);//new Unit(playerX, playerY, UnitType.PLAYER);
 	unitsList.push(boardPlayer);
 	unitsData[playerY][playerX] = UnitType.PLAYER;
 
-	boardShip = createShip(shipX, shipY, UnitType.SHIPLEFT);
+	boardShip = createUnit(shipX, shipY, UnitType.SHIPLEFT);
 	unitsList.push(boardShip);
 	unitsData[shipY][shipX] = UnitType.SHIPLEFT;
 
@@ -230,7 +228,6 @@ function buttonDown(event) {
 function moveButton(event) {
 	if (/touch/.test(event.type)) {
 		let touches = event.touches;
-		//[{pageX:event.touches[0].pageX,pageY:event.touches[0].pageY},{pageX:width/2,pageY:height*0.75}];// simulate
 
 		touchZ = touches.length > 1;
 		if (touchZ) {
@@ -254,8 +251,9 @@ function clickButton(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
 	// is it a swipe or click ?
-	currentButtonX = Math.round((target.clientX - currentButtonX) / boardPlayer.width);
-	currentButtonY = Math.round((target.clientY - currentButtonY) / boardPlayer.width);
+	currentButtonX = Math.round((target.clientX - currentButtonX) / boardPlayer.playerOnScreen.width);
+	currentButtonY = Math.round((target.clientY - currentButtonY) / boardPlayer.playerOnScreen.width);
+
 	if (currentButtonX || currentButtonY) {
 		//console.log("swipe: "+currentButtonX+"x"+currentButtonY);
 		if (state == 1) {
@@ -276,7 +274,7 @@ function clickButton(event) {
 		// clicked index (x/y)
 		currentButtonX = target.target.x;
 		currentButtonY = target.target.y;
-		//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
+		console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
 
 		if (state == 1) {
 			let direction = determineDirection(currentButtonX, currentButtonY);
@@ -358,17 +356,20 @@ function drawBoard() {
 					if (_z) {
 						if (_x == playerX && _y == playerY) {
 							// make sure we draw the player underlay object
-							unitScreen[y][x].overlay = player.overlay;
-							unitScreen[y][x].selection = player.selection;
-							unitScreen[y][x].origin = player.origin;
+							unitScreen[y][x].player = boardPlayer;
+							unitScreen[y][x].overlay = boardPlayer.overlay;
+							unitScreen[y][x].selection = boardPlayer.selection;
+							unitScreen[y][x].origin = boardPlayer.origin || 0;
+							boardPlayer.playerOnScreen = unitScreen[y][x];
 						} else if (_x == shipX && _y == shipY) {
 							// set ship owner
-							unitScreen[y][x].origin = ship.origin;
+							unitScreen[y][x].ship = boardShip;
+							unitScreen[y][x].origin = boardShip.origin || 0;
 						} else {
 							// set castle owner
 							_unit = getUnit(_x, _y);
 							if (_unit && _unit.origin) {
-								unitScreen[y][x].origin = _unit.origin;
+								unitScreen[y][x].origin = _unit.origin || 0;
 							}
 						}
 					}

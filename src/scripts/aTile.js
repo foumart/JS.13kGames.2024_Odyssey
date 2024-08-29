@@ -35,6 +35,8 @@ class BoardTile extends BoardElement {
 	reset() {
 		// The following reflected on the corresponding game unit this board element represented for a while.
 		// When moving we reset all board elements and then  assign new data on each board element.
+		this.ship = 0;
+		this.player = 0;
 		this.overlay = 0;
 		this.origin = 0;
 		this.selection = 0;

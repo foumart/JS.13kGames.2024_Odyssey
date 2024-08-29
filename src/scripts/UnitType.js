@@ -8,26 +8,26 @@ class UnitType {
 	static get SHIPUP() {
 		return 2;
 	}
-	static get SHIPLEFT() {
+	static get SHIPDOWN() {
 		return 3;
 	}
-	static get SHIPRIGHT() {
+	static get SHIPLEFT() {
 		return 4;
+	}
+	static get SHIPRIGHT() {
+		return 5;
 	}
 
 	static get ENEMY1() {
-		return 5;
-	}
-	static get ENEMY2() {
 		return 6;
 	}
-	static get ENEMY3() {
+	static get ENEMY2() {
 		return 7;
 	}
-	static get ENEMY4() {
+	static get ENEMY3() {
 		return 8;
 	}
-	static get ENEMY5() {
+	static get ENEMY4() {
 		return 9;
 	}
 

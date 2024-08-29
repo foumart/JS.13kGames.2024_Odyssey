@@ -6,6 +6,7 @@ const offscreenPixelData = [
 	// UNITS
 	"5656622a2a3fff2b00c92606e2e2f0ffb08eda8763",// player
 	"835426ff2525c6c6d4ffffffbf6812e3e3f1544434",// ship up
+	"835426ff2525c6c6d4ffffffbf6812e3e3f1544434",// ship down
 	"bf6812ff2525e3e3f1ffffff835426c6c6d4544434",// ship left
 	"ff2525bf6812835426e3e3f1ffffffc6c6d4544434",// ship right
 	
@@ -13,7 +14,6 @@ const offscreenPixelData = [
 	"2965ff2658d7537de73a3a933c6be24343a0544434",
 	"24a22c39be4300e9120d8537982943c52e51544434",
 	"2965ff2658d7537de73a3a933c6be24343a0544434",
-	"24a22c39be4300e9120d8537982943c52e51544434",
 
 	"89899544444ec6c6d46b6b7ce1e1ee835426b25800",// castle
 	"0d85375656623b3b460c6804898995c6c6d42b2b39",// shrine
@@ -57,6 +57,7 @@ const offscreenColorData = [
 	// UNITS
 	"@IRBI[dRQujS\`v_DPdZNzTfPQJB@RPB",// player pirate
 	"@HR@X\\u@\`d^Fp\\qCX~a@@xADximA@OM@",// ship up
+	"@HR@X\\u@\`d^Fp\\qCX~a@@xADximA@OM@",// ship down
 	"@AR@X\\E@cdf@^\\uDpsG^FGGIoIIExmm@",// ship left
 	"@IP@@XlD@umeh^lttxfFRxxpXRR{@[[G",// ship right
 	
@@ -64,7 +65,6 @@ const offscreenColorData = [
 	"HA@@ZJ@@lS@Ddm@fpdtD@vf@@\`D@@@@@",//enemy2
 	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
 	"HA@@ZJ@@lS@Ddm@fpdtD@vf@@\`D@@@@@",//enemy2
-	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
 
 	"HZZTXm]QXe]QPIIB@b\\B\`mbSi~UaX~SD",//10 castle
 	"@Q[D@uue\`jjZhVnP}]i~_Va}[eHA@A",//11 shrine
