@@ -4,21 +4,21 @@ const offscreenBitmaps = [];
 
 const offscreenPixelData = [
 	// UNITS
-	"5656622a2a3fff2b00c92606e2e2f0ffb08eda8763",// player
-	"835426ff2525c6c6d4ffffffbf6812e3e3f1544434",// ship up
-	"835426ff2525c6c6d4ffffffbf6812e3e3f1544434",// ship down
-	"bf6812ff2525e3e3f1ffffff835426c6c6d4544434",// ship left
-	"ff2525bf6812835426e3e3f1ffffffc6c6d4544434",// ship right
+	"ff2b00c926062a2a3f565662da8763ffb08effffff",// player
+	"ff2b00c926062a2a3f565662da8763ffb08effffff",// player
+	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship up
+	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship down
+	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship right
+	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship left
 	
-	"24a22c39be4300e9120d8537982943c52e51544434",// enemies
-	"2965ff2658d7537de73a3a933c6be24343a0544434",
-	"24a22c39be4300e9120d8537982943c52e51544434",
-	"2965ff2658d7537de73a3a933c6be24343a0544434",
+	"24a22c39be4300e9120d8537982943c52e51544434",// enemy 1
+	"2965ff2658d7537de73a3a933c6be24343a0544434",// enemy 2
+	"24a22c39be4300e9120d8537982943c52e51544434",// enemy 1
 
-	"89899544444ec6c6d46b6b7ce1e1ee835426b25800",// castle
-	"0d85375656623b3b460c6804898995c6c6d42b2b39",// shrine
-	"0c680424a22c0d853700e91200ca10544434835426",// tree
-	"b25800835426ffca3ae0a70ede8e27bf6812544434",// gold
+	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle
+	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine
+	"864404452d1512510d00ca1024a9210d853700e912",// tree
+	"b25800dd8700e4ae1e31395ffff115ffca3ab3cdf0",// gold
 	"adbaa8f4e5d50c680471806ba7734024a22c835426",// mount
 	"adbaa8f4e5d50c680471806ba7734024a22c835426",//
 	"adbaa8f4e5d50c680471806ba7734024a22c835426",//
@@ -27,8 +27,8 @@ const offscreenPixelData = [
 	"3737d13a3adc3d3ddf4343de4d4de8",// 00 depths
 	"3a3adc3d3ddf4343de4d4de8",// 01 water
 	"4343de4d4de85c5cf07070ef",// 02 riff1
-	"3d3ddf4343de4d4de87070ef8585f5",// 04 riff2
 	"93791f2db22d3d963d4343de4d4de87070ef8585f5",// 04 riff3
+	"3d3ddf4343de4d4de87070ef8585f5",// 04 riff2
 	"4343de4d4de87070ef8585f5c8c8f5",// 05 shine
 	"4d4de84343de8585f54343de00ae0000c70000dc00",
 	"4d4de84343de8585f54343de00ae0000c70000dc00",
@@ -55,21 +55,21 @@ const offscreenPixelData = [
 
 const offscreenColorData = [
 	// UNITS
-	"@IRBI[dRQujS\`v_DPdZNzTfPQJB@RPB",// player pirate
-	"@HR@X\\u@\`d^Fp\\qCX~a@@xADximA@OM@",// ship up
-	"@HR@X\\u@\`d^Fp\\qCX~a@@xADximA@OM@",// ship down
-	"@AR@X\\E@cdf@^\\uDpsG^FGGIoIIExmm@",// ship left
-	"@IP@@XlD@umeh^lttxfFRxxpXRR{@[[G",// ship right
+	"Xb[DcIRc\\w{YPvMBXmRKfkZVX\\cC@[XC",// player
+	"\`cZC\\RI\\K_~cPunBYmQCrkZtX\\cC@[XC",// player
+	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship up
+	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship down
+	"hnc@}wD@n~}@}ulGpoAuEBB\\JccAPII@",// ship right
+	"@\\uE@\`~o@owuxenonH}FcPPhH\\\\Q@IIB",// ship left
 	
 	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
 	"HA@@ZJ@@lS@Ddm@fpdtD@vf@@\`D@@@@@",//enemy2
 	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
-	"HA@@ZJ@@lS@Ddm@fpdtD@vf@@\`D@@@@@",//enemy2
 
-	"HZZTXm]QXe]QPIIB@b\\B\`mbSi~UaX~SD",//10 castle
-	"@Q[D@uue\`jjZhVnP}]i~_Va}[eHA@A",//11 shrine
-	"@QK@HlRAaeUJQmRKH[IA@@F@@KOC@X[@",//12 tree
-	"@HB@@cQ@\`]LBhcsAPuMB@WQG@xz@@@@@",//13 gold
+	"psscpw]pOw]\`vn\\@ctCXc^|Q_euQ^l",//10 castle
+	"@kf@pwwA{nn\\wLyfnIqMwI|flat]SCcB",//11 shrine
+	"@fuCp}g]p|l^Xfu^@s^C@@B@@@A@@@@@",//12 tree
+	"@PA@@jV@XVY@HZuA_uSg|ZzD\`g@@dD@",//13 gold
 	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//14 mount
 	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//15
 	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//16
@@ -78,8 +78,8 @@ const offscreenColorData = [
 	"TlSbZL]IbTIkaSTZeb",// 00 depths
 	"dKc[\\bK[Tb[YTc[\\Yd",// 01 water
 	"RSQQRRRRTRQRSRQRRR",// 02 riff1
-	"S[U[cc[[[kZZ\\L[S[S",// 03 riff2
 	"mgmuslmmmqmglurmmm",// 04 riff3
+	"S[U[cc[[[kZZ\\L[S[S",// 03 riff2
 	"RSRaRTlTSbQRSReRRd",// 05 shine
 	"IRJZQK[SQZRRQJ[QR[",
 	"IRJZQK[SQZRRQJ[QR[",

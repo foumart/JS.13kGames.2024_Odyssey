@@ -22,7 +22,9 @@ let stageData,
 	currentButtonY,
 	oddDirectionalArray,
 	touchX, touchY, touchZ;// are we trying to zoom map
-let playerX,
+let player,
+	ship,
+	playerX,
 	playerY,
 	shipX,
 	shipY;
@@ -251,8 +253,8 @@ function clickButton(event) {
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
 	// is it a swipe or click ?
-	currentButtonX = Math.round((target.clientX - currentButtonX) / boardPlayer.playerOnScreen.width);
-	currentButtonY = Math.round((target.clientY - currentButtonY) / boardPlayer.playerOnScreen.width);
+	currentButtonX = Math.round((target.clientX - currentButtonX) / player.width);
+	currentButtonY = Math.round((target.clientY - currentButtonY) / player.width);
 
 	if (currentButtonX || currentButtonY) {
 		//console.log("swipe: "+currentButtonX+"x"+currentButtonY);
@@ -274,7 +276,7 @@ function clickButton(event) {
 		// clicked index (x/y)
 		currentButtonX = target.target.x;
 		currentButtonY = target.target.y;
-		console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
+		//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
 
 		if (state == 1) {
 			let direction = determineDirection(currentButtonX, currentButtonY);
@@ -344,7 +346,9 @@ function drawBoard() {
 
 	// Update units
 	for(let y = 0; y < screenWidth + screenOut; y++) {
+		let _player, shouldDrawPlayer;
 		for(let x = 0; x < screenWidth + screenOut; x++) {
+			shouldDrawPlayer = false;
 			if (unitScreen[y]) {
 				if (unitScreen[y][x]) {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
@@ -355,26 +359,29 @@ function drawBoard() {
 
 					if (_z) {
 						if (_x == playerX && _y == playerY) {
+							player = unitScreen[y][x];
+							if (!_player) {
+								shouldDrawPlayer = true;
+								_player = _z;
+							}
 							// make sure we draw the player underlay object
-							unitScreen[y][x].player = boardPlayer;
-							unitScreen[y][x].overlay = boardPlayer.overlay;
-							unitScreen[y][x].selection = boardPlayer.selection;
-							unitScreen[y][x].origin = boardPlayer.origin || 0;
-							boardPlayer.playerOnScreen = unitScreen[y][x];
+							player.overlay = boardPlayer.overlay;
+							player.selection = boardPlayer.selection;
+							player.origin = boardPlayer.origin || 1;
 						} else if (_x == shipX && _y == shipY) {
 							// set ship owner
-							unitScreen[y][x].ship = boardShip;
-							unitScreen[y][x].origin = boardShip.origin || 0;
-						} else {
-							// set castle owner
-							_unit = getUnit(_x, _y);
-							if (_unit && _unit.origin) {
-								unitScreen[y][x].origin = _unit.origin || 0;
-							}
+							ship = unitScreen[y][x];
+							ship.origin = boardShip.origin || 0;
+							
+						}
+
+						_unit = getUnit(_x, _y);
+						if (_unit && _unit.origin) {
+							unitScreen[y][x].origin = _unit.origin || 0;
 						}
 					}
 	
-					unitScreen[y][x].update(_z);//
+					if (!shouldDrawPlayer) unitScreen[y][x].update(_z);
 						//_z,
 						//(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
 						//(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
@@ -382,6 +389,7 @@ function drawBoard() {
 				}
 			}
 		}
+		if (_player) player.update(_player);
 	}
 
 	if (buttonScreen) {

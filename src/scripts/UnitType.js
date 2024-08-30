@@ -5,29 +5,29 @@ class UnitType {
 	static get PLAYER() {
 		return 1;
 	}
-	static get SHIPUP() {
+	static get PLAYERRIGHT() {
 		return 2;
 	}
-	static get SHIPDOWN() {
+	static get SHIPUP() {
 		return 3;
 	}
-	static get SHIPLEFT() {
+	static get SHIPDOWN() {
 		return 4;
 	}
-	static get SHIPRIGHT() {
+	static get SHIPLEFT() {
 		return 5;
+	}
+	static get SHIPRIGHT() {
+		return 6;
 	}
 
 	static get ENEMY1() {
-		return 6;
-	}
-	static get ENEMY2() {
 		return 7;
 	}
-	static get ENEMY3() {
+	static get ENEMY2() {
 		return 8;
 	}
-	static get ENEMY4() {
+	static get ENEMY3() {
 		return 9;
 	}
 

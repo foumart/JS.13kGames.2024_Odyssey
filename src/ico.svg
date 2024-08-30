@@ -1,1 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><title>ico</title><rect width="160" height="160" style="fill:#5a0fc8"/><path d="M117,125H94L77,76,59,125H38L20,73,36,55,48,94,69,33H86l19,58,22-58h22Z" style="fill:#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+<title>ico</title>
+
+<rect width="160" height="160" x="0" y="0" fill="#35c" />
+<rect width="12" height="8" x="72" y="56" fill="red" />
+<rect width="4" height="8" x="72" y="60" fill="#852" />
+<rect width="12" height="20" x="68" y="68" fill="#fff" />
+<rect width="8" height="12" x="64" y="72" fill="#ccd" />
+<rect width="4" height="4" x="64" y="88" fill="#ccd" />
+<rect width="4" height="4" x="64" y="92" fill="#432" />
+
+<rect width="4" height="16" x="80" y="72" fill="#b61" />
+<rect width="4" height="4" x="72" y="88" fill="#432" />
+<rect width="4" height="4" x="80" y="88" fill="#432" />
+<rect width="4" height="4" x="80" y="76" fill="#ccd" />
+<rect width="8" height="4" x="80" y="68" fill="#e70" />
+
+<rect width="4" height="4" x="84" y="76" fill="#fff" />
+<rect width="4" height="4" x="84" y="80" fill="#ccd" />
+<rect width="4" height="4" x="88" y="80" fill="#fff" />
+<rect width="4" height="4" x="88" y="84" fill="#ccd" />
+<rect width="4" height="4" x="92" y="84" fill="#ccd" />
+
+<rect width="20" height="8" x="68" y="92" fill="#b61" />
+<rect width="16" height="4" x="68" y="96" fill="#852" />
+<rect width="4" height="8" x="88" y="88" fill="#b61" />
+<rect width="4" height="4" x="72" y="92" fill="#e70" />
+<rect width="4" height="4" x="80" y="92" fill="#e70" />
+<rect width="4" height="4" x="92" y="88" fill="#e70" />
+</svg>

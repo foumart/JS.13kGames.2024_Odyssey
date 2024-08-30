@@ -3,7 +3,8 @@ let unit,
 	boardShip,
 	boarding,
 	landing,
-	onFoot = true;
+	onFoot = true,
+	inDialog = false;
 
 function createUnit(x, y, z) {
 	unit = new Unit(x, y, z);
@@ -95,8 +96,20 @@ function action(direction) {
 			break;
 		case 6: // Action
 			//console.log("Action");
-			paused = true;
-			updateMap();
+			//paused = true;
+			//updateMap();
+			unit = getUnit(playerX, playerY);
+			if (unit.overlay == 10) {
+				//console.log("CASTLE")
+				displayDialog();
+			} else if (unit.overlay == 11) {
+				console.log("SHRINE")
+			} else if (unit.overlay == 12) {
+				console.log("TREE")
+			} else if (unit.overlay == 13) {
+				console.log("GOLD")
+			}
+
 			break;
 		default: // Corners
 			console.log("Default action:", direction);
@@ -106,11 +119,47 @@ function action(direction) {
 
 function finalizeMove() {
 	paused = false;
-	//console.log(getUnit(playerX, playerY), idsData[playerY][playerX]);
+	updateActionButton();
+}
+
+function displayDialog() {
+	inDialog = !inDialog;
+	dialog.style.display = inDialog ? 'block' : 'none';
+	gameContainer.style.display = inDialog ? 'none' : 'block';
+	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
+	/*gameContainer.style.pointerEvents = inDialog ? 'none' : 'auto';
+	if (buttonScreen) {
+		for (let _y = 0; _y < buttonScreen.length; _y ++) {
+			for (let _x = 0; _x < buttonScreen[_y].length; _x ++) {
+				buttonScreen[_y][_x].btn.style.pointerEvents = inDialog ? "none" : "auto";
+			}
+		}
+	}*/
+}
+
+function updateActionButton() {
+	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 |
+	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
+	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
+
+	unit = getUnit(playerX, playerY);
+
+	if (unit.overlay == 10) {//CASTLE
+		actButton.innerHTML = unit.origin>1 ? '&#9876' : '&#9881';
+	} else if (unit.overlay == 11) {//SHRINE
+		actButton.innerHTML = "&#128736";
+	} else if (unit.overlay == 12) {//TREE
+		actButton.innerHTML = "&#129683";
+	} else if (unit.overlay == 13) {//GOLD
+		actButton.innerHTML = "&#128142";
+	} else {
+		actButton.innerHTML = onFoot ? '&#9935' : '&#9784';
+	}
 }
 
 
 function prepareToMove(dir) {
+	if (inDialog) displayDialog();// hide the dialog
 	paused = true;
 	boardPlayer.overlay = unitsData[playerY][playerX];
 	if (boarding) {

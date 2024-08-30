@@ -50,8 +50,8 @@ let state = 0;
 let tween = { transition: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, actButton, infoTab, actionTab, upButton, leftButton, rightButton, downButton;
-let title, playButton, fullscreenButton, soundButton;
+let controls, actButton, infoTab, dialog, upButton, leftButton, rightButton, downButton;
+let title, titleText, playButton, fullscreenButton, soundButton;
 
 
 // Game initialization
@@ -88,11 +88,13 @@ function toggleSound(event) {
 		}
 	}
 
-	if (!SoundFXvolume) {
-		soundButton.innerHTML = "&nbsp&#215&#10919";
-	} else {
-		soundButton.innerHTML = (SoundFXvolume == 1 ? "&#8901&#8901&#8901" : SoundFXvolume > 0.25 ? "&nbsp&#8901&#8901" : "&nbsp&nbsp&#8901") + "&#10919";
-	}
+	soundButton.innerHTML = (
+		!SoundFXvolume ? "&#215"
+			: (
+				SoundFXvolume == 1 ? "&#8901&#8901" :
+				SoundFXvolume > 0.25 ? "&#8901&#8901" : ""
+			) + "&#8901"
+	) + "&#10919";
 }
 
 function setupUI() {
@@ -134,15 +136,14 @@ function resizeUI(e) {
 
 	// Resize in-game UI elements
 	if (upButton) {
-		controls.style = portrait ? "bottom:0;width:54%" : "bottom:0;width:28%";
-		actButton.style = `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px;min-width:${controls.offsetHeight*0.7}px;`;
-		infoTab.style = `width:${portrait?width:controls.offsetWidth}px;height:${portrait?controls.offsetHeight:height}px;background:linear-gradient(${!portrait?'90deg,':''}rgba(55,55,209,1),rgba(0,120,215,0));`;
-		actionTab.style = `bottom:0;right:0;width:${portrait?width:controls.offsetWidth}px;height:${portrait?controls.offsetHeight:height}px;background:linear-gradient(${!portrait?'90deg,':''}rgba(0,120,215,0),rgba(55,55,209,1));`;
+		updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + 'border-radius:2rem;background-color:rgba(255,255,255,0.2)');
+		updateStyleUI(controls, `bottom:0;width:${portrait?54:28}%`);
+		updateStyleUI(actButton, `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px;min-width:${controls.offsetHeight*0.7}px;`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
-		actButton.style.fontSize = 200 * scale + 'px';
+		actButton.style.fontSize = 212 * scale + 'px';
 	}
 
 	gameContext.imageSmoothingEnabled = false;
@@ -154,16 +155,19 @@ function resizeUI(e) {
 	// Fullscreen button
 	updateStyleUI(fullscreenButton, `float:right`);
 	// Sound button
-	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:1rem;margin-right:3px`);
+	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:2rem;margin-right:3px`);
 	// Play and Settings buttons
 	if (playButton) {
-		updateStyleUI(playButton, `position:absolute;top:75%;left:50%;transform:translateX(-50%);width:50%;border-radius:1rem`);
-		updateStyleUI(title, `position:absolute;top:15%;left:50%;transform:translateX(-50%) scale(${width<600?1:(width<height?width:height)/600})`);
+		updateStyleUI(playButton, `position:absolute;top:75%;left:50%;transform:translateX(-50%);width:50%;border-radius:2rem`);
+		updateStyleUI(title, `position:absolute;top:50%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 240, 280);
+		titleText.innerHTML = `<span style="color:orange;position:absolute;">&#8202◍</span><span style="position:absolute;">&#8202&#9784</span><span style="color:gold">〇dyssey${portrait?'&#8202':' &nbsp'}</span>`;
+		titleText.style = `width:100%;margin-top:-${portrait?85:70}%`;
 	}
 }
 
-function updateStyleUI(element, style) {
-	element.style = `line-height:${99*scale}px;font-size:${72*scale}px;`+style;
+function updateStyleUI(element, _style, _size = 99, _space = 128) {//element.style = _style;return;
+	element.style = `${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
+	console.log(_space,scale);
 }
 
 function switchState(event) {
@@ -180,33 +184,37 @@ function getIcon(size) {
 
 function createUI() {
 	uiDiv.innerHTML = '';
-	uiDiv.style = "pointer-events:none";
+	gameCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 
 	if (!state) {
-		title = generateUIButton(uiDiv, `${getIcon(220)}`, switchState);
+		title = generateUIButton(uiDiv, `${getIcon(932)}`, switchState);
+		titleText = document.createElement('div');
+		title.append(titleText);
 	} else {
 		infoTab = document.createElement('div');
 		infoTab.innerHTML = "<br>Welcome Corsair!";
 		uiDiv.append(infoTab);
 
-		actionTab = document.createElement('div');
-		uiDiv.append(actionTab);
-		actButton = generateUIButton(actionTab, '&#9974', e => action(6), "css_controls");
+		actButton = generateUIButton(uiDiv, '&#9935', e => action(6), "css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
+
+		dialog = document.createElement('div');
+		uiDiv.append(dialog);
+		dialog.innerHTML = `<br> Castle <button onclick="alert('Button clicked!')">Click Me</button>`;
 	}
 
 	// Fullscreen and Sound buttons
-	fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen, "css_space");
-	soundButton = generateUIButton(uiDiv, '', toggleSound, "css_space");
+	fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen);
+	soundButton = generateUIButton(uiDiv, '', toggleSound);
 
 	if (!state) {
 		// Create Play Button
-		playButton = generateUIButton(uiDiv, `Play`, switchState, "css_space");
+		playButton = generateUIButton(uiDiv, `Play`, switchState);
 	} else {
-		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_controls");   // ^
-		leftButton = generateUIButton(controls, '&#9664', e => action(4), "css_controls"); // <
+		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_controls");    // ^
+		leftButton = generateUIButton(controls, '&#9664', e => action(4), "css_controls");  // <
 		rightButton = generateUIButton(controls, '&#9654', e => action(2), "css_controls"); // >
 		downButton = generateUIButton(controls, '&#9660', e => action(3), "css_controls");  // v
 
@@ -220,7 +228,7 @@ function createUI() {
 	resizeUI();
 }
 
-function generateUIButton(div, code, handler, className) {
+function generateUIButton(div, code, handler, className = "css_space") {
 	const button = document.createElement('div');
 	button.innerHTML = code;
 	button.addEventListener(interactionTap, handler.bind(this));

@@ -2,36 +2,41 @@ class BoardUnit extends BoardTile {
 
 	constructor(x, y, type) {
 		super(x, y, type);
-		this.colors = ["lime","red","yellow","white","magenta"];
+		this.colors = ["lime","red","indigo","white","magenta"];
 	}
 
 	shouldAnimate() {
 		return this.type == 1 && onFoot ||
 			this.type > UnitType.PLAYER && this.type < UnitType.ENEMY1 && !onFoot;
-			//this.type == UnitType.CASTLE;
 	}
 
-	getX() {
-		return this.width/2 + super.getX() - (this.shouldAnimate() ? tween.transitionX * this.width : 0);
+	getX(reverse) {
+		return (reverse ? this.width * tween.transitionX : 0) +
+			this.width/2 + super.getX() - (this.shouldAnimate() ? tween.transitionX * this.width : 0);
 	}
 
-	getY() {
-		return this.width/2 + super.getY() - (this.shouldAnimate() ? tween.transitionY * this.height : 0);
+	getY(reverse) {
+		return (reverse ? this.height * tween.transitionY : 0) +
+			this.height/2 + super.getY() - (this.shouldAnimate() ? tween.transitionY * this.height : 0);
 	}
 	
 	draw() {
 		if (this.type) {
 			//gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
 
-			if (this.overlay) {
-				this.drawImage(this.overlay);
-			}
 			let _offsets = [2,2,2,3,1,4];
-			let _offsetX = this.player
-				? _offsets[unitsData[playerY][playerX]]
-				: this.ship ? _offsets[unitsData[shipY][shipX]] : 1;
+			let _offsetX = this == player && !this.overlay
+				? _offsets[unitsData[playerY][playerX]-1]
+				: this == ship ? _offsets[unitsData[shipY][shipX]-1] : 1;
 
-			let _offsetY = this.player || this.ship ? 3 : 4;
+			let _offsetY = this == player && !this.overlay
+				|| this == ship ? 3 : 4;
+
+			if (this.overlay) {
+				this.drawImage(this.overlay, true);
+				_offsetX += tileWidth * tween.transitionX;
+				_offsetY -= tileWidth * tween.transitionY;
+			}
 
 			// draw a wide colored rectangle behind unit as a selection
 			if (this.selection) {
@@ -40,7 +45,7 @@ class BoardUnit extends BoardTile {
 			}
 
 			// draw animated colored flag
-			if (this.origin && this.type>1 || this.overlay) {
+			if (this.origin && this.type > UnitType.PLAYER || this.overlay == UnitType.CASTLE) {
 				// draw flag base
 				gameContext.fillStyle = "#835426";
 				this.fillRect(_offsetX, _offsetY, 1, 2);
@@ -65,11 +70,11 @@ class BoardUnit extends BoardTile {
 		);
 	}
 
-	drawImage(_type) {
+	drawImage(_type, reverse) {
 		gameContext.drawImage(
 			offscreenBitmaps[_type-1], 0, 0, unitWidth, unitWidth,
-			this.getX() - this.width/2 - this.width/tileWidth,
-			this.getY() - this.height - this.width/tileWidth * (this.type > 9 ? 2 : 1),
+			this.getX(reverse) - this.width/2 - this.width/tileWidth,
+			this.getY(reverse) - this.height - this.width/tileWidth * (_type > 9 ? 2 : 1),
 			this.width/tileWidth*unitWidth,
 			this.width/tileWidth*unitWidth
 		);
