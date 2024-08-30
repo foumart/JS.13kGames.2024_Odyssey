@@ -1,12 +1,12 @@
 * {
 	padding: 0;
 	margin: 0;
-	overflow: hidden;
 }
 
 body {
-	background-color: #44d;
+	background-color: #4346e5;
 	color: #fff;
+	overflow: hidden;
 }
 
 div, canvas {
@@ -16,11 +16,11 @@ div, canvas {
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 	image-rendering: pixelated;
+	
 }
 
 
 .css_button {
-	background-color: rgba(232,240,255,0.5);
 	position: relative;
 	cursor: pointer;
 	pointer-events: auto;
@@ -29,6 +29,7 @@ div, canvas {
 .css_icon {
 	color: #fff;
 	text-align: center;
+	background-color: rgba(232,240,255,0.5);
 	filter: drop-shadow(0 .1rem 5px #006);
 }
 .css_controls {
@@ -38,6 +39,19 @@ div, canvas {
 
 .css_space {
 	padding: 0 2vw;
+}
+
+@keyframes rotate {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+	
+.rotate {
+	animation: rotate 9s linear infinite;
 }
 
 /*.css_title {

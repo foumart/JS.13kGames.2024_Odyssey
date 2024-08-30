@@ -30,7 +30,7 @@ function toggleFullscreen(e) {
 function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 1 - screenOut/(12+screenOut*.8)) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 2 - screenOut/(12+screenOut*.8) - screenWidth/9) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		drawBoard();
 	}
@@ -51,11 +51,31 @@ let tween = { transition: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
 let controls, actButton, infoTab, dialog, upButton, leftButton, rightButton, downButton;
-let title, titleText, playButton, fullscreenButton, soundButton;
+let title, titleText, playButton, installButton, fullscreenButton, soundButton;
+let installPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (event) => {
+	event.preventDefault();
+	installPrompt = event;
+	installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt);
+	installButton.addEventListener("click", displayInstallPrompt.bind(this));
+	resizeUI(1);
+});
+
+async function displayInstallPrompt() {
+	if (!installPrompt) {
+		return;
+	}
+	const result = await installPrompt.prompt();
+	console.log(`Install prompt was: ${result.outcome}`);
+	//alert("BB");
+	//disableInAppInstallPrompt();
+};
 
 
 // Game initialization
 function init() {
+
 	// resizing
 	window.addEventListener("resize", () => {
 		resizeUI();
@@ -153,21 +173,22 @@ function resizeUI(e) {
 	gameContext.lineJoin = 'round';
 
 	// Fullscreen button
-	updateStyleUI(fullscreenButton, `float:right`);
+	if (fullscreenButton) updateStyleUI(fullscreenButton, `float:right;margin-left:3px`);
 	// Sound button
-	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:2rem;margin-right:3px`);
+	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:2rem`);
 	// Play and Settings buttons
 	if (playButton) {
-		updateStyleUI(playButton, `position:absolute;top:75%;left:50%;transform:translateX(-50%);width:50%;border-radius:2rem`);
-		updateStyleUI(title, `position:absolute;top:50%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 240, 280);
-		titleText.innerHTML = `<span style="color:orange;position:absolute;">&#8202◍</span><span style="position:absolute;">&#8202&#9784</span><span style="color:gold">〇dyssey${portrait?'&#8202':' &nbsp'}</span>`;
-		titleText.style = `width:100%;margin-top:-${portrait?85:70}%`;
+		if (installButton) updateStyleUI(installButton, `position:absolute;top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:40%;border-radius:2rem`, 80, portrait?112:99);
+		updateStyleUI(playButton, `position:absolute;top:${portrait?70:68}%;left:50%;transform:translateX(-50%);width:50%;border-radius:2rem`);
+		title.innerHTML = getIcon(portrait ? 160 : 99);
+		updateStyleUI(title, `position:absolute;top:56%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
+		titleText.innerHTML = `<div style="text-shadow:brown ${3*scale}px 0;margin-top:-${136*scale}px;margin-left:${214*scale}px;font-size:${40*scale}px">Thy</div><div style="text-shadow:brown ${4*scale}px 0;margin-top:-${104*scale}px;margin-left:${124*scale}px;font-size:${64*scale}px">Corsair</div><div class="rotate" style="color:brown;font-size:${360*scale}px;margin-top:-${40*scale};margin-left:${292*scale}">&#9784</div><div class="rotate" style="color:coral;margin-top:-${40*scale}px;margin-left:${280*scale}px;font-size:${360*scale}px">&#9784</div><span style="position:relative;text-shadow:maroon ${9*scale}px 0"><b>O</b>dyssey</span>`;
+		updateStyleUI(titleText, `position:absolute;top:48%;left:50%;transform:translateY(-${portrait?300:200}%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 200);
 	}
 }
 
-function updateStyleUI(element, _style, _size = 99, _space = 128) {//element.style = _style;return;
+function updateStyleUI(element, _style, _size = 99, _space = 128) {
 	element.style = `${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
-	console.log(_space,scale);
 }
 
 function switchState(event) {
@@ -179,7 +200,7 @@ function switchState(event) {
 }
 
 function getIcon(size) {
-	return `<img src=ico.svg height=${size} width=${size}>`;
+	return `<img src=ico.png height=${size} width=${size}>`;
 }
 
 function createUI() {
@@ -187,9 +208,8 @@ function createUI() {
 	gameCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 
 	if (!state) {
-		title = generateUIButton(uiDiv, `${getIcon(932)}`, switchState);
-		titleText = document.createElement('div');
-		title.append(titleText);
+		title = generateUIButton(uiDiv, "", switchState, "");
+		titleText = generateUIButton(uiDiv, "", switchState, "");
 	} else {
 		infoTab = document.createElement('div');
 		infoTab.innerHTML = "<br>Welcome Corsair!";
@@ -206,33 +226,34 @@ function createUI() {
 	}
 
 	// Fullscreen and Sound buttons
-	fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen);
+	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen);
 	soundButton = generateUIButton(uiDiv, '', toggleSound);
 
 	if (!state) {
 		// Create Play Button
 		playButton = generateUIButton(uiDiv, `Play`, switchState);
+		
 	} else {
-		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_controls");    // ^
-		leftButton = generateUIButton(controls, '&#9664', e => action(4), "css_controls");  // <
-		rightButton = generateUIButton(controls, '&#9654', e => action(2), "css_controls"); // >
-		downButton = generateUIButton(controls, '&#9660', e => action(3), "css_controls");  // v
+		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_icon css_controls");    // ^
+		leftButton = generateUIButton(controls, '&#9664', e => action(4), "css_icon css_controls");  // <
+		rightButton = generateUIButton(controls, '&#9654', e => action(2), "css_icon css_controls"); // >
+		downButton = generateUIButton(controls, '&#9660', e => action(3), "css_icon css_controls");  // v
 
 		upButton.style = "margin:2% auto 0";
 		leftButton.style = "float:left;margin:2%";
 		rightButton.style = "float:right;margin:2%";
-		downButton.style = "margin:2% auto";
+		downButton.style = "margin:2% auto;overflow:hidden";
 	}
 
 	toggleSound();
 	resizeUI();
 }
 
-function generateUIButton(div, code, handler, className = "css_space") {
+function generateUIButton(div, code, handler, className = "css_icon css_space") {
 	const button = document.createElement('div');
 	button.innerHTML = code;
 	button.addEventListener(interactionTap, handler.bind(this));
-	button.className = "css_button css_icon " + className;
+	button.className = "css_button " + className;
 	
 	div.append(button);
 	return button;

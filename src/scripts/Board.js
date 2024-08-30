@@ -1,7 +1,7 @@
 const
-	screenWidth = 9,// must be odd number, so there will be a central tile where player will reside
-	screenSide = 4,// must be even, screenWidth / 2 | 0
-	screenOut = 6,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
+	screenWidth = 7,// must be odd number, so there will be a central tile where player will reside
+	screenSide = 3,// must be even, screenWidth / 2 | 0
+	screenOut = 14,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
 	tilt = 1,
 	jump = 3;// how many tiles to jump when wrapping from map sides
 
@@ -34,7 +34,7 @@ function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
 	boardScale = 1;
-	tween.transition = 0.01;
+	tween.transition = 0.6;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
 	oddDirectionalArray = generateOddArray(renderedScreenSize);
