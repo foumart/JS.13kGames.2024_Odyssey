@@ -1,11 +1,11 @@
 {
-	"name": "js13k_template",
+	"name": "js13k_odyssey",
 	"version": "0.0.2",
 
-	"title": "The Cursed Island",
-	"description": "js13k progressive web app starter pack",
-	"keywords": ["js13kgames", "js13k", "pwa", "template"],
-	"link": "https://drafts.js13kgames.com/the-cursed-island/",
+	"title": "Odyssey",
+	"description": "Odyssey: The Cursed Island",
+	"keywords": ["odyssey", "island", "js13kgames", "js13k", "pwa"],
+	"link": "https://drafts.js13kgames.com/odyssey/",
 	"orientation": "any",
 	"iconExtension": "svg",
 	"iconType": "image/svg+xml",
@@ -40,7 +40,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/foumart/JS.13kGames.git"
+		"url": "git+https://github.com/foumart/JS.13kGames.2024_Odyssey.git"
 	},
 	"author": {
 		"name": "Noncho Savov",

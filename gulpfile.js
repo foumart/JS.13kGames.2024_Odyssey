@@ -249,8 +249,11 @@ function prep(callback) {
 
 // Delete the temporary folder generated during packaging
 function clean(callback) {
-	del(dir + '/tmp/');
-	callback();
+	(async () => {
+		del = (await import('del')).deleteAsync;
+		del(dir + '/tmp/');
+		callback();
+	})();
 }
 
 // Package zip (exclude any fonts that are used locally, like Twemoji.ttf)
@@ -320,7 +323,7 @@ function getDateString(shorter) {
 
 // Exports
 exports.default = series(prep, ico, sw, app, cs, mf, mangle, assets, pack, clean, archive, check, watch);
-exports.sync = series(app, cs, mangle, assets, pack, clean, reload);
+exports.sync = series(ico, app, cs, mangle, assets, pack, clean, reload);
 exports.zip = series(archive, check);
 
 /*
