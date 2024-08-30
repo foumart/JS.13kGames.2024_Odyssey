@@ -49,6 +49,9 @@ const debug = argv.debug != undefined ? true : false;
 // --roadroll: use a JS packer for up to 15% compression
 const roadroll = argv.roadroll != undefined ? true : false;
 
+// --prod: replaces the start_url in manifest to make PWA work on the js13k platform, otherwise using to index.html.
+const prod = argv.prod != undefined ? true : false;
+
 // --mobile: should html` tags for mobile be included. Adds 42 bytes.
 const mobile = argv.mobile != undefined || argv.all != undefined ? `
 <meta name="mobile-web-app-capable" content="yes">
@@ -168,7 +171,7 @@ function mf(callback) {
 		src('resources/mf.webmanifest', { allowEmpty: true })
 			.pipe(replace('service_worker', 'sw', replaceOptions))
 			.pipe(replace('{TITLE}', title, replaceOptions))
-			.pipe(replace('{LINK}', debug ? "index.html" : link, replaceOptions))
+			.pipe(replace('{LINK}', prod ? link : "index.html", replaceOptions))
 			.pipe(replace('{ICON_EXTENSION}', iconExtension, replaceOptions))
 			.pipe(replace('{ICON_TYPE}', iconType, replaceOptions))
 			.pipe(replace('{ICON_SIZE}', iconSize, replaceOptions))
