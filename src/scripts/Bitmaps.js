@@ -87,21 +87,21 @@ const offscreenColorData = [
 	"IRJZQK[SQZRRQJ[QR[",
 
 	"IKQIIIJaIIIYYQIIII",// 10 land
-	"bRsRRqS]~RJbZqRRs",// 11 coasts
-	"RRUjRRRbRRYbKvKvv",// 12 
+	"bRsRRqS]~RJ~bZqRRs",// 11 coasts
+	"RRUjRRRbRRYbKvKvv",// 12 
 	"NRU^RRwcR7QbNSS^RR",// 13
 	"lwoYdKSIIIaQaIYJIL",// 14
-	"\\~QYuIIjaIjIYiQIj",// ◱ 15
-	"bRiRRkR\\iZJuIm~mv",// ◰ 16
-	"MRR]bRMSbnYQwmKvm",// ◳ 17
-	"whcnLIUISMLIUIaUYI",// ◲ 18
-	"w\\nIUYjUIjMLUIi",// 19
-	"m\\}IIjIKjQQujm~uv",// ] 1A 10
-	"UTk Ri]bkMSunm~wv",// [ 1B 11
-	"o\\mUaIUIYnRIwmUvn",// 1C 12
+	"\\%~QYuIIjaIjIYiQIj",// ◱ 15
+	"bRiRRkR\\iZJuIm~mv",// ◰ 16
+	"MRR]bRMSbnYQwmKvm",// ◳ 17
+	"w%cnLIUISMLIUIaUYI",// ◲ 18
+	"w\\nI!UYjUIjML5UIi",// 19
+	"m\\}IIjIKjQQujm~uv",// ] 1A 10
+	"UTk#Ri]bkMSunm~wv",// [ 1B 11
+	"o\\mUaIUIYnRIwmUvn",// 1C 12
 	"UYjMLuUIjnJkUIjMai",// ║ 1D 13
-	"l\\lIIIaIYQjJjUun",// ═ 1E 14
-	"nLuMRiUbj]Zunm~wv"// ⧈ 0F 15
+	"l\\lIIIaIYQjJjUun",// ═ 1E 14
+	"nLuMRiUbj]Zunm~wv"// ⧈ 0F 15
 ];
 
 for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {

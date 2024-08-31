@@ -46,8 +46,6 @@ function initBoard() {
 	islesData = stageData.islands.splice(0);// start location and directions of consecutive generation
 	unitsList = [];
 
-	//if (_debug) islandGenerator.debugInfo();
-
 	// determine tiles and create some random units
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
@@ -316,12 +314,6 @@ function generateOddArray(size) {
 
 // Draw the board
 function drawBoard() {
-	//if (!tween.transitionX && !tween.transitionY) {
-		gameContext.fillStyle = "#4848e3";
-		gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-	//}
-
-	//gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	let _unit, _x, _y, _z,
 		_ox = portrait ? screenSide : screenSide + screenOut/2,
 		_oy = !portrait ? screenSide : screenSide + screenOut/2;
@@ -334,11 +326,7 @@ function drawBoard() {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
 					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
 					_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
-					tileScreen[y][x].update(_z);//
-						//_z,
-						//(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
-						//(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
-					//)
+					tileScreen[y][x].update(_z);
 				}
 			}
 		}
@@ -382,17 +370,13 @@ function drawBoard() {
 					}
 	
 					if (!shouldDrawPlayer) unitScreen[y][x].update(_z);
-						//_z,
-						//(x < screenOut/2 ? screenOut/2 - x : x >= screenWidth + screenOut/2 ? x - screenWidth + 1 - screenOut/2 : 0) +
-						//(y < screenOut/2 ? screenOut/2 - y : y >= screenWidth + screenOut/2 ? y - screenWidth + 1 - screenOut/2 : 0)
-					//);
 				}
 			}
 		}
 		if (_player) player.update(_player);
 	}
 
-	if (buttonScreen) {
+	if (buttonScreen && !paused) {
 		for (_y = 0; _y < buttonScreen.length; _y ++) {
 			for (_x = 0; _x < buttonScreen[_y].length; _x ++) {
 				buttonScreen[_y][_x].update(1, playerX - _ox, playerY - _oy);

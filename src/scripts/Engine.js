@@ -1,3 +1,7 @@
+// island generator constants
+const seaSize = 44,
+	seaOffset = 9;
+
 let islandGenerator;
 
 // game loop vars
@@ -37,7 +41,9 @@ function gameStart() {
 		// gameplay
 		step ++;
 		if (step == 1) {
-			TweenFX.to(tween, 60, {transition: 1}, e => {
+			gameContainer.style.display = "none";
+			TweenFX.to(tween, 60, {transition: 1}, null, e => {
+				gameContainer.style.display = "block";
 				// level zoomed in
 			});
 		}
@@ -73,9 +79,9 @@ function gameStop() {
 
 function getStageData() {
 	return new Promise((resolve, reject) => {
-		islandGenerator = new IslandGenerator(this, 40, 40, {
+		islandGenerator = new IslandGenerator(this, seaSize, seaSize, {
 			type: 1,
-			offset: 10,
+			offset: seaOffset,
 			debug: _debug ? {feedback: true} : 0
 		}, resolve)
 	});

@@ -3,6 +3,7 @@ let unit,
 	boardShip,
 	boarding,
 	landing,
+	holding,
 	onFoot = true,
 	inDialog = false;
 
@@ -28,7 +29,7 @@ function action(direction) {
 					boardPlayer.y += boardWidth-jump;
 				}
 				tween.transitionY = -1;
-				TweenFX.to(tween, 6, {transitionY: 0}, null, finalizeMove.bind(this));
+				TweenFX.to(tween, 6, {transitionY: 0}, null, e => finalizeMove(1));
 				prepareToMove(1);
 			}
 
@@ -47,7 +48,7 @@ function action(direction) {
 					boardPlayer.x -= boardWidth-jump;
 				}
 				tween.transitionX = 1;
-				TweenFX.to(tween, 6, {transitionX: 0}, null, finalizeMove.bind(this));
+				TweenFX.to(tween, 6, {transitionX: 0}, null, e => finalizeMove(2));
 				prepareToMove(2);
 			}
 
@@ -66,7 +67,7 @@ function action(direction) {
 					boardPlayer.y -= boardWidth-jump;
 				}
 				tween.transitionY = 1;
-				TweenFX.to(tween, 6, {transitionY: 0}, null, finalizeMove.bind(this));
+				TweenFX.to(tween, 6, {transitionY: 0}, null, e => finalizeMove(3));
 				prepareToMove(3);
 			}
 
@@ -85,7 +86,7 @@ function action(direction) {
 					boardPlayer.x += boardWidth-jump;
 				}
 				tween.transitionX = -1;
-				TweenFX.to(tween, 6, {transitionX: 0}, null, finalizeMove.bind(this));
+				TweenFX.to(tween, 6, {transitionX: 0}, null, e => finalizeMove(4));
 				prepareToMove(4);
 			}
 
@@ -117,9 +118,35 @@ function action(direction) {
 	}
 }
 
-function finalizeMove() {
+function prepareToMove(dir) {
+	if (inDialog) displayDialog();// hide the dialog
+	paused = true;
+	gameContainer.style.display = "none";
+	boardPlayer.overlay = unitsData[playerY][playerX];
+	if (boarding) {
+		onFoot = false;
+		boardShip.origin = 1;
+		boardPlayer.overlay = UnitType.EMPTY;
+	} else if (landing) {
+		onFoot = true;
+	} else if (!onFoot) {
+		shipX = playerX; shipY = playerY;
+	}
+
+	unitsData[playerY][playerX] = boarding || !onFoot
+		? dir % 2 ? (dir-1 ? UnitType.SHIPUP : UnitType.SHIPDOWN) : dir == 2 ? UnitType.SHIPLEFT : UnitType.SHIPRIGHT
+		: UnitType.PLAYER;
+
+	//infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
+}
+
+function finalizeMove(dir) {
 	paused = false;
+	gameContainer.style.display = "block";
 	updateActionButton();
+	if (holding) {
+		action(dir);
+	}
 }
 
 function displayDialog() {
@@ -157,27 +184,6 @@ function updateActionButton() {
 	}
 }
 
-
-function prepareToMove(dir) {
-	if (inDialog) displayDialog();// hide the dialog
-	paused = true;
-	boardPlayer.overlay = unitsData[playerY][playerX];
-	if (boarding) {
-		onFoot = false;
-		boardShip.origin = 1;
-		boardPlayer.overlay = UnitType.EMPTY;
-	} else if (landing) {
-		onFoot = true;
-	} else if (!onFoot) {
-		shipX = playerX; shipY = playerY;
-	}
-
-	unitsData[playerY][playerX] = boarding || !onFoot
-		? dir % 2 ? (dir-1 ? UnitType.SHIPUP : UnitType.SHIPDOWN) : dir == 2 ? UnitType.SHIPLEFT : UnitType.SHIPRIGHT
-		: UnitType.PLAYER;
-
-	infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
-}
 
 function isPassable(x, y, tileId = TileType.RIFF2) {
 	if (onFoot) {

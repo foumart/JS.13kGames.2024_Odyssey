@@ -11,7 +11,7 @@ const mobile = isTouchDevice();
 const interactionDown = mobile ? "touchstart" : "mousedown";
 const interactionUp = mobile ? "touchend" : "mouseup";
 const interactionMove = mobile ? "touchmove" : "mousemove";
-const interactionTap = mobile ? "touchstart" : "click";
+const interactionTap = mobile ? "touchstart" : "mousedown";
 const rollOver = mobile ? 0 : "mouseover";
 const rollOut = mobile ? 0 : "mouseout";
 function isTouchDevice() {
@@ -54,23 +54,42 @@ let controls, actButton, infoTab, dialog, upButton, leftButton, rightButton, dow
 let title, titleText, playButton, installButton, fullscreenButton, soundButton;
 let installPrompt = null;
 
+// save the install prompt event
 window.addEventListener("beforeinstallprompt", (event) => {
 	event.preventDefault();
 	installPrompt = event;
-	installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt);
-	installButton.addEventListener("click", displayInstallPrompt.bind(this));
+
+	tryToShowInstallButton();
 	resizeUI(1);
 });
+// prevent long tap on mobile
+document.oncontextmenu = function() {return false;};
+
+function tryToShowInstallButton() {
+	if (!state && installPrompt) {
+		installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt.bind(this));
+	}
+}
 
 async function displayInstallPrompt() {
 	if (!installPrompt) {
 		return;
 	}
-	const result = await installPrompt.prompt();
-	console.log(`Install prompt was: ${result.outcome}`);
-	//alert("BB");
-	//disableInAppInstallPrompt();
+	await installPrompt.prompt()
+		.then(results => {console.log(results)
+			if (results.outcome == "accepted") {
+				hideInstallButton();
+			}
+		})
+		.catch(error => {
+			hideInstallButton();
+		});
 };
+
+function hideInstallButton() {
+	installButton.display = "none";
+	installPrompt = null;
+}
 
 
 // Game initialization
@@ -180,7 +199,7 @@ function resizeUI(e) {
 	if (playButton) {
 		if (installButton) updateStyleUI(installButton, `position:absolute;top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:40%;border-radius:2rem`, 80, portrait?112:99);
 		updateStyleUI(playButton, `position:absolute;top:${portrait?70:68}%;left:50%;transform:translateX(-50%);width:50%;border-radius:2rem`);
-		title.innerHTML = getIcon(portrait ? 160 : 99);
+		title.innerHTML = getIcon(portrait ? 128 : 99);
 		updateStyleUI(title, `position:absolute;top:56%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="text-shadow:brown ${3*scale}px 0;margin-top:-${136*scale}px;margin-left:${214*scale}px;font-size:${40*scale}px">Thy</div><div style="text-shadow:brown ${4*scale}px 0;margin-top:-${104*scale}px;margin-left:${124*scale}px;font-size:${64*scale}px">Corsair</div><div class="rotate" style="color:brown;font-size:${360*scale}px;margin-top:-${40*scale};margin-left:${292*scale}">&#9784</div><div class="rotate" style="color:coral;margin-top:-${40*scale}px;margin-left:${280*scale}px;font-size:${360*scale}px">&#9784</div><span style="position:relative;text-shadow:maroon ${9*scale}px 0"><b>O</b>dyssey</span>`;
 		updateStyleUI(titleText, `position:absolute;top:48%;left:50%;transform:translateY(-${portrait?300:200}%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 200);
@@ -196,6 +215,7 @@ function switchState(event) {
 	state = 1;
 	gameInit();
 	createUI();
+	tryToShowInstallButton();
 	resizeUI(1);
 }
 
@@ -249,10 +269,20 @@ function createUI() {
 	resizeUI();
 }
 
+function interactionStart(handler) {
+	holding = true;
+	handler();
+	window.addEventListener(interactionUp, interactionEnd.bind(this));
+}
+function interactionEnd() {
+	window.removeEventListener(interactionUp, interactionEnd.bind(this));
+	holding = false;
+}
+
 function generateUIButton(div, code, handler, className = "css_icon css_space") {
 	const button = document.createElement('div');
 	button.innerHTML = code;
-	button.addEventListener(interactionTap, handler.bind(this));
+	button.addEventListener(interactionTap, interactionStart.bind(this, handler));
 	button.className = "css_button " + className;
 	
 	div.append(button);
