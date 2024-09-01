@@ -43,7 +43,10 @@ class UnitType {
 	static get GOLD() {
 		return 13;
 	}
-	static get MOUNT() {
+	static get WRECK() {
 		return 14;
+	}
+	static get TREASURE() {
+		return 15;
 	}
 }

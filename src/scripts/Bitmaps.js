@@ -11,17 +11,17 @@ const offscreenPixelData = [
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship right
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship left
 	
-	"24a22c39be4300e9120d8537982943c52e51544434",// enemy 1
-	"2965ff2658d7537de73a3a933c6be24343a0544434",// enemy 2
-	"24a22c39be4300e9120d8537982943c52e51544434",// enemy 1
+	"2929883a3a934343a07057cc3778ff4ca0ff4cc6ff",// enemy 1 07 fish
+	"c92606ff3d1700970b00b90d5aff0023d61e292988",// enemy 2 08 serpent
+	"2a2a3f565662da876382829affb08ea4a4cbffffff",// enemy 3 09 knight
 
-	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle
-	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine
-	"864404452d1512510d00ca1024a9210d853700e912",// tree
-	"b25800dd8700e4ae1e31395ffff115ffca3ab3cdf0",// gold
-	"adbaa8f4e5d50c680471806ba7734024a22c835426",// mount
-	"adbaa8f4e5d50c680471806ba7734024a22c835426",//
-	"adbaa8f4e5d50c680471806ba7734024a22c835426",//
+	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle 10
+	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine 11
+	"864404452d1512510d00ca1024a9210d853700e912",// tree 12
+	"712c0e452d15b25800dd8700e4ae1efff115ffca3a",// gold pile 13
+	"b25800dd8700fff115292988ffca3a3a3a935c9e87",// gold wreck 14
+	"0c480400e912",// ?
+	"0c480400e912",// ?
 
 	// TILES
 	"3737d13a3adc3d3ddf4343de4d4de8",// 00 depths
@@ -49,7 +49,7 @@ const offscreenPixelData = [
 	"2e8b2e2db22d3d963d32db32ffb0693737d14343de7070ef",// 1B
 	"2db22d3d963d2bc82b32db32ffb0693737d14343de4d4de8",// 1C
 	"2db22d3d963d2bc82b32db32ffb0697070ef4343de4d4de8",// 1D
-	"2db22d3d963d2bc82b32db32ffb0693737d14343de7070ef",// 1E
+	"2e8b2e2db22d3d963d2bc82b32db32ffb0693737d14343de",// 1E
 	"00dc002db22d3d963d2bc82bffb0693737d14343de4d4de8"//  1F
 ];
 
@@ -62,17 +62,17 @@ const offscreenColorData = [
 	"hnc@}wD@n~}@}ulGpoAuEBB\\JccAPII@",// ship right
 	"@\\uE@\`~o@owuxenonH}FcPPhH\\\\Q@IIB",// ship left
 	
-	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
-	"HA@@ZJ@@lS@Ddm@fpdtD@vf@@\`D@@@@@",//enemy2
-	"@QA@HZJAQLQLHMHbp@Qd@HbD@ad@\`d@@",// enemy1
+	"hwE@~en@uwEbinPLXJZQHSK@PYQ@@P@@",// enemy1 fish
+	"\`uC@YNr@tulFXBpeP@knApulx\\d{_{[G",// enemy2 serpent
+	"pTfAT]]LJoyCX]bJHStTSIbJHJQA@IHA",// enemy3 knight
 
 	"psscpw]pOw]\`vn\\@ctCXc^|Q_euQ^l",//10 castle
 	"@kf@pwwA{nn\\wLyfnIqMwI|flat]SCcB",//11 shrine
 	"@fuCp}g]p|l^Xfu^@s^C@@B@@@A@@@@@",//12 tree
-	"@PA@@jV@XVY@HZuA_uSg|ZzD\`g@@dD@",//13 gold
-	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//14 mount
-	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//15
-	"@QA@XRbCKUL[kai\\fotootots}e^X[XC",//16
+	"@\`A@@tg@hgk@Xl|Ak~ek]lt_y]{LPQZA",//13 gold pile
+	"@PA@@ZU@HkJDoJka|kQwftptdF@ft@",//14 gold wreck
+	"@@@@@QR@HJIBHIRA@HI@@HB@@HA@@@@@",//15 ?
+	"@@@@@QR@HJIBHIRA@HI@@HB@@HA@@@@@",//16 ?
 
 	// TILES
 	"TlSbZL]IbTIkaSTZeb",// 00 depths
@@ -100,7 +100,7 @@ const offscreenColorData = [
 	"UTk#Ri]bkMSunm~wv",// [ 1B 11
 	"o\\mUaIUIYnRIwmUvn",// 1C 12
 	"UYjMLuUIjnJkUIjMai",// ║ 1D 13
-	"l\\lIIIaIYQjJjUun",// ═ 1E 14
+	"ueuSZRjRbRKSYv^vw",// ═ 1E 14
 	"nLuMRiUbj]Zunm~wv"// ⧈ 0F 15
 ];
 

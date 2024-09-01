@@ -47,7 +47,7 @@ let screenOffsetY = 0;
 // game state, 0: menu, 1: in-game
 let state = 0;
 
-let tween = { transition: 0, transitionX: 0, transitionY: 0 };
+let tween = { transition: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
 let controls, actButton, infoTab, dialog, upButton, leftButton, rightButton, downButton;
@@ -182,7 +182,7 @@ function resizeUI(e) {
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
-		actButton.style.fontSize = 212 * scale + 'px';
+		actButton.style.fontSize = 200 * scale + 'px';
 	}
 
 	gameContext.imageSmoothingEnabled = false;
@@ -235,7 +235,7 @@ function createUI() {
 		infoTab.innerHTML = "<br>Welcome Corsair!";
 		uiDiv.append(infoTab);
 
-		actButton = generateUIButton(uiDiv, '&#9935', e => action(6), "css_controls");
+		actButton = generateUIButton(uiDiv, '&#9935', e => action(6), "css_icon css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
