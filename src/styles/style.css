@@ -4,7 +4,7 @@
 }
 
 body {
-	background-color: #4346e5;
+	background: linear-gradient(#4346e5, #4346e5 41%, #4396e5 42%, #4346e5 48%,#4346e5 66%, #122390);
 	color: #fff;
 	overflow: hidden;
 }
@@ -28,9 +28,20 @@ div, canvas {
 
 .css_icon {
 	color: #fff;
-	text-align: center;
 	background-color: rgba(232,240,255,0.5);
 	filter: drop-shadow(0 .1rem 5px #006);
+}
+.css_play {
+	background-color: rgba(32, 255, 32, 0.7);
+}
+.css_play:hover {
+	background-color: rgba(32, 255, 32, 0.8);
+}
+.css_install {
+	background-color: rgba(255, 212, 64, 0.8);
+}
+.css_install:hover {
+	background-color: rgba(255, 212, 64, 0.9);
 }
 .css_controls {
 	width: 40%;

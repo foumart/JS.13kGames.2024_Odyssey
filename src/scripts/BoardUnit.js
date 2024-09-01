@@ -2,7 +2,6 @@ class BoardUnit extends BoardTile {
 
 	constructor(x, y, type) {
 		super(x, y, type);
-		this.colors = ["lime","red","aqua","white","magenta"];
 	}
 
 	shouldAnimate() {
@@ -45,7 +44,7 @@ class BoardUnit extends BoardTile {
 				? _offsets[unitsData[playerY][playerX]-1]
 				: this == boardShip ? _offsets[unitsData[shipY][shipX]-1] : 1;
 
-			let _offsetY = this == boardPlayer && !(this.overlay)
+			let _offsetY = this == boardPlayer && !this.overlay
 				|| this == boardShip ? 3 : 4;
 
 			// draw the object beneath this unit
@@ -57,7 +56,7 @@ class BoardUnit extends BoardTile {
 
 			// draw a wide colored rectangle behind unit as a selection
 			if (this.selection) {
-				gameContext.fillStyle = this.colors[this.selection-1];
+				gameContext.fillStyle = colors[this.selection-1];
 				this.fillRect(-2, -3, unitWidth+2, unitWidth-2);
 			}
 
@@ -67,7 +66,7 @@ class BoardUnit extends BoardTile {
 				gameContext.fillStyle = "#864404";
 				this.fillRect(_offsetX, _offsetY, 1, 2);
 				// animate flag
-				gameContext.fillStyle = this.colors[this.origin||0];
+				gameContext.fillStyle = colors[this.origin||1];
 				this.fillRect(_offsetX, _offsetY + 1, (2 + (step / 7 | 0) % 2));
 				this.fillRect(_offsetX + 1, _offsetY, (1 + (step / 5 | 0) % 2));
 			}

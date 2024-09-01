@@ -7,10 +7,19 @@ let unit,
 	onFoot = true,
 	inDialog = false,
 	hasEvent = false;
+const colors = ["lime","red","aqua","white","magenta"];
 
 function createUnit(x, y, z) {
 	unit = new Unit(x, y, z);
 	return unit;
+}
+
+function prepareCastleSiegeDialog(_origin) {
+	dialog.innerHTML = `${_origin} Castle!<br><br><button onclick="alert('Attack clicked!')">Attack</button>`;
+}
+
+function prepareCastleMenuDialog() {
+	dialog.innerHTML = `<br>&#127984 Welcome!<br><br><button onclick="alert('Buy clicked!')">Buy</button>`;
 }
 
 function action(direction) {
@@ -21,6 +30,14 @@ function action(direction) {
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
+				let _unit = getUnit(playerX, playerY-1);
+				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+					console.log("break",_unit);
+					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
+					prepareCastleSiegeDialog(_unit.origin);
+					displayDialog();
+					return;
+				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : gamePlayer.overlay;
 				playerY --;
 				gamePlayer.y --;
@@ -40,6 +57,13 @@ function action(direction) {
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
+				let _unit = getUnit(playerX+1, playerY);
+				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
+					prepareCastleSiegeDialog(_unit.origin);
+					displayDialog();
+					return;
+				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : gamePlayer.overlay;
 				playerX ++;
 				gamePlayer.x ++;
@@ -59,6 +83,13 @@ function action(direction) {
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
+				let _unit = getUnit(playerX, playerY+1);
+				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
+					prepareCastleSiegeDialog(_unit.origin);
+					displayDialog();
+					return;
+				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : gamePlayer.overlay;
 				playerY ++;
 				gamePlayer.y ++;
@@ -78,6 +109,13 @@ function action(direction) {
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
+				let _unit = getUnit(playerX-1, playerY);
+				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
+					prepareCastleSiegeDialog(_unit.origin);
+					displayDialog();
+					return;
+				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPDOWN : gamePlayer.overlay;
 				playerX --;
 				gamePlayer.x --;
@@ -98,7 +136,8 @@ function action(direction) {
 			break;
 		case 6: // Action
 			if (gamePlayer.overlay == 10) {
-				infoTab.innerHTML = `<br>You see a Castle`;
+				//infoTab.innerHTML = `<br>You see a Castle`;
+				prepareCastleMenuDialog();
 				displayDialog();
 			} else if (gamePlayer.overlay == 11) {
 				infoTab.innerHTML = `<br>You see a Shrine`;
@@ -181,28 +220,24 @@ function performEnemyMoves() {
 	gameContainer.style.display = "none";
 	// move enemies
 	enemies.forEach(enemy => {
-		if ((enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x + 1, enemy.y) ||
+		if ((enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x + 1, enemy.y, 99) ||
 				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x+1]<TileType.SHINE && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
-				//enemy.overlay = unitsData[enemy.y][enemy.x+1];
 				enemy.movingX = 1; enemy.movingY = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x - 1, enemy.y) ||
+				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x - 1, enemy.y, 99) ||
 				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x-1]<TileType.SHINE && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
-				//enemy.overlay = unitsData[enemy.y][enemy.x-1];
 				enemy.movingX = -1; enemy.movingY = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y + 1) ||
+				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y + 1, 99) ||
 				enemy.type == UnitType.ENEMY1 && mapData[enemy.y+1][enemy.x]<TileType.SHINE && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.y > playerY ? 1 : 3)) {
-				//enemy.overlay = unitsData[enemy.y+1][enemy.x];
 				enemy.movingY = 1; enemy.movingX = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y - 1) ||
+				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y - 1, 99) ||
 				enemy.type == UnitType.ENEMY1 && mapData[enemy.y-1][enemy.x]<TileType.SHINE && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.y < playerY ? 1 : 3)) {
-				//enemy.overlay = unitsData[enemy.y-1][enemy.x];
 				enemy.movingY = -1; enemy.movingX = 0;
 		}
 	});
@@ -245,14 +280,14 @@ function updateActionButton() {
 	}
 }
 
-function isWalkable(x, y) {
+function isWalkable(x, y, mapId = UnitType.CASTLE) {
 	// check if current unit tile is player or empty, or walkable item as gold, tree, etc.
 	// also check if current map tile is land
-	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= UnitType.CASTLE) &&
+	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= mapId) &&
 			(mapData[y][x] >= TileType.LAND);
 }
 
-function isSailable(x, y, tileId = 3) {
+function isSailable(x, y, tileId = TileType.RIFF2) {
 	// check if current unit tile is player or empty, or walkable item as gold wreck.
 	// also check if current map tile is at least water tileId (depth)
 	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] == UnitType.WRECK) &&

@@ -67,7 +67,7 @@ document.oncontextmenu = function() {return false;};
 
 function tryToShowInstallButton() {
 	if (!state && installPrompt) {
-		installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt.bind(this));
+		installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt.bind(this), 'css_icon css_install');
 	}
 }
 
@@ -175,9 +175,9 @@ function resizeUI(e) {
 
 	// Resize in-game UI elements
 	if (upButton) {
-		updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + 'border-radius:2rem;background-color:rgba(255,255,255,0.2)');
+		updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `color:navy;width:${portrait?width*.9:width*.5}px;height:${portrait?height*.5:height*.9}px;top:50%;left:50%;transform:translateY(-${portrait?60:50}%) translateX(-${portrait?50:42}%);border-radius:2rem;background-color:rgba(255,255,255,0.6)`);
 		updateStyleUI(controls, `bottom:0;width:${portrait?54:28}%`);
-		updateStyleUI(actButton, `position:absolute;bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px;min-width:${controls.offsetHeight*0.7}px;`, 99, -1);
+		updateStyleUI(actButton, `bottom:${30*scale}px;right:${30*scale}px;width:${controls.offsetWidth*0.6}px;height:${controls.offsetHeight*0.7}px;min-width:${controls.offsetHeight*0.7}px;`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -186,28 +186,28 @@ function resizeUI(e) {
 	}
 
 	gameContext.imageSmoothingEnabled = false;
-	gameContext.textAlign = "center";
-	gameContext.strokeStyle = 'black';
-    gameContext.lineWidth = 12 * getScale();
-	gameContext.lineJoin = 'round';
+	//gameContext.textAlign = "center";
+	//gameContext.strokeStyle = 'black';
+	//gameContext.lineWidth = 12 * getScale();
+	//gameContext.lineJoin = 'round';
 
 	// Fullscreen button
-	if (fullscreenButton) updateStyleUI(fullscreenButton, `float:right;margin-left:3px`);
+	if (fullscreenButton) updateStyleUI(fullscreenButton, `right:0;margin:1%`);
 	// Sound button
-	updateStyleUI(soundButton, `float:right;border-bottom-left-radius:2rem`);
+	updateStyleUI(soundButton, `right:${fullscreenButton?fullscreenButton.offsetWidth:0}px;margin:1% 2%`);
 	// Play and Settings buttons
 	if (playButton) {
-		if (installButton) updateStyleUI(installButton, `position:absolute;top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:40%;border-radius:2rem`, 80, portrait?112:99);
-		updateStyleUI(playButton, `position:absolute;top:${portrait?70:68}%;left:50%;transform:translateX(-50%);width:50%;border-radius:2rem`);
-		title.innerHTML = getIcon(portrait ? 128 : 99);
-		updateStyleUI(title, `position:absolute;top:56%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
-		titleText.innerHTML = `<div style="text-shadow:brown ${3*scale}px 0;margin-top:-${136*scale}px;margin-left:${214*scale}px;font-size:${40*scale}px">Thy</div><div style="text-shadow:brown ${4*scale}px 0;margin-top:-${104*scale}px;margin-left:${124*scale}px;font-size:${64*scale}px">Corsair</div><div class="rotate" style="color:brown;font-size:${360*scale}px;margin-top:-${40*scale};margin-left:${292*scale}">&#9784</div><div class="rotate" style="color:coral;margin-top:-${40*scale}px;margin-left:${280*scale}px;font-size:${360*scale}px">&#9784</div><span style="position:relative;text-shadow:maroon ${9*scale}px 0"><b>O</b>dyssey</span>`;
-		updateStyleUI(titleText, `position:absolute;top:48%;left:50%;transform:translateY(-${portrait?300:200}%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 200);
+		if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:40%`, 80, portrait?112:99);
+		updateStyleUI(playButton, `top:${portrait?70:68}%;left:50%;transform:translateX(-50%);width:50%`);
+		title.innerHTML = getIcon(portrait ? 112 : 99);
+		updateStyleUI(title, `top:${portrait?60:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
+		titleText.innerHTML = `<div class="rotate" style="color:brown;font-size:${360*scale}px;margin-top:-${40*scale};margin-left:${292*scale}">&#9784</div><div class="rotate" style="color:coral;margin-top:-${40*scale}px;margin-left:${280*scale}px;font-size:${360*scale}px">&#9784</div><div style="text-shadow:#900 ${6*scale}px 0;margin-top:-${80*scale}px;margin-left:${270*scale}px;font-size:${80*scale}px;color:#ff9"><i><b>Isle-Hop</b></i></div><span style="position:relative;text-shadow:maroon ${9*scale}px 0"><b>O</b>dyssey</span>`;
+		updateStyleUI(titleText, `top:48%;left:50%;transform:translateY(-${portrait?300:220}%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`, 200);
 	}
 }
 
 function updateStyleUI(element, _style, _size = 99, _space = 128) {
-	element.style = `${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
+	element.style = `border-radius:1rem;position:absolute;text-align:center;${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
 }
 
 function switchState(event) {
@@ -242,7 +242,6 @@ function createUI() {
 
 		dialog = document.createElement('div');
 		uiDiv.append(dialog);
-		dialog.innerHTML = `<br> Castle <button onclick="alert('Button clicked!')">Click Me</button>`;
 	}
 
 	// Fullscreen and Sound buttons
@@ -251,7 +250,7 @@ function createUI() {
 
 	if (!state) {
 		// Create Play Button
-		playButton = generateUIButton(uiDiv, `Play`, switchState);
+		playButton = generateUIButton(uiDiv, `Play`, switchState, 'css_icon css_play');
 		
 	} else {
 		upButton = generateUIButton(controls, '&#9650', e => action(1), "css_icon css_controls");    // ^

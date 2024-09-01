@@ -139,11 +139,11 @@ function initBoard() {
 			}
 
 			if (
-				Math.random()<.2 && !getUnitId(x, y)+1 &&
-				!getUnitId(x-1, y)+1 && !getUnitId(x+1, y)+1 &&
-				!getUnitId(x, y-1)+1 && !getUnitId(x, y+1)+1 &&
-				!getUnitId(x-1, y-1)+1 && !getUnitId(x+1, y+1)+1 &&
-				!getUnitId(x+1, y-1)+1 && !getUnitId(x-1, y+1)+1
+				Math.random()<.2 && getUnitId(x, y)==-1 &&
+				getUnitId(x-1, y)==-1 && getUnitId(x+1, y)==-1 &&
+				getUnitId(x, y-1)==-1 && getUnitId(x, y+1)==-1 &&
+				getUnitId(x-1, y-1)==-1 && getUnitId(x+1, y+1)==-1 &&
+				getUnitId(x+1, y-1)==-1 && getUnitId(x-1, y+1)==-1
 			) {
 				if (isWalkable(x, y)) {
 					if (idsData[y][x] > 5 && idsData[y][x] < 14 && treasures.indexOf(idsData[y][x]) == -1) {
@@ -165,7 +165,7 @@ function initBoard() {
 						e3 ++;
 					}
 				} else if (isSailable(x, y)) {
-					if (mapData[y][x] && treasures.indexOf(y) == -1 && y > 13 && e2 < 9) {
+					if (mapData[y][x] && treasures.indexOf(y) == -1 && y > 13 && e2 < 9 && idsData[y][x] != 1) {
 						// place water enemies on riffs
 						let enemy1 = isSailable(x, y, 2) && e1 < 9;
 						unit = createUnit(x, y, enemy1 ? UnitType.ENEMY1 : UnitType.ENEMY2)
@@ -404,18 +404,18 @@ function drawBoard() {
 							}
 							boardPlayer.overlay = gamePlayer.overlay;
 							boardPlayer.selection = gamePlayer.selection;
-							boardPlayer.origin = gamePlayer.origin || 1;
+							boardPlayer.origin = UnitType.PLAYER;
 						} else if (_x == shipX && _y == shipY) {
 							boardShip = unitScreen[y][x];
-							boardShip.origin = gameShip.origin || 0;
+							boardShip.origin = gameShip.origin;
 						}
 
 						_unit = getUnit(_x, _y);
 						if (_unit) {
-							unitScreen[y][x].overlay = _unit.overlay || 0;
-							unitScreen[y][x].movingX = _unit.movingX || 0;
-							unitScreen[y][x].movingY = _unit.movingY || 0;
-							unitScreen[y][x].origin = _unit.origin || 0;
+							unitScreen[y][x].overlay = _unit.overlay;
+							unitScreen[y][x].movingX = _unit.movingX;
+							unitScreen[y][x].movingY = _unit.movingY;
+							unitScreen[y][x].origin = _unit.origin;
 						}
 					}
 	
@@ -442,7 +442,7 @@ function getUnit(x, y) {
 function getUnitId(x, y) {
 	let id = -1;
 	unitsList.forEach((unit, index) => {
-		if (unit.x == x && unit.y == y && unit != gamePlayer && unit != gameShip) {
+		if (unit.x == x && unit.y == y) {//unit != gamePlayer && unit != gameShip
 			id = index;
 		}
 	});
