@@ -14,7 +14,7 @@ async function gameInit() {
 	
 	let data = await getStageData();
 	populateStageData(data);
-	
+
 	initBoard();
 	gameStart();
 }
@@ -38,39 +38,52 @@ function populateStageData(data) {
 function gameStart() {
 	gameStop();
 	gameLoop = setInterval(e => {
-		// gameplay
-		step ++;
-		if (step == 1) {
-			gameContainer.style.display = "none";
-			TweenFX.to(tween, 60, {transition: 1}, null, e => {
-				gameContainer.style.display = "block";
-				// level zoomed in
-			});
-		}
-		drawBoard();
-		// level has actually ended
-		if (state > 1) {
-			gameStop();
-			console.log("stage complete");
-		}
+		if (state) {
+			// gameplay
+			step ++;
+			if (step == 1) {
+				gameContainer.style.display = "none";
+				TweenFX.to(tween, 6, {transition: 1}, null, e => {
+					gameContainer.style.display = "block";
+					action(6);
+					// level zoomed in
+				});
+			}
+			drawBoard();
+			// level has actually ended
+			if (state > 1) {
+				gameStop();
+				console.log("stage complete");
+			}
 
-		if (_debug) {
-			if (!fps) {
-				fps = document.createElement('div');
-				uiDiv.appendChild(fps);
-				fps.style.fontFamily = "Arial";
-				fps.style.fontSize = "16px";
-				fps.style.pointerEvents = "none";
+			if (_debug) {
+				if (!fps) {
+					fps = document.createElement('div');
+					uiDiv.appendChild(fps);
+					fps.style.fontFamily = "Arial";
+					fps.style.fontSize = "16px";
+					fps.style.pointerEvents = "none";
+				}
+				var time = Date.now();
+				frame++;
+				if (time - startTime > 1000) {
+					fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
+					startTime = time;
+					frame = 0;
+				}
 			}
-			var time = Date.now();
-			frame++;
-			if (time - startTime > 1000) {
-				fps.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
-				startTime = time;
-				frame = 0;
+		} else {
+			// chose a deep water tile to center the title screen map
+			while(mapData[playerY+1][playerX]||mapData[playerY+2][playerX]) {
+				playerX = islandGenerator.rand(9,boardWidth*.8);
+				playerY = islandGenerator.rand(9,boardWidth*.8);
 			}
+
+			drawBoard();
 		}
 	}, 17);
+
+	debugBoard();
 }
 
 function gameStop() {
@@ -79,9 +92,9 @@ function gameStop() {
 
 function getStageData() {
 	return new Promise((resolve, reject) => {
-		islandGenerator = new IslandGenerator(this, seaSize, seaSize, {
+		islandGenerator = new IslandGenerator(this, state?seaSize:38, state?seaSize:38, {
 			type: 1,
-			offset: seaOffset,
+			offset: state?seaOffset:6,
 			debug: _debug ? {feedback: true} : 0
 		}, resolve)
 	});

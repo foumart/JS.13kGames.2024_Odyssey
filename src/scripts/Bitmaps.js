@@ -11,16 +11,16 @@ const offscreenPixelData = [
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship right
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship left
 	
-	"2929883a3a934343a07057cc3778ff4ca0ff4cc6ff",// enemy 1 07 fish
-	"c92606ff3d1700970b00b90d5aff0023d61e292988",// enemy 2 08 serpent
-	"2a2a3f565662da876382829affb08ea4a4cbffffff",// enemy 3 09 knight
+	"2929883a3a934343a07057cc3778ff4ca0ff4cc6ff",// enemy 1 07 07 fish
+	"c92606ff3d1700970b00b90d5aff0023d61e292988",// enemy 2 08 08 serpent
+	"ff2b00c926062a2a3f565662da8763ffb08effffff",// enemy 3 09 09 Knight
+	"832c15452d15d1641caf4b31ff6c2bffa02fffffff",// enemy 4 10 0A Crab
 
-	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle 10
-	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine 11
-	"864404452d1512510d00ca1024a9210d853700e912",// tree 12
-	"712c0e452d15b25800dd8700e4ae1efff115ffca3a",// gold pile 13
-	"b25800dd8700fff115292988ffca3a3a3a935c9e87",// gold wreck 14
-	"0c480400e912",// ?
+	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle 11 0B
+	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine 12 0C
+	"864404452d1512510d00ca1024a9210d853700e912",// tree 13 0D
+	"712c0e452d15b25800dd8700e4ae1efff115ffca3a",// gold pile 14 0E
+	"b25800dd8700fff115292988ffca3a3a3a935c9e87",// gold wreck 15 0F
 	"0c480400e912",// ?
 
 	// TILES
@@ -55,7 +55,7 @@ const offscreenPixelData = [
 
 const offscreenColorData = [
 	// UNITS
-	"Xb[DcIRc\\w{YPvMBXmRKfkZVX\\cC@[XC",// player
+	"Xb[DSIRc\\w{YPvMBXmRKfkZVX\\cC@[XC",// player
 	"\`cZC\\RI\\K_~cPunBYmQCrkZtX\\cC@[XC",// player
 	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship up
 	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship down
@@ -64,7 +64,8 @@ const offscreenColorData = [
 	
 	"hwE@~en@uwEbinPLXJZQHSK@PYQ@@P@@",// enemy1 fish
 	"\`uC@YNr@tulFXBpeP@knApulx\\d{_{[G",// enemy2 serpent
-	"pTfAT]]LJoyCX]bJHStTSIbJHJQA@IHA",// enemy3 knight
+	"@JQCPQJZXw{MhnT\\XeIae[RZX\\SC@[XC",// enemy3 knight
+	"CC@Xu@@nllCebWWLPu\\A@lc@\`MlDKCZ^",// enemy4 crab
 
 	"psscpw]pOw]\`vn\\@ctCXc^|Q_euQ^l",//10 castle
 	"@kf@pwwA{nn\\wLyfnIqMwI|flat]SCcB",//11 shrine
@@ -72,7 +73,6 @@ const offscreenColorData = [
 	"@\`A@@tg@hgk@Xl|Ak~ek]lt_y]{LPQZA",//13 gold pile
 	"@PA@@ZU@HkJDoJka|kQwftptdF@ft@",//14 gold wreck
 	"@@@@@QR@HJIBHIRA@HI@@HB@@HA@@@@@",//15 ?
-	"@@@@@QR@HJIBHIRA@HI@@HB@@HA@@@@@",//16 ?
 
 	// TILES
 	"TlSbZL]IbTIkaSTZeb",// 00 depths

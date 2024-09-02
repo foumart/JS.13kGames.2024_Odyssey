@@ -30,23 +30,26 @@ class UnitType {
 	static get ENEMY3() {
 		return 9;
 	}
-
-	static get CASTLE() {
+	static get ENEMY4() {// 0A
 		return 10;
 	}
-	static get SHRINE() {
+
+	static get CASTLE() {// 0A
 		return 11;
 	}
-	static get TREE() {
+	static get SHRINE() {// 0B
 		return 12;
 	}
-	static get GOLD() {
+	static get TREE() {// 0C
 		return 13;
 	}
-	static get WRECK() {
+	static get GOLD() {// 0D
 		return 14;
 	}
-	static get TREASURE() {
+	static get WRECK() {// 0E
 		return 15;
 	}
+	/*static get TREASURE() {
+		return 15;
+	}*/
 }

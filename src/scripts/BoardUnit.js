@@ -89,8 +89,8 @@ class BoardUnit extends BoardTile {
 	drawImage(_type, reverse) {
 		gameContext.drawImage(
 			offscreenBitmaps[_type-1], 0, 0, unitWidth, unitWidth,
-			this.getX(reverse) - this.width/2 - this.width/tileWidth * (_type == 8 && ((step+this.y*9)/50|0)%2 ? 2 : 1),
-			this.getY(reverse) - this.height - this.width/tileWidth * (_type > 6 ? _type==7||_type==14 ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : 2 : 1),
+			this.getX(reverse) - this.width/2 - this.width/tileWidth * (_type == UnitType.ENEMY2 && ((step+this.y*9)/50|0)%2 ? 2 : 1),
+			this.getY(reverse) - this.height - this.width/tileWidth * (_type > UnitType.SHIPRIGHT ? _type==UnitType.ENEMY1 || _type==UnitType.WRECK ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : 2 : 1),
 			this.width/tileWidth*unitWidth,
 			this.width/tileWidth*unitWidth
 		);

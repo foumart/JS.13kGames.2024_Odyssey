@@ -9,17 +9,13 @@ let unit,
 	hasEvent = false;
 const colors = ["lime","red","aqua","white","magenta"];
 
+let crewHealth = 20;
+let playerHealth = 99;
+let shipHealth = 50;
+
 function createUnit(x, y, z) {
 	unit = new Unit(x, y, z);
 	return unit;
-}
-
-function prepareCastleSiegeDialog(_origin) {
-	dialog.innerHTML = `${_origin} Castle!<br><br><button onclick="alert('Attack clicked!')">Attack</button>`;
-}
-
-function prepareCastleMenuDialog() {
-	dialog.innerHTML = `<br>&#127984 Welcome!<br><br><button onclick="alert('Buy clicked!')">Buy</button>`;
 }
 
 function action(direction) {
@@ -34,8 +30,8 @@ function action(direction) {
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
 					console.log("break",_unit);
 					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
-					prepareCastleSiegeDialog(_unit.origin);
-					displayDialog();
+					//prepareCastleSiegeDialog(_unit.origin);
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : gamePlayer.overlay;
@@ -59,9 +55,7 @@ function action(direction) {
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				let _unit = getUnit(playerX+1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
-					prepareCastleSiegeDialog(_unit.origin);
-					displayDialog();
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : gamePlayer.overlay;
@@ -85,9 +79,7 @@ function action(direction) {
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				let _unit = getUnit(playerX, playerY+1);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
-					prepareCastleSiegeDialog(_unit.origin);
-					displayDialog();
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : gamePlayer.overlay;
@@ -111,9 +103,7 @@ function action(direction) {
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				let _unit = getUnit(playerX-1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
-					prepareCastleSiegeDialog(_unit.origin);
-					displayDialog();
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPDOWN : gamePlayer.overlay;
@@ -137,8 +127,8 @@ function action(direction) {
 		case 6: // Action
 			if (gamePlayer.overlay == 10) {
 				//infoTab.innerHTML = `<br>You see a Castle`;
-				prepareCastleMenuDialog();
-				displayDialog();
+				//prepareCastleMenuDialog();
+				prepareDialog("Capitol", "will you", "Upgrade", "Exit", quitGame, displayDialog);
 			} else if (gamePlayer.overlay == 11) {
 				infoTab.innerHTML = `<br>You see a Shrine`;
 			} else if (gamePlayer.overlay == 12) {
@@ -201,18 +191,22 @@ function finalizeMove(dir) {
 		}
 	});
 
-	if (_debug) console.log(
-		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num>=1&&num<=6||num==8||num==9?"█":" ") + num.toString(16)).toUpperCase())).join("\n")
-	);
-
-	infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
-	
 	paused = false;
 	gameContainer.style.display = "block";
 	updateActionButton();
 	if (holding && dir) {
 		action(dir);
 	}
+
+	debugBoard();
+}
+
+function debugBoard() { 
+	if (_debug) console.log(
+		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"▀":"▄":"█":num==11?"□":" ") + num.toString(16)).toUpperCase())).join("\n")
+	);
+
+	if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
 }
 
 function performEnemyMoves() {
@@ -258,11 +252,29 @@ function displayDialog() {
 	}*/
 }
 
+function prepareDialog(_label, _label2, _btn1, _btn2, _callback1, _callback2) {
+	window.callback1 = _callback1;
+	window.callback2 = _callback2;
+	dialog.innerHTML = `<br><b style="filter:drop-shadow(0 ${6*scale}px 0 #239)">${_label}</b><br>${_label2}<br><br><button style="background-color:#fda" onclick="callback1()">${_btn1}</button><button onclick="callback2()">${_btn2}</button>`;
+	if (!inDialog) displayDialog();
+}
+
+function closeButtonClick(e) {
+	prepareDialog("QUIT", "Are you sure?", "Confirm", "Cancel", quitGame, displayDialog);
+}
+
+function quitGame() {
+	state = -1;
+	switchState();
+}
+
+
 function updateActionButton() {
 	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 | 〇 &#12295 |
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
-	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732
+	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
+	// "▀" "▄" "█" "■" "□" "▐" "⬞" "⬝" "†"
 
 	//unit = getUnit(playerX, playerY);
 

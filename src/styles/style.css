@@ -1,10 +1,11 @@
 * {
 	padding: 0;
 	margin: 0;
+	
 }
 
 body {
-	background: linear-gradient(#4346e5, #4346e5 41%, #4396e5 42%, #4346e5 48%,#4346e5 66%, #122390);
+	background-color: #3a3adc;
 	color: #fff;
 	overflow: hidden;
 }
@@ -16,7 +17,15 @@ div, canvas {
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 	image-rendering: pixelated;
-	
+}
+
+button {
+	background-color: #afc;
+	padding: 1rem 2rem;
+	margin: 1rem 1rem;
+	font-size: 1.8rem;
+	border-radius: 1rem;
+	border: 0;
 }
 
 
@@ -28,39 +37,27 @@ div, canvas {
 
 .css_icon {
 	color: #fff;
-	background-color: rgba(232,240,255,0.5);
-	filter: drop-shadow(0 .1rem 5px #006);
+	background-color: rgba(255,255,255,0.55);
+	filter: drop-shadow(0 .1rem 5px #026);
 }
 .css_play {
-	background-color: rgba(32, 255, 32, 0.7);
+	background: rgba(64, 255, 0, 0.8);
+	
 }
-.css_play:hover {
+/*.css_play:hover {
 	background-color: rgba(32, 255, 32, 0.8);
-}
+}*/
 .css_install {
-	background-color: rgba(255, 212, 64, 0.8);
+	background: rgba(255, 200, 0, 0.8);
 }
-.css_install:hover {
-	background-color: rgba(255, 212, 64, 0.9);
-}
+/*.css_install:hover {
+	background: rgba(255, 212, 64, 0.9);
+}*/
 .css_controls {
 	width: 40%;
 	border-radius: 2rem;
 }
 
 .css_space {
-	padding: 0 2vw;
-}
-
-@keyframes rotate {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-}
-	
-.rotate {
-	animation: rotate 9s linear infinite;
+	padding: 0 3vw;
 }

@@ -34,11 +34,18 @@ let boardPlayer,
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
-	boardScale = 1;
-	tween.transition = 0.6;
+	boardScale = mobile ? state ? 0.84 : 0.94 : state ? 0.7 : 0.84;
+	tween.transition = state ? 0.6 : 0.8;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
-	let c=0,t=0,e1=0,e2=0,e3=0,g1=0,g2=0, treasures = [];
+	let t=0,
+		//c=0,
+		e1=0,
+		e2=0,
+		//e3=0,
+		//g1=0,
+		//g2=0,
+		treasures = [];
 	oddDirectionalArray = generateOddArray(renderedScreenSize);
 
 	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied)
@@ -67,7 +74,7 @@ function initBoard() {
 				// walk through all islands to place castles and shrines
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
-						c ++;
+						//c ++;
 						unit = createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
 						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
@@ -146,23 +153,23 @@ function initBoard() {
 				getUnitId(x+1, y-1)==-1 && getUnitId(x-1, y+1)==-1
 			) {
 				if (isWalkable(x, y)) {
-					if (idsData[y][x] > 5 && idsData[y][x] < 14 && treasures.indexOf(idsData[y][x]) == -1) {
-						// place gold piles on land on isles 6-13
+					if (idsData[y][x] > 5 && treasures.indexOf(idsData[y][x]) == -1) {
+						// place gold piles on isles 6-13
 						treasures.push(idsData[y][x]);
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
 						//sconsole.log("G1", unitsList.length+"("+treasures.length+")", idsData[y][x], x+"x"+y);
-						g1 ++;
-					} else if (mapData[y][x] >= TileType.LAND && idsData[y][x] > 1 && idsData[y][x] < 7 && treasures.indexOf(-idsData[y][x]) == -1) {
-						// place enemies on land on isles 2-6
-						unit = createUnit(x, y, UnitType.ENEMY3);
+						//g1 ++;
+					} else if (mapData[y][x] >= TileType.LAND && idsData[y][x] > 1 && treasures.indexOf(-idsData[y][x]) == -1) {
+						// place knight (isles 2-6) or crab (isles 7-13) enemies on 
+						unit = createUnit(x, y, idsData[y][x] > 6 ? UnitType.ENEMY4 : UnitType.ENEMY3);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
 						treasures.push(-idsData[y][x]);
 						unitsList.push(unit);
-						unitsData[y][x] = UnitType.ENEMY3;
+						unitsData[y][x] = idsData[y][x] > 6 ? UnitType.ENEMY4 : UnitType.ENEMY3;
 						//console.log("E3", unitsList.length+"("+treasures.length+")", -idsData[y][x], x+"x"+y);
-						e3 ++;
+						//e3 ++;
 					}
 				} else if (isSailable(x, y)) {
 					if (mapData[y][x] && treasures.indexOf(y) == -1 && y > 13 && e2 < 9 && idsData[y][x] != 1) {
@@ -181,14 +188,23 @@ function initBoard() {
 						unitsList.push(createUnit(x, y, UnitType.WRECK));
 						unitsData[y][x] = UnitType.WRECK;
 						//console.log("G2", unitsList.length+"("+treasures.length+")", y, x+"x"+y);
-						g2 ++;
+						//g2 ++;
 					}
 				}
 			}
 		}
 	}
 
-	if (_debug) console.log(unitsList.length, "trees:"+t,"castles:"+c,"g1:"+g1,"g2:"+g2,"e1:"+e1,"e2:"+e2,"e3:"+e3);
+	if (_debug) console.log(
+		unitsList.length,
+		"trees:"+t,
+		//"castles:"+c,
+		//"g1:"+g1,
+		//"g2:"+g2,
+		//"e1:"+e1,
+		//"e2:"+e2,
+		//"e3:"+e3
+	);
 
 	// starting town position
 	playerX = shipX = stageData.x;
@@ -221,9 +237,9 @@ function initBoard() {
 	unitsList.push(gameShip);
 	unitsData[shipY][shipX] = UnitType.SHIPLEFT;
 
-	/*if (_debug) console.log(
+	if (_debug) console.log(
 		mapData.map(arr => arr.map(num => (num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
-	);*/
+	);
 
 	// data initialization completed
 
@@ -381,6 +397,8 @@ function drawBoard() {
 			}
 		}
 	}
+
+	if (!state) return;// break here if we are still on the title screen
 
 	// Update units
 	for(let y = 0; y < screenWidth + screenOut; y++) {
