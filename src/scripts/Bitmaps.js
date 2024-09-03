@@ -21,7 +21,7 @@ const offscreenPixelData = [
 	"864404452d1512510d00ca1024a9210d853700e912",// tree 13 0D
 	"712c0e452d15b25800dd8700e4ae1efff115ffca3a",// gold pile 14 0E
 	"b25800dd8700fff115292988ffca3a3a3a935c9e87",// gold wreck 15 0F
-	"0c480400e912",// ?
+	"919bb29fa9c9b6c3e4c1cef2d5e1ffeef3ffffffff",// clouds ovelay 16
 
 	// TILES
 	"3737d13a3adc3d3ddf4343de4d4de8",// 00 depths
@@ -72,7 +72,7 @@ const offscreenColorData = [
 	"@fuCp}g]p|l^Xfu^@s^C@@B@@@A@@@@@",//12 tree
 	"@\`A@@tg@hgk@Xl|Ak~ek]lt_y]{LPQZA",//13 gold pile
 	"@PA@@ZU@HkJDoJka|kQwftptdF@ft@",//14 gold wreck
-	"@@@@@QR@HJIBHIRA@HI@@HB@@HA@@@@@",//15 ?
+	"@cS@X~]D\`mdf@dkwXJcns]YD}o@@hF@@",//15 clouds overlay
 
 	// TILES
 	"TlSbZL]IbTIkaSTZeb",// 00 depths

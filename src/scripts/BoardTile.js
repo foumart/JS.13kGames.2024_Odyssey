@@ -10,12 +10,12 @@ class BoardTile extends BoardElement {
 
 	getOffsetX() {
 		return (portrait ? - screenOffsetX : screenOffsetX) - this.width*screenOut/2 -
-			((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.transition);
+			((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.zoom);
 	}
 	
 	getOffsetY() {
 		return (portrait ? screenOffsetY : -screenOffsetY) - this.height*screenOut/2 -
-			((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.transition);
+			((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.zoom);
 	}
 
 	getX() {
@@ -37,6 +37,7 @@ class BoardTile extends BoardElement {
 		this.overlay = 0;
 		this.origin = 0;
 		this.selection = 0;
+		this.visited = 0;
 	}
 
 	resize() {
@@ -52,5 +53,16 @@ class BoardTile extends BoardElement {
 			this.width,
 			this.width
 		);
+		if (this.visited < 2) {
+			bgrContext.globalAlpha = state ? 0.5 : 1;
+			bgrContext.drawImage(
+				offscreenBitmaps[15], 0, 0, tileWidth+2, tileWidth+2,
+				this.getX() - this.width/3,
+				this.getY() - this.width/3,
+				this.width + this.width/3,
+				this.width + this.width/3
+			);
+			bgrContext.globalAlpha = 1;
+		}
 	}
 }

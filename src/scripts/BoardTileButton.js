@@ -10,11 +10,11 @@ class BoardButton extends BoardTile {
 	}
 
 	getOffsetX() {
-		return - ((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.transition)
+		return - ((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.zoom)
 	}
 	
 	getOffsetY() {
-		return - ((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.transition)
+		return - ((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.zoom)
 	}
 
 	draw() {

@@ -139,8 +139,8 @@ function action(direction) {
 				// PASS
 				if (inDialog) displayDialog();// hide the dialog
 				//infoTab.innerHTML = `<br>${onFoot ? 'Dug, nothing? pass' : 'Fish, nothing? pass'}`;
-				tween.transitionZ = 1;
-				TweenFX.to(tween, 6, {transitionZ: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
+				tween.transitionU = 1;
+				TweenFX.to(tween, 6, {transitionU: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
 				performEnemyMoves();
 			}
 
@@ -203,6 +203,14 @@ function finalizeMove(dir) {
 	} else {
 		gameContainer.style.display = "block";//TODO: fix lag
 		updateActionButton();
+	}
+
+	revealArea(playerX, playerY);
+	if (!onFoot) {
+		revealArea(playerX-1, playerY);
+		revealArea(playerX+1, playerY);
+		revealArea(playerX, playerY-1);
+		revealArea(playerX, playerY+1);
 	}
 
 	debugBoard();
@@ -285,7 +293,8 @@ function updateActionButton() {
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050
+	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
+	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
 
 	//unit = getUnit(playerX, playerY);
 

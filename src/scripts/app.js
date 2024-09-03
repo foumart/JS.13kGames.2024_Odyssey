@@ -50,7 +50,7 @@ let screenOffsetY = 0;
 // game state, 0: menu, 1: in-game
 let state = 0;
 
-let tween = { id:0, transition: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
+let tween = { zoom: 0, transitionU: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
 let controls, infoTab, dialog, title, titleText;
@@ -72,7 +72,6 @@ document.oncontextmenu = function() {return false;};
 function tryToShowInstallButton() {
 	if (!state && installPrompt) {
 		installButton = generateUIButton(uiDiv, `Install`, e => displayInstallPrompt(), 'css_icon');
-		//gameDirty = 2;
 	}
 }
 
@@ -147,14 +146,6 @@ function setupUI() {
 	width = window.innerWidth;
 	height = window.innerHeight;
 	scale = getScale();
-}
-
-function getScale() {
-	return (height < width ? height : width) / 1000;
-}
-
-function getSize(limit = 600) {
-	return (portrait ? width : height) < limit ? 1 : (portrait ? width : height) / limit;
 }
 
 function resizeUI(e) {
@@ -232,14 +223,14 @@ function resizeUI(e) {
 	if (playButton) {
 		if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
 		updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#0d4`);
-		title.innerHTML = getIcon(portrait ? 80*getSize() : 65*getSize());
-		updateStyleUI(title, `filter:drop-shadow(0 1vh 0 #23b);top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
-		titleText.innerHTML = `<div style="text-shadow:#23b9 .03em 0;color:#238;font-size:${440*scale}px;margin-top:-${20*scale};margin-left:${336*scale
-			}">&#9784</div><div style="text-shadow:#23b .03em 0;color:#49e;margin-top:-${20*scale}px;margin-left:${310*scale}px;font-size:${440*scale
-			}px">&#9784</div><div style="filter:drop-shadow(.1em 0 0 #126);text-shadow:#fb4 .1em 0;margin-top:-${105*scale}px;margin-left:${240*scale
-			}px;font-size:${42*scale}px;color:#ffc"><i><b>The</b></i></div><div style="filter:drop-shadow(.1em 0 0 #126);text-shadow:#fb4 .1em 0;margin-top:-${90*scale}px;margin-left:${320*scale
-			}px;font-size:${99*scale}px;color:#ffc"><i><b>Isle-Hop</b></i></div><span style="filter:drop-shadow(.06em 0 0 #126);position:relative;text-shadow:#1ce .05em 0">O<b>dyssey</b></span>`;
-		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?360:270}%) translateX(-50%) scale(${getSize(700)})`, 220);
+		title.innerHTML = getIcon(portrait ? 80*getSize() : 75*getSize());
+		updateStyleUI(title, `filter:drop-shadow(0 1vh 0 #238);top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
+		titleText.innerHTML = `<div style="text-shadow:#1268 .03em .01em;color:#23ac;font-size:${480*scale}px;margin-top:-${36*scale};margin-left:${368*scale
+			}">&#9881</div><div style="text-shadow:#24c .03em .01em;color:#49e;margin-top:-${44*scale}px;margin-left:${340*scale}px;font-size:${480*scale
+			}px">&#9881</div><div style="filter:drop-shadow(.2em .1em 0 #0067);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
+			}px;font-size:${45*scale}px;color:#ff9"><i>The</i></div><div style="filter:drop-shadow(.15em .1em 0 #0067);text-shadow:#f74 .07em .03em;margin-top:-${95*scale}px;margin-left:${325*scale
+			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div><span style="filter:drop-shadow(.1em .05em 0 #0067);position:relative;text-shadow:#1be .06em .03em">O<b>dyssey</b></span>`;
+		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?350:250}%) translateX(-50%) scale(${getSize(500)})`, 220);
 	}
 }
 
@@ -254,12 +245,20 @@ function updateStyleUI(element, _style, _size = 99, _space = 128) {
 function switchState(event) {
 	console.log("switchState", state);
 	inDialog = 0;
-	//gameDirty = 2;
+	gameDirty = 2;
 	state ++;
 	gameInit();
 	createUI();
 	tryToShowInstallButton();
 	resizeUI(1);
+}
+
+function getScale() {
+	return (height < width ? height : width) / 1000;
+}
+
+function getSize(limit = 600, strength = 3) {
+	return (portrait ? width : height) < limit ? 1 : (strength + (portrait ? width : height) / (portrait ? 960 : 540)) / (strength+1);
 }
 
 function getIcon(size) {
@@ -271,11 +270,19 @@ function createUI() {
 	gameCanvas.style.pointerEvents = bgrCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 
 	infoTab = generateUIButton(uiDiv, '<b>v0.</b>3', () => prepareDialog("", "Game by Noncho Savov<br>", "Got it!", () => displayDialog()));
+	
+	if (_debug) {
+		fpsElement = document.createElement('div');
+		uiDiv.appendChild(fpsElement);
+		fpsElement.style.fontFamily = "Arial";
+		fpsElement.style.fontSize = "16px";
+		fpsElement.style.pointerEvents = "none";
+	}
 
 	if (!state) {
 		title = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
-		bgrCanvas.style.opacity = .7;
+		bgrCanvas.style.opacity = .4;
 	} else {
 		actButton = generateUIButton(uiDiv, '&#9935', e => action(6), "css_icon css_controls");
 

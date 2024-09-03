@@ -3,7 +3,8 @@ const seaSize = 44, seaOffset = 9;
 let islandGenerator = new IslandGenerator(this);
 
 // game loop vars
-let gameLoop, step, fpsElement, frame, startTime = Date.now();
+let gameLoop, step
+let fpsElement, frame, startTime = Date.now();// debug fps
 let paused = false;
 
 async function gameInit() {
@@ -18,14 +19,14 @@ async function gameInit() {
 }
 
 function gameStart() {
-	cancelAnimationFrame(tween.id);
+	gameStop();
 	doAnimationFrame();
 
 	if (state) debugBoard();
 }
 
 function gameStop() {
-	clearInterval(gameLoop);
+	cancelAnimationFrame(gameLoop);
 }
 
 function doAnimationFrame(timeStamp) {
@@ -35,7 +36,7 @@ function doAnimationFrame(timeStamp) {
 		if (step == 1) {
 			gameContainer.style.display = "none";
 			// initial level zoomed in
-			TweenFX.to(tween, 6, {transition: 1}, e => doFrameAnimationMove(), e => {
+			TweenFX.to(tween, 6, {zoom: 1}, e => doFrameAnimationMove(), e => {
 				gameContainer.style.display = "block";//TODO: fix lag
 				action(6);
 			});
@@ -50,13 +51,6 @@ function doAnimationFrame(timeStamp) {
 		}
 
 		if (_debug) {
-			if (!fpsElement) {
-				fpsElement = document.createElement('div');
-				uiDiv.appendChild(fpsElement);
-				fpsElement.style.fontFamily = "Arial";
-				fpsElement.style.fontSize = "16px";
-				fpsElement.style.pointerEvents = "none";
-			}
 			var time = Date.now();
 			frame++;
 			if (time - startTime > 1000) {
@@ -66,7 +60,7 @@ function doAnimationFrame(timeStamp) {
 			}
 		}
 	} else if (gameDirty > 1) {
-		// chose a deep water tile to center the title screen map in between the islands
+		// chose a central deep water tile to position the title screen map (somewhere between the islands)
 		let waterId = 0, limit = 0;
 		while(mapData[playerY+1][playerX] > waterId || mapData[playerY+2][playerX] > waterId) {
 			playerX = islandGenerator.rand(9,boardWidth*.6);
@@ -77,6 +71,14 @@ function doAnimationFrame(timeStamp) {
 			}
 		}
 
+		// reveal clouds around the title and the play button
+		for (waterId = 1; waterId < 5; waterId ++) {
+			revealArea(playerX - 5 + waterId * 2, playerY - 5 + waterId * 2);
+			revealArea(playerX + 5 - waterId * 2, playerY - 5 + waterId * 2);
+			revealArea(playerX, playerY-8 + waterId * 4);
+			revealArea(playerX -10 + waterId * 4, playerY);
+		}
+
 		drawBoard();
 
 		if (_debug) console.log(
@@ -84,7 +86,7 @@ function doAnimationFrame(timeStamp) {
 		);
 	}
 
-	tween.id = requestAnimationFrame(() => doAnimationFrame());
+	gameLoop = requestAnimationFrame(() => doAnimationFrame());
 }
 
 

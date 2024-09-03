@@ -20,13 +20,13 @@ class BoardUnit extends BoardTile {
 	getX(reverse) {
 		return (reverse ? this.width * tween.transitionX : 0) + this.width/2 + super.getX()
 			- (this.shouldAnimate() ? tween.transitionX * this.width : 0)
-			- (this.isEnemyMovingX() * ((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.width);
+			- (this.isEnemyMovingX() * ((tween.transitionU || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.width);
 	}
 
 	getY(reverse) {
 		return (reverse ? this.height * tween.transitionY : 0) + this.height/2 + super.getY()
 			- (this.shouldAnimate() ? tween.transitionY * this.height : 0)
-			- (this.isEnemyMovingY() * ((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.height);
+			- (this.isEnemyMovingY() * ((tween.transitionU || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.height);
 	}
 
 	reset() {

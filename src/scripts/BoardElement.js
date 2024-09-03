@@ -6,8 +6,8 @@ class BoardElement {
 
 	resize() {
 		this.elementSize = portrait ? gameCanvas.width / screenWidth : gameCanvas.height / screenWidth;
-		this.width = this.elementSize * boardScale * tween.transition;
-		this.height = this.elementSize * boardScale * tilt * tween.transition;
+		this.width = this.elementSize * boardScale * tween.zoom;
+		this.height = this.elementSize * boardScale * tilt * tween.zoom;
 	}
 
 }

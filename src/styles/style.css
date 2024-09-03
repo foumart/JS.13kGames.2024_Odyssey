@@ -5,7 +5,7 @@
 }
 
 body {
-	background-color: #3a3adc;
+	background-color: #336;
 	color: #fff;
 	overflow: hidden;
 }
@@ -42,7 +42,7 @@ button {
 
 .css_icon {
 	color: #fff;
-	background-color: rgba(255,255,255,0.55);
+	background-color: #fff8;
 	filter: drop-shadow(0 .1rem .1rem #026);
 	border-bottom: 1vh solid #fff8;
 }

@@ -21,7 +21,7 @@ let stageData,
 	currentButtonX,
 	currentButtonY,
 	oddDirectionalArray,// used for direction determination on touch interaction
-	gameDirty, // should we redraw screen, 1: clears map + units; 2: clears only units
+	gameDirty, // should we redraw screen on next frame paint, 1: clears map + units; 2: clears only units
 	touchX, touchY, touchZ;// are we trying to zoom the map
 let boardPlayer,
 	boardShip,
@@ -29,14 +29,16 @@ let boardPlayer,
 	playerX,
 	playerY,
 	shipX,
-	shipY;
+	shipY,
+	townX,
+	townY;
 
 
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
 	boardScale = mobile ? state ? 0.84 : 0.91 : state ? 0.7 : 0.84;
-	tween.transition = state ? 0.6 : 0.8;
+	tween.zoom = state ? 0.6 : 0.8;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
 	let t=0,
@@ -68,6 +70,7 @@ function initBoard() {
 					t ++;
 					unitsList.push(createUnit(x, y, UnitType.TREE));
 					unitsData[y][x] = UnitType.TREE;
+					//revealClouds(x, y);
 					// if (stageData.relief[y][x] > 2)
 					// TODO: place treasures buried on land
 				}
@@ -208,8 +211,8 @@ function initBoard() {
 	);
 
 	// starting town position
-	playerX = shipX = stageData.x;
-	playerY = shipY = stageData.y;
+	townX = playerX = shipX = stageData.x;
+	townY = playerY = shipY = stageData.y;
 	// setting player next to the town
 	if (isPassable(playerX+1, playerY+1)) {
 		playerX ++; playerY ++;
@@ -240,9 +243,10 @@ function initBoard() {
 
 	// data initialization completed
 
+	// TODO: should be optimized, fix lag
 	gameContainer.innerHTML = "";
 
-	// now preparing to render only what is visible inside the game window
+	// now preparing board elements to render only what is visible inside the game window
 	tileScreen = [];// 2d array (renderedScreenSize x renderedScreenSize)
 	unitScreen = [];// 2d array
 	buttonScreen = [];// 2d array
@@ -272,6 +276,10 @@ function initBoard() {
 		tileScreen.push(tileArr);
 		unitScreen.push(unitArr);
 	}
+
+	revealArea(playerX, playerY);
+	revealArea(shipX, shipY);
+	revealArea(townX, townY);
 }
 
 function addButtonListeners(button) {
@@ -346,6 +354,8 @@ function clickButton(event) {
 	}
 }
 
+
+
 function determineDirection(x, y) {
 	if (!x && !y) return -1;
 	return oddDirectionalArray[y][x];
@@ -377,7 +387,9 @@ function generateOddArray(size) {
 
 // Draw the board
 function drawBoard() {
-	/*if (!tween.transitionX && !tween.transitionY) {
+	// the game canvas context is cleared every 7 frames or each frame while moving
+	// the map canvas context is cleared only when zooming or while moving
+	/*if (!tween.zoom) {
 		gameContext.fillStyle = "#4848e3";
 		gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
 	}*/
@@ -390,6 +402,8 @@ function drawBoard() {
 		// Update base tiles
 		gameDirty --;
 		if (gameDirty) {
+			bgrContext.fillStyle = "#338";
+			bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
 			for(let y = 0; y < screenWidth + screenOut; y++) {
 				for(let x = 0; x < screenWidth + screenOut; x++) {
 					if (tileScreen[y]) {
@@ -397,6 +411,8 @@ function drawBoard() {
 							_x = x + playerX - _ox - (portrait?screenOut/2:0);
 							_y = y + playerY - _oy - (!portrait?screenOut/2:0);
 							_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
+							tileScreen[y][x].visited = 0;
+							if (visitedData[_y] && visitedData[_y][_x]) tileScreen[y][x].visited = visitedData[_y][_x];
 							tileScreen[y][x].update(_z);
 						}
 					}
@@ -405,14 +421,17 @@ function drawBoard() {
 		}
 	}
 
-	if (!state || !gameDirty) return;// break here if we are still on the title screen - we only draw the map
+	if (gameDirty) {
+		gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+	}
+
+	if (!state || !gameDirty) return;// break here if we are still on the title screen or we dont have to draw units
 
 	// Update units
-	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	for(let y = 0; y < screenWidth + screenOut; y++) {
-		let _player, shouldDrawPlayer;
+		let _player, shouldSkipDrawingUnit;
 		for(let x = 0; x < screenWidth + screenOut; x++) {
-			shouldDrawPlayer = false;
+			shouldSkipDrawingUnit = false;
 			if (unitScreen[y]) {
 				if (unitScreen[y][x]) {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
@@ -425,7 +444,7 @@ function drawBoard() {
 						if (_x == playerX && _y == playerY) {
 							boardPlayer = unitScreen[y][x];
 							if (!_player) {// drawing the player at the end of the row itteration to be on top
-								shouldDrawPlayer = true;
+								shouldSkipDrawingUnit = true;
 								_player = _z;
 							}
 							boardPlayer.overlay = gamePlayer.overlay;
@@ -442,10 +461,11 @@ function drawBoard() {
 							unitScreen[y][x].movingX = _unit.movingX;
 							unitScreen[y][x].movingY = _unit.movingY;
 							unitScreen[y][x].origin = _unit.origin;
+							shouldSkipDrawingUnit = visitedData[_y][_x] < 2;
 						}
 					}
 	
-					if (!shouldDrawPlayer) unitScreen[y][x].update(_z);
+					if (!shouldSkipDrawingUnit) unitScreen[y][x].update(_z);
 				}
 			}
 		}
