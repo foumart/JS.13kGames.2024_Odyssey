@@ -1,6 +1,6 @@
 class TweenFX {
 
-	static to(_element, _duration, _object, _update, _callback, _timeout = 16.7) {
+	static to(_element, _duration, _object, _update, _callback) {
 		const tweenedKeys = [];
 		const tweenedStart = [];
 		const tweenedEnd = [];
@@ -26,15 +26,15 @@ class TweenFX {
 						element[key] = tweenedStart[i] - (tweenedStart[i] - tweenedEnd[i]) / duration * eased;
 					}
 				});
-				if (_update) _update();
-				setTimeout(tween, _timeout);
+				if (_update != null) _update();
+				requestAnimationFrame(tween);
 			} else if (_callback) {
-				_callback();
+				requestAnimationFrame(_callback);
 			}
 		}
 
 		if (_update != null) _update();
-		setTimeout(tween, _timeout);
+		requestAnimationFrame(tween);
 	}
 }
 

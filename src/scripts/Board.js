@@ -20,8 +20,9 @@ let stageData,
 	unitsData,
 	currentButtonX,
 	currentButtonY,
-	oddDirectionalArray,
-	touchX, touchY, touchZ;// are we trying to zoom map
+	oddDirectionalArray,// used for direction determination on touch interaction
+	gameDirty, // should we redraw screen, 1: clears map + units; 2: clears only units
+	touchX, touchY, touchZ;// are we trying to zoom the map
 let boardPlayer,
 	boardShip,
 	enemies,
@@ -34,7 +35,7 @@ let boardPlayer,
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
-	boardScale = mobile ? state ? 0.84 : 0.94 : state ? 0.7 : 0.84;
+	boardScale = mobile ? state ? 0.84 : 0.91 : state ? 0.7 : 0.84;
 	tween.transition = state ? 0.6 : 0.8;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
@@ -237,10 +238,6 @@ function initBoard() {
 	unitsList.push(gameShip);
 	unitsData[shipY][shipX] = UnitType.SHIPLEFT;
 
-	if (_debug) console.log(
-		mapData.map(arr => arr.map(num => (num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
-	);
-
 	// data initialization completed
 
 	gameContainer.innerHTML = "";
@@ -380,27 +377,38 @@ function generateOddArray(size) {
 
 // Draw the board
 function drawBoard() {
+	/*if (!tween.transitionX && !tween.transitionY) {
+		gameContext.fillStyle = "#4848e3";
+		gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+	}*/
+
 	let _unit, _x, _y, _z,
 		_ox = portrait ? screenSide : screenSide + screenOut/2,
 		_oy = !portrait ? screenSide : screenSide + screenOut/2;
 
-	// Update base tiles
-	for(let y = 0; y < screenWidth + screenOut; y++) {
-		for(let x = 0; x < screenWidth + screenOut; x++) {
-			if (tileScreen[y]) {
-				if (tileScreen[y][x]) {
-					_x = x + playerX - _ox - (portrait?screenOut/2:0);
-					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
-					_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
-					tileScreen[y][x].update(_z);
+	if (gameDirty) {
+		// Update base tiles
+		gameDirty --;
+		if (gameDirty) {
+			for(let y = 0; y < screenWidth + screenOut; y++) {
+				for(let x = 0; x < screenWidth + screenOut; x++) {
+					if (tileScreen[y]) {
+						if (tileScreen[y][x]) {
+							_x = x + playerX - _ox - (portrait?screenOut/2:0);
+							_y = y + playerY - _oy - (!portrait?screenOut/2:0);
+							_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
+							tileScreen[y][x].update(_z);
+						}
+					}
 				}
 			}
 		}
 	}
 
-	if (!state) return;// break here if we are still on the title screen
+	if (!state || !gameDirty) return;// break here if we are still on the title screen - we only draw the map
 
 	// Update units
+	gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	for(let y = 0; y < screenWidth + screenOut; y++) {
 		let _player, shouldDrawPlayer;
 		for(let x = 0; x < screenWidth + screenOut; x++) {
@@ -444,10 +452,13 @@ function drawBoard() {
 		if (_player) boardPlayer.update(_player);
 	}
 
-	if (buttonScreen && !paused) {
-		for (_y = 0; _y < buttonScreen.length; _y ++) {
-			for (_x = 0; _x < buttonScreen[_y].length; _x ++) {
-				buttonScreen[_y][_x].update(1, playerX - _ox, playerY - _oy);
+	if (gameDirty) {
+		gameDirty = 0;
+		if (buttonScreen && !paused) {
+			for (_y = 0; _y < buttonScreen.length; _y ++) {
+				for (_x = 0; _x < buttonScreen[_y].length; _x ++) {
+					buttonScreen[_y][_x].update(1, playerX - _ox, playerY - _oy);
+				}
 			}
 		}
 	}

@@ -31,7 +31,7 @@ function action(direction) {
 					console.log("break",_unit);
 					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
 					//prepareCastleSiegeDialog(_unit.origin);
-					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : gamePlayer.overlay;
@@ -43,7 +43,7 @@ function action(direction) {
 					gamePlayer.y += boardWidth-jump;
 				}
 				tween.transitionY = -1;
-				TweenFX.to(tween, 6, {transitionY: 0}, null, e => finalizeMove(1));
+				TweenFX.to(tween, 6, {transitionY: 0}, e => doFrameAnimationMove(), e => finalizeMove(1));
 				prepareToMove(1);
 			}
 
@@ -55,7 +55,7 @@ function action(direction) {
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				let _unit = getUnit(playerX+1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPUP : gamePlayer.overlay;
@@ -67,7 +67,7 @@ function action(direction) {
 					gamePlayer.x -= boardWidth-jump;
 				}
 				tween.transitionX = 1;
-				TweenFX.to(tween, 6, {transitionX: 0}, null, e => finalizeMove(2));
+				TweenFX.to(tween, 6, {transitionX: 0}, e => doFrameAnimationMove(), e => finalizeMove(2));
 				prepareToMove(2);
 			}
 
@@ -79,7 +79,7 @@ function action(direction) {
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				let _unit = getUnit(playerX, playerY+1);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : gamePlayer.overlay;
@@ -91,7 +91,7 @@ function action(direction) {
 					gamePlayer.y -= boardWidth-jump;
 				}
 				tween.transitionY = 1;
-				TweenFX.to(tween, 6, {transitionY: 0}, null, e => finalizeMove(3));
+				TweenFX.to(tween, 6, {transitionY: 0}, e => doFrameAnimationMove(), e => finalizeMove(3));
 				prepareToMove(3);
 			}
 
@@ -103,7 +103,7 @@ function action(direction) {
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				let _unit = getUnit(playerX-1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
-					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", "Retreat", quitGame, displayDialog);
+					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPDOWN : gamePlayer.overlay;
@@ -115,7 +115,7 @@ function action(direction) {
 					gamePlayer.x += boardWidth-jump;
 				}
 				tween.transitionX = -1;
-				TweenFX.to(tween, 6, {transitionX: 0}, null, e => finalizeMove(4));
+				TweenFX.to(tween, 6, {transitionX: 0}, e => doFrameAnimationMove(), e => finalizeMove(4));
 				prepareToMove(4);
 			}
 
@@ -128,19 +128,19 @@ function action(direction) {
 			if (gamePlayer.overlay == 10) {
 				//infoTab.innerHTML = `<br>You see a Castle`;
 				//prepareCastleMenuDialog();
-				prepareDialog("Capitol", "will you", "Upgrade", "Exit", quitGame, displayDialog);
+				prepareDialog("Capitol", "will you", "Upgrade", quitGame, "Exit", displayDialog);
 			} else if (gamePlayer.overlay == 11) {
-				infoTab.innerHTML = `<br>You see a Shrine`;
+				//.innerHTML = `<br>You see a Shrine`;
 			} else if (gamePlayer.overlay == 12) {
-				infoTab.innerHTML = `<br>You see a tree`;
+				//infoTab.innerHTML = `<br>You see a tree`;
 			} else if (gamePlayer.overlay == 13) {
-				infoTab.innerHTML = `<br>You see a gold pile`;
+				//infoTab.innerHTML = `<br>You see a gold pile`;
 			} else {
 				// PASS
 				if (inDialog) displayDialog();// hide the dialog
-				infoTab.innerHTML = `<br>${onFoot ? 'Dug, nothing? pass' : 'Fish, nothing? pass'}`;
+				//infoTab.innerHTML = `<br>${onFoot ? 'Dug, nothing? pass' : 'Fish, nothing? pass'}`;
 				tween.transitionZ = 1;
-				TweenFX.to(tween, 6, {transitionZ: 0}, null, e => finalizeMove(0));
+				TweenFX.to(tween, 6, {transitionZ: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
 				performEnemyMoves();
 			}
 
@@ -153,6 +153,7 @@ function action(direction) {
 
 function prepareToMove(dir) {
 	if (inDialog) displayDialog();// hide the dialog
+	gameDirty = 2;
 	gamePlayer.overlay = unitsData[playerY][playerX];
 	if (boarding) {
 		onFoot = false;
@@ -170,6 +171,10 @@ function prepareToMove(dir) {
 		: UnitType.PLAYER;
 
 	performEnemyMoves();
+}
+
+function doFrameAnimationMove() {
+	gameDirty = 2;// set on each turn to redraw the map
 }
 
 function finalizeMove(dir) {
@@ -191,22 +196,28 @@ function finalizeMove(dir) {
 		}
 	});
 
+	gameDirty = 2;
 	paused = false;
-	gameContainer.style.display = "block";
-	updateActionButton();
 	if (holding && dir) {
 		action(dir);
+	} else {
+		gameContainer.style.display = "block";//TODO: fix lag
+		updateActionButton();
 	}
 
 	debugBoard();
 }
 
-function debugBoard() { 
+function debugBoard() {return;
 	if (_debug) console.log(
-		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"▀":"▄":"█":num==11?"□":" ") + num.toString(16)).toUpperCase())).join("\n")
+		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
 	);
 
-	if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
+	//if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
+	if (infoTab) {
+		let _char = "&#9608";
+		infoTab.innerHTML = `&#10050<br>${_char.repeat(17)}<span style="color:#ccc">${_char.repeat(12)}</span><div style="position:absolute;left:1%;font-size:3em;color:gold"><br><br><br><br>&#9737 200</div>`
+	}
 }
 
 function performEnemyMoves() {
@@ -214,24 +225,23 @@ function performEnemyMoves() {
 	gameContainer.style.display = "none";
 	// move enemies
 	enemies.forEach(enemy => {
-		if ((enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x + 1, enemy.y, 99) ||
+		if (((enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x + 1, enemy.y, 99) ||
 				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x+1]<TileType.SHINE && islandGenerator.rand(0,1)
-			) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
+			) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
 				enemy.movingX = 1; enemy.movingY = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x - 1, enemy.y, 99) ||
+				(enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x - 1, enemy.y, 99) ||
 				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x-1]<TileType.SHINE && islandGenerator.rand(0,1)
-			) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
+			) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
 				enemy.movingX = -1; enemy.movingY = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y + 1, 99) ||
-				enemy.type == UnitType.ENEMY1 && mapData[enemy.y+1][enemy.x]<TileType.SHINE && islandGenerator.rand(0,1)
-			) && islandGenerator.rand(0, enemy.y > playerY ? 1 : 3)) {
+				(enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x, enemy.y + 1, 5) && islandGenerator.rand(0,1)
+			) && islandGenerator.rand(0, enemy.y < playerY ? 1 : 3)) {
 				enemy.movingY = 1; enemy.movingX = 0;
 		} else if ((
-				enemy.type == UnitType.ENEMY3 && isWalkable(enemy.x, enemy.y - 1, 99) ||
+				(enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x, enemy.y - 1, 99) ||
 				enemy.type == UnitType.ENEMY1 && mapData[enemy.y-1][enemy.x]<TileType.SHINE && islandGenerator.rand(0,1)
-			) && islandGenerator.rand(0, enemy.y < playerY ? 1 : 3)) {
+			) && islandGenerator.rand(0, enemy.y > playerY ? 1 : 3)) {
 				enemy.movingY = -1; enemy.movingX = 0;
 		}
 	});
@@ -252,15 +262,16 @@ function displayDialog() {
 	}*/
 }
 
-function prepareDialog(_label, _label2, _btn1, _btn2, _callback1, _callback2) {
+function prepareDialog(_label, _label2, _btn1, _callback1, _btn2, _callback2) {
 	window.callback1 = _callback1;
 	window.callback2 = _callback2;
-	dialog.innerHTML = `<br><b style="filter:drop-shadow(0 ${6*scale}px 0 #239)">${_label}</b><br>${_label2}<br><br><button style="background-color:#fda" onclick="callback1()">${_btn1}</button><button onclick="callback2()">${_btn2}</button>`;
+	dialog.innerHTML = `${_label}<br><b>${_label2}</b><br><button style="color:#f009;background-color:#fda" onmousedown="callback1()" ontouchstart="callback1()">${_btn1}</button>`;
+	if (_btn2) dialog.innerHTML += `<button style="color:#0a09" onmousedown="callback2()" ontouchstart="callback2()">${_btn2}</button>`;
 	if (!inDialog) displayDialog();
 }
 
 function closeButtonClick(e) {
-	prepareDialog("QUIT", "Are you sure?", "Confirm", "Cancel", quitGame, displayDialog);
+	prepareDialog("QUIT", "You sure?", "Yes", quitGame, "No", displayDialog);
 }
 
 function quitGame() {
@@ -274,7 +285,7 @@ function updateActionButton() {
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// "▀" "▄" "█" "■" "□" "▐" "⬞" "⬝" "†"
+	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050
 
 	//unit = getUnit(playerX, playerY);
 

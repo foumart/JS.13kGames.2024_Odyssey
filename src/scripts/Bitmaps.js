@@ -12,7 +12,7 @@ const offscreenPixelData = [
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship left
 	
 	"2929883a3a934343a07057cc3778ff4ca0ff4cc6ff",// enemy 1 07 07 fish
-	"c92606ff3d1700970b00b90d5aff0023d61e292988",// enemy 2 08 08 serpent
+	"c92606ff3d1700970b00b90d5aff0023d61e3a3a93",// enemy 2 08 08 serpent
 	"ff2b00c926062a2a3f565662da8763ffb08effffff",// enemy 3 09 09 Knight
 	"832c15452d15d1641caf4b31ff6c2bffa02fffffff",// enemy 4 10 0A Crab
 
@@ -63,7 +63,7 @@ const offscreenColorData = [
 	"@\\uE@\`~o@owuxenonH}FcPPhH\\\\Q@IIB",// ship left
 	
 	"hwE@~en@uwEbinPLXJZQHSK@PYQ@@P@@",// enemy1 fish
-	"\`uC@YNr@tulFXBpeP@knApulx\\d{_{[G",// enemy2 serpent
+	"\`u{@YVqytulV\`{plJGfn@\`sux\\l{_cfG",// enemy2 serpent
 	"@JQCPQJZXw{MhnT\\XeIae[RZX\\SC@[XC",// enemy3 knight
 	"CC@Xu@@nllCebWWLPu\\A@lc@\`MlDKCZ^",// enemy4 crab
 

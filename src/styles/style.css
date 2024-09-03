@@ -21,15 +21,20 @@ div, canvas {
 
 button {
 	background-color: #afc;
-	padding: 1rem 2rem;
-	margin: 1rem 1rem;
-	font-size: 1.8rem;
-	border-radius: 1rem;
-	border: 0;
+	padding: 2vh 4vw;
+	margin: 2vh 2vw;
+	font-size: 1em;
+	font-weight: 900;
+	border-radius: 1em;
+	border: 2vw solid #fff8;
+	border-top: 0;
+	border-bottom: 0;
+	cursor: pointer;
 }
 
-
 .css_button {
+	font-family: system-ui;
+	font-weight: 900;
 	position: relative;
 	cursor: pointer;
 	pointer-events: auto;
@@ -38,26 +43,15 @@ button {
 .css_icon {
 	color: #fff;
 	background-color: rgba(255,255,255,0.55);
-	filter: drop-shadow(0 .1rem 5px #026);
+	filter: drop-shadow(0 .1rem .1rem #026);
+	border-bottom: 1vh solid #fff8;
 }
-.css_play {
-	background: rgba(64, 255, 0, 0.8);
-	
-}
-/*.css_play:hover {
-	background-color: rgba(32, 255, 32, 0.8);
-}*/
-.css_install {
-	background: rgba(255, 200, 0, 0.8);
-}
-/*.css_install:hover {
-	background: rgba(255, 212, 64, 0.9);
-}*/
+
 .css_controls {
 	width: 40%;
 	border-radius: 2rem;
 }
 
 .css_space {
-	padding: 0 3vw;
+	padding: 0 2vw 1vw;
 }

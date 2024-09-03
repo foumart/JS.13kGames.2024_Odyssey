@@ -10,11 +10,11 @@ class BoardUnit extends BoardTile {
 	}
 
 	isEnemyMovingX() {
-		return this.type == UnitType.ENEMY2 || this.type == UnitType.ENEMY3 ? this.movingX : 0;
+		return this.type > UnitType.ENEMY1 && this.type < UnitType.CASTLE ? this.movingX : 0;
 	}
 
 	isEnemyMovingY() {
-		return this.type == UnitType.ENEMY1 || this.type == UnitType.ENEMY3 ? this.movingY : 0;
+		return this.type > UnitType.ENEMY2 && this.type < UnitType.CASTLE ? this.movingY : 0;
 	}
 
 	getX(reverse) {
@@ -37,8 +37,6 @@ class BoardUnit extends BoardTile {
 
 	draw() {
 		if (this.type) {
-			//gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
-
 			let _offsets = [2,2,2,3,1,4];
 			let _offsetX = this == boardPlayer && !this.overlay
 				? _offsets[unitsData[playerY][playerX]-1]
@@ -72,8 +70,6 @@ class BoardUnit extends BoardTile {
 			}
 
 			this.drawImage(this.type);
-
-			//gameContext.globalAlpha = 1;
 		}
 	}
 
@@ -89,8 +85,8 @@ class BoardUnit extends BoardTile {
 	drawImage(_type, reverse) {
 		gameContext.drawImage(
 			offscreenBitmaps[_type-1], 0, 0, unitWidth, unitWidth,
-			this.getX(reverse) - this.width/2 - this.width/tileWidth * (_type == UnitType.ENEMY2 && ((step+this.y*9)/50|0)%2 ? 2 : 1),
-			this.getY(reverse) - this.height - this.width/tileWidth * (_type > UnitType.SHIPRIGHT ? _type==UnitType.ENEMY1 || _type==UnitType.WRECK ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : 2 : 1),
+			this.getX(reverse) - this.width/2 - this.width/tileWidth * ((_type == UnitType.ENEMY2 || _type == UnitType.ENEMY4) && ((step+this.y*9)/50|0)%2 ? 2 : 1),
+			this.getY(reverse) - this.height - this.width/tileWidth * (_type==UnitType.ENEMY1 || _type==UnitType.WRECK ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : _type > UnitType.SHIPRIGHT ? 2 : 1),
 			this.width/tileWidth*unitWidth,
 			this.width/tileWidth*unitWidth
 		);

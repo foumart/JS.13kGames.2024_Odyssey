@@ -26,9 +26,8 @@ class BoardTile extends BoardElement {
 		return this.getOffsetY() + this.y * this.height + tween.transitionY * this.height;
 	}
 
-	update(type) {//, alpha = 1
+	update(type) {
 		this.type = type;
-		//this._alpha = alpha;
 		this.resize();
 	}
 
@@ -46,16 +45,12 @@ class BoardTile extends BoardElement {
 	}
 
 	draw() {
-		//gameContext.globalAlpha = (screenOut - this._alpha) / screenOut;
-
-		gameContext.drawImage(
+		bgrContext.drawImage(
 			offscreenBitmaps[(this.type || 0) + 16], 0, 0, tileWidth, tileWidth,
 			this.getX(),
 			this.getY(),
 			this.width,
 			this.width
 		);
-
-		//gameContext.globalAlpha = 1;
 	}
 }
