@@ -5,7 +5,7 @@ class BoardUnit extends BoardTile {
 	}
 
 	shouldAnimate() {
-		return this.type == 1 && onFoot ||
+		return this.type < UnitType.SHIPUP && onFoot ||
 			this.type > UnitType.PLAYER && this.type < UnitType.ENEMY1 && !onFoot;
 	}
 
@@ -37,7 +37,7 @@ class BoardUnit extends BoardTile {
 
 	draw() {
 		if (this.type) {
-			let _offsets = [2,2,2,3,1,4];
+			let _offsets = [2,2,2,3,4,1];
 			let _offsetX = this == boardPlayer && !this.overlay
 				? _offsets[unitsData[playerY][playerX]-1]
 				: this == boardShip ? _offsets[unitsData[shipY][shipX]-1] : 1;
@@ -59,9 +59,9 @@ class BoardUnit extends BoardTile {
 			}
 
 			// draw animated colored flag
-			if (this.origin && (this.type > UnitType.PLAYER && this.type < UnitType.ENEMY1) || this.type == UnitType.CASTLE || this.overlay == UnitType.CASTLE) {
+			if (this.origin && (this.type > UnitType.PLAYERRIGHT && this.type < UnitType.ENEMY1) || this.type == UnitType.CASTLE || this.overlay == UnitType.CASTLE) {
 				// draw flag base
-				gameContext.fillStyle = "#864404";
+				gameContext.fillStyle = "#840";
 				this.fillRect(_offsetX, _offsetY, 1, 2);
 				// animate flag
 				gameContext.fillStyle = colors[this.origin||1];
@@ -84,7 +84,10 @@ class BoardUnit extends BoardTile {
 
 	drawImage(_type, reverse) {
 		gameContext.drawImage(
-			offscreenBitmaps[_type-1], 0, 0, unitWidth, unitWidth,
+			this.type == UnitType.PLAYERRIGHT ||
+			this.type == UnitType.SHIPRIGHT ||
+			this.type == UnitType.SHIPDOWN ? offscreenBitmapsFlipped[_type-2] : offscreenBitmaps[_type-1], 
+			0, 0, unitWidth, unitWidth,
 			this.getX(reverse) - this.width/2 - this.width/tileWidth * ((_type == UnitType.ENEMY2 || _type == UnitType.ENEMY4) && ((step+this.y*9)/50|0)%2 ? 2 : 1),
 			this.getY(reverse) - this.height - this.width/tileWidth * (_type==UnitType.ENEMY1 || _type==UnitType.WRECK ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : _type > UnitType.SHIPRIGHT ? 2 : 1),
 			this.width/tileWidth*unitWidth,

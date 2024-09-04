@@ -9,6 +9,7 @@ let unit,
 	hasEvent = false;
 const colors = ["lime","red","aqua","white","magenta"];
 
+let stage = 1;
 let crewHealth = 20;
 let playerHealth = 99;
 let shipHealth = 50;
@@ -34,7 +35,7 @@ function action(direction) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
-				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : gamePlayer.overlay;
+				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : gamePlayer.overlay;
 				playerY --;
 				gamePlayer.y --;
 				if (!onFoot && !landing) gameShip.y --;
@@ -82,7 +83,7 @@ function action(direction) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", "Attack", quitGame, "Retreat", displayDialog);
 					return;
 				}
-				unitsData[playerY][playerX] = landing ? UnitType.SHIPLEFT : gamePlayer.overlay;
+				unitsData[playerY][playerX] = landing ? UnitType.SHIPRIGHT : gamePlayer.overlay;
 				playerY ++;
 				gamePlayer.y ++;
 				if (!onFoot && !landing) gameShip.y ++;
@@ -165,10 +166,10 @@ function prepareToMove(dir) {
 		shipX = playerX; shipY = playerY;
 	}
 
-	// change ship appearance as player moves
+	// change character/ship appearance as player moves
 	unitsData[playerY][playerX] = boarding || !onFoot
-		? dir % 2 ? (dir-1 ? UnitType.SHIPUP : UnitType.SHIPDOWN) : dir == 2 ? UnitType.SHIPLEFT : UnitType.SHIPRIGHT
-		: UnitType.PLAYER;
+		? dir % 2 ? (dir-1 ? UnitType.SHIPUP : UnitType.SHIPDOWN) : dir == 2 ? UnitType.SHIPRIGHT : UnitType.SHIPLEFT
+		: dir == 2 ? UnitType.PLAYERRIGHT : UnitType.PLAYER;
 
 	performEnemyMoves();
 }
@@ -205,18 +206,18 @@ function finalizeMove(dir) {
 		updateActionButton();
 	}
 
-	revealArea(playerX, playerY);
+	revealAround(playerX, playerY);
 	if (!onFoot) {
-		revealArea(playerX-1, playerY);
-		revealArea(playerX+1, playerY);
-		revealArea(playerX, playerY-1);
-		revealArea(playerX, playerY+1);
+		revealAround(playerX-1, playerY);
+		revealAround(playerX+1, playerY);
+		revealAround(playerX, playerY-1);
+		revealAround(playerX, playerY+1);
 	}
 
 	debugBoard();
 }
 
-function debugBoard() {return;
+function debugBoard() {
 	if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
 	);

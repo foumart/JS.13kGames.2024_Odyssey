@@ -149,6 +149,22 @@ function initBoard() {
 				}
 			}
 
+			// obscure the stage in clouds, 00: full clouds, 01: partially visible, 02: no clouds
+			if (y>1 && x) {
+				if (stage < 13 && state) {
+					visitedData[y-2][x] = idsData[y-2][x] > 1
+						? stage == 1 && idsData[y-2][x] < 9
+							? visitedData[y-2][x] ? Math.random() < .5 ? visitedData[y-2][x]-1 : 1 : Math.random() < .5 ? 1 : 2
+							: 0
+						: stage < 9
+							? Math.random() >= stage/9 ? 2 : 1//&& mapData[y-2][x] == 1
+							: 0;
+				} else if (visitedData[y-2][x] ) {
+					visitedData[y-2][x] = 0;
+				}
+				//if (idsData[y-1][x-1] > 1 && stage>1) visitedData[y-1][x-1] = 0;
+			}
+
 			if (
 				Math.random()<.2 && getUnitId(x, y)==-1 &&
 				getUnitId(x-1, y)==-1 && getUnitId(x+1, y)==-1 &&
@@ -199,7 +215,7 @@ function initBoard() {
 		}
 	}
 
-	if (_debug) console.log(
+	/*if (_debug) console.log(
 		unitsList.length,
 		"trees:"+t,
 		//"castles:"+c,
@@ -208,7 +224,7 @@ function initBoard() {
 		//"e1:"+e1,
 		//"e2:"+e2,
 		//"e3:"+e3
-	);
+	);*/
 
 	// starting town position
 	townX = playerX = shipX = stageData.x;
@@ -237,9 +253,9 @@ function initBoard() {
 	unitsList.push(gamePlayer);
 	unitsData[playerY][playerX] = UnitType.PLAYER;
 
-	gameShip = createUnit(shipX, shipY, UnitType.SHIPLEFT);
+	gameShip = createUnit(shipX, shipY, UnitType.SHIPRIGHT);
 	unitsList.push(gameShip);
-	unitsData[shipY][shipX] = UnitType.SHIPLEFT;
+	unitsData[shipY][shipX] = UnitType.SHIPRIGHT;
 
 	// data initialization completed
 
@@ -277,9 +293,11 @@ function initBoard() {
 		unitScreen.push(unitArr);
 	}
 
-	revealArea(playerX, playerY);
-	revealArea(shipX, shipY);
-	revealArea(townX, townY);
+	revealAround(playerX, playerY);
+	revealAround(shipX, shipY);
+	revealAround(townX, townY);
+
+	//...
 }
 
 function addButtonListeners(button) {
@@ -402,8 +420,11 @@ function drawBoard() {
 		// Update base tiles
 		gameDirty --;
 		if (gameDirty) {
-			bgrContext.fillStyle = "#338";
-			bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
+			// hilight
+			//if (step%9==0) {
+				bgrContext.fillStyle = "#14f";//"#fff";
+				bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
+			//}
 			for(let y = 0; y < screenWidth + screenOut; y++) {
 				for(let x = 0; x < screenWidth + screenOut; x++) {
 					if (tileScreen[y]) {
@@ -412,8 +433,11 @@ function drawBoard() {
 							_y = y + playerY - _oy - (!portrait?screenOut/2:0);
 							_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
 							tileScreen[y][x].visited = 0;
+							tileScreen[y][x].realX = _x;
+							tileScreen[y][x].realY = _y;
 							if (visitedData[_y] && visitedData[_y][_x]) tileScreen[y][x].visited = visitedData[_y][_x];
 							tileScreen[y][x].update(_z);
+							if (!state) tileScreen[y][x].drawOverlay();
 						}
 					}
 				}
@@ -440,6 +464,7 @@ function drawBoard() {
 
 					unitScreen[y][x].reset();
 
+					// draw units
 					if (_z) {
 						if (_x == playerX && _y == playerY) {
 							boardPlayer = unitScreen[y][x];
@@ -461,11 +486,18 @@ function drawBoard() {
 							unitScreen[y][x].movingX = _unit.movingX;
 							unitScreen[y][x].movingY = _unit.movingY;
 							unitScreen[y][x].origin = _unit.origin;
-							shouldSkipDrawingUnit = visitedData[_y][_x] < 2;
+							// some units are visible in the fog, others not
+							shouldSkipDrawingUnit = visitedData[_y][_x] < (
+								_unit.type > UnitType.ENEMY2 &&
+								_unit.type < UnitType.TREE ? 1 : 2
+							);
 						}
 					}
 	
 					if (!shouldSkipDrawingUnit) unitScreen[y][x].update(_z);
+
+					// draw tile clouds
+					tileScreen[y][x].drawOverlay();
 				}
 			}
 		}

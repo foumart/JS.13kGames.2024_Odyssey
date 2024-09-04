@@ -1,5 +1,5 @@
 // island generator game map constants and title map initialization
-const seaSize = 44, seaOffset = 9;
+const seaSize = 44, seaOffset = 9, titleMapSize = 38;
 let islandGenerator = new IslandGenerator(this);
 
 // game loop vars
@@ -11,7 +11,7 @@ async function gameInit() {
 	step = 0;
 	frame = 0;
 	
-	let data = await getStageData(!state ? 38 : seaSize, seaOffset);
+	let data = await getStageData(!state ? titleMapSize : seaSize, seaOffset);
 	populateStageData(data);
 
 	initBoard();
@@ -38,7 +38,11 @@ function doAnimationFrame(timeStamp) {
 			// initial level zoomed in
 			TweenFX.to(tween, 6, {zoom: 1}, e => doFrameAnimationMove(), e => {
 				gameContainer.style.display = "block";//TODO: fix lag
-				action(6);
+				//action(6);
+				// debug visitedData
+				/*if (_debug) console.log(
+					visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
+				);*/
 			});
 		} else if (step % 7 == 0) {
 			gameDirty = 2;// only every seventh frame we update the units while idle
@@ -73,17 +77,17 @@ function doAnimationFrame(timeStamp) {
 
 		// reveal clouds around the title and the play button
 		for (waterId = 1; waterId < 5; waterId ++) {
-			revealArea(playerX - 5 + waterId * 2, playerY - 5 + waterId * 2);
-			revealArea(playerX + 5 - waterId * 2, playerY - 5 + waterId * 2);
-			revealArea(playerX, playerY-8 + waterId * 4);
-			revealArea(playerX -10 + waterId * 4, playerY);
+			revealAround(playerX - 5 + waterId * 2, playerY - 6 + waterId * 2);
+			revealAround(playerX + 5 - waterId * 2, playerY - 6 + waterId * 2);
+			revealAround(playerX, playerY-9 + waterId * 4);
+			revealAround(playerX -9 + waterId * 4, playerY);
 		}
 
 		drawBoard();
 
-		if (_debug) console.log(
+		/*if (_debug) console.log(
 			mapData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
-		);
+		);*/
 	}
 
 	gameLoop = requestAnimationFrame(() => doAnimationFrame());

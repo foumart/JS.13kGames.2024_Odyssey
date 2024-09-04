@@ -1,15 +1,16 @@
 const unitWidth = 8;
 const tileWidth = 6;
 const offscreenBitmaps = [];
+const offscreenBitmapsFlipped = [];
 
 const offscreenPixelData = [
 	// UNITS
-	"ff2b00c926062a2a3f565662da8763ffb08effffff",// player
-	"ff2b00c926062a2a3f565662da8763ffb08effffff",// player
+	"ff2b00c926062a2a3f565662da8763ffb08effffff",// player left
+	"",// player right
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship up
-	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship down
-	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship right
+	"",// ship down
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// ship left
+	"",// ship right
 	
 	"2929883a3a934343a07057cc3778ff4ca0ff4cc6ff",// enemy 1 07 07 fish
 	"c92606ff3d1700970b00b90d5aff0023d61e3a3a93",// enemy 2 08 08 serpent
@@ -19,9 +20,9 @@ const offscreenPixelData = [
 	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// castle 11 0B
 	"32323200ca100d85375a605b899589a9b9a9ffffff",// shrine 12 0C
 	"864404452d1512510d00ca1024a9210d853700e912",// tree 13 0D
-	"712c0e452d15b25800dd8700e4ae1efff115ffca3a",// gold pile 14 0E
+	"712c0eb25800dd8700e4ae1efff115ffca3a",// gold pile 14 0E
 	"b25800dd8700fff115292988ffca3a3a3a935c9e87",// gold wreck 15 0F
-	"919bb29fa9c9b6c3e4c1cef2d5e1ffeef3ffffffff",// clouds ovelay 16
+	"3355996688dd87a3eab0c3edc6deffe1f2ffffffff",// clouds ovelay 16
 
 	// TILES
 	"3737d13a3adc3d3ddf4343de4d4de8",// 00 depths
@@ -55,12 +56,12 @@ const offscreenPixelData = [
 
 const offscreenColorData = [
 	// UNITS
-	"Xb[DSIRc\\w{YPvMBXmRKfkZVX\\cC@[XC",// player
-	"\`cZC\\RI\\K_~cPunBYmQCrkZtX\\cC@[XC",// player
+	"Xb[DSIRc\\w{YPvMBXmRKfkZVX\\cC@[XC",// player left
+	"",// player right
 	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship up
-	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship down
-	"hnc@}wD@n~}@}ulGpoAuEBB\\JccAPII@",// ship right
+	"",// ship down
 	"@\\uE@\`~o@owuxenonH}FcPPhH\\\\Q@IIB",// ship left
+	"",// ship right
 	
 	"hwE@~en@uwEbinPLXJZQHSK@PYQ@@P@@",// enemy1 fish
 	"\`u{@YVqytulV\`{plJGfn@\`sux\\l{_cfG",// enemy2 serpent
@@ -70,9 +71,9 @@ const offscreenColorData = [
 	"psscpw]pOw]\`vn\\@ctCXc^|Q_euQ^l",//10 castle
 	"@kf@pwwA{nn\\wLyfnIqMwI|flat]SCcB",//11 shrine
 	"@fuCp}g]p|l^Xfu^@s^C@@B@@@A@@@@@",//12 tree
-	"@\`A@@tg@hgk@Xl|Ak~ek]lt_y]{LPQZA",//13 gold pile
+	"@\`C@@se@Xn\\AHusBP^lAHbVA@HJ@@@@@",//13 gold pile
 	"@PA@@ZU@HkJDoJka|kQwftptdF@ft@",//14 gold wreck
-	"@cS@X~]D\`mdf@dkwXJcns]YD}o@@hF@@",//15 clouds overlay
+	"@YS@\`s]BPmlTX\\}^PQue\\JbZSAPCH@@@",//15 clouds overlay
 
 	// TILES
 	"TlSbZL]IbTIkaSTZeb",// 00 depths
@@ -121,12 +122,25 @@ for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
 	for(j = 0; j < l; j++) {
 		for(i = 0; i < l; i++){
 			if(offscreenpx[j*l+i]) {
-				offscreenCtx.fillStyle = "#"+offscreenC.substr(6*(offscreenpx[j*l+i]-1), 6);
+				offscreenCtx.fillStyle = "#"+offscreenC.substr(6*(offscreenpx[j*l+i]-1), 6) + (k==15?["cc","dd","bb","cc","ee","ff"][offscreenpx[j*l+i]-1]:"ff");
 				offscreenCtx.fillRect(i, j, 1, 1);
 			}
 		}
 	}
 
 	offscreenBitmaps.push(offscreenCanvas);
+
+	// Create flipped canvas
+	const flippedCanvas = document.createElement('canvas');
+	flippedCanvas.width = l;
+	flippedCanvas.height = l;
+	const flippedCtx = flippedCanvas.getContext('2d');
+
+	flippedCtx.translate(l, 0);
+	flippedCtx.scale(-1, 1);
+	flippedCtx.drawImage(offscreenCanvas, 0, 0);
+
+	offscreenBitmapsFlipped.push(flippedCanvas);
+
 }
 
