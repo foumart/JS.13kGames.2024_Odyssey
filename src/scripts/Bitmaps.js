@@ -71,7 +71,7 @@ const offscreenColorData = [
 	"psscpw]pOw]\`vn\\@ctCXc^|Q_euQ^l",//10 castle
 	"@kf@pwwA{nn\\wLyfnIqMwI|flat]SCcB",//11 shrine
 	"@fuCp}g]p|l^Xfu^@s^C@@B@@@A@@@@@",//12 tree
-	"@\`C@@se@Xn\\AHusBP^lAHbVA@HJ@@@@@",//13 gold pile
+	"@@@@@\`C@@se@Xn\\AHusBP^lAHbVA@HJ@",//13 gold pile
 	"@PA@@ZU@HkJDoJka|kQwftptdF@ft@",//14 gold wreck
 	"@YS@\`s]BPmlTX\\}^PQue\\JbZSAPCH@@@",//15 clouds overlay
 
@@ -139,6 +139,7 @@ for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
 	flippedCtx.translate(l, 0);
 	flippedCtx.scale(-1, 1);
 	flippedCtx.drawImage(offscreenCanvas, 0, 0);
+	//flippedCtx.restore();
 
 	offscreenBitmapsFlipped.push(flippedCanvas);
 

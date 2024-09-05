@@ -35,9 +35,11 @@ function doAnimationFrame(timeStamp) {
 		step ++;
 		if (step == 1) {
 			gameContainer.style.display = "none";
+			updateInfoTab();
 			// initial level zoomed in
 			TweenFX.to(tween, 6, {zoom: 1}, e => doFrameAnimationMove(), e => {
 				gameContainer.style.display = "block";//TODO: fix lag
+				
 				//action(6);
 				// debug visitedData
 				/*if (_debug) console.log(

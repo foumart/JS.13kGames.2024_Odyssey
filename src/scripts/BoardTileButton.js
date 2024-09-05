@@ -19,7 +19,7 @@ class BoardButton extends BoardTile {
 
 	draw() {
 		if (this.btn) {
-			this.btn.style = (_debug&&false?'opacity:1;border:1px dashed rgba(255,255,255,0.5);box-sizing:content-box;':'')+`width:${
+			this.btn.style = (_debug&&false?'opacity:1;border:1px dashed rgba(255,255,255,0.5);':'')+`width:${
 				this.width
 			}px;height:${
 				this.height

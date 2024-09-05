@@ -1,7 +1,7 @@
 * {
 	padding: 0;
 	margin: 0;
-	box-sizing: border-box;
+	/* box-sizing: content-box; */
 }
 
 body {
@@ -29,6 +29,7 @@ button {
 	border-top: 0;
 	border-bottom: 0;
 	cursor: pointer;
+	filter: drop-shadow(1vh 1vmin 0 #1246);
 }
 
 .css_button {
@@ -43,7 +44,7 @@ button {
 	color: #fff;
 	background-color: #bcfc;
 	filter: drop-shadow(1vmin 1vmin 0 #1269);
-	border-bottom: 1vmin solid #fff9;
+	border-bottom: 1vmax solid #fff9;
 }
 
 .css_controls {

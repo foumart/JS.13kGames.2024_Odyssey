@@ -179,7 +179,7 @@ function resizeUI(e) {
 	}
 
 	// Resize the Dialog Menu
-	updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `border-top:3vh solid #fff9;border-bottom:3vh solid #fff9;width:${portrait?width*.9:!state?width*.56:width*.42}px;top:50%;left:50%;transform:translateY(-${!state?110:portrait?68:42}%) translateX(-${portrait||!state?50:45}%)`, state?80:64, !state?80:portrait?160:99);
+	updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `padding-top:2vmax;border-top:3vh solid #fff9;border-bottom:3vh solid #fff9;width:${portrait?width*.9:!state?width*.5:width*.42}px;top:50%;left:50%;transform:translateY(-${!state?128:portrait?60:34}%) translateX(-${portrait||!state?50:44}%)`, state?72:64, !state?80:99);
 
 	// Resize in-game UI elements
 	if (upButton) {
@@ -201,20 +201,21 @@ function resizeUI(e) {
 	if (closeButton) updateStyleUI(closeButton, `position:relative;float:right;margin:1%;margin-left:0;background:#faac`, 68, 72);
 
 	if (playerButton) {
-		playerButton.innerHTML = addHealthbar(playerHealth);
-		shipButton.innerHTML = addHealthbar(shipHealth);
-		crewButton.innerHTML = addHealthbar(crewHealth);
-		playerButton.prepend(offscreenBitmaps[1]);
-		shipButton.prepend(offscreenBitmaps[5]);
+		playerButton.innerHTML = addHealthbar(playerHealth, playerHealthMax);
+		shipButton.innerHTML = addHealthbar(shipHealth, shipHealthMax);
+		crewButton.innerHTML = addHealthbar(crewHealth, crewHealthMax);
+		playerButton.prepend(offscreenBitmapsFlipped[0]);
+		shipButton.prepend(offscreenBitmapsFlipped[4]);
 		crewButton.prepend(offscreenBitmaps[8]);
-		offscreenBitmaps[1].style = offscreenBitmaps[5].style = offscreenBitmaps[8].style = `position:relative;width:${(width/16)}px;min-width:48px;min-height:48px`;
-		updateStyleUI(playerButton, `padding:${(portrait?height:width)/99}px;position:relative;float:left;margin:1% 0 1% 1%;border-radius:0`, 28, 1);
-		updateStyleUI(shipButton, `padding:${(portrait?height:width)/99}px;position:relative;float:left;margin:1% 0 1% 1%;border-radius:0`, 28, 1);
-		updateStyleUI(crewButton, `padding:${(portrait?height:width)/99}px;position:relative;float:left;margin:1% 0 1% 1%;border-radius:0`, 28, 1);
+		offscreenBitmapsFlipped[0].style = offscreenBitmapsFlipped[4].style = offscreenBitmaps[8].style = `border:1vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:${(width/16)}px;min-width:48px;min-height:48px`;
+		e = `padding:1vmax;position:relative;float:left;margin:1% 0 0 1%;border-radius:1vmax`;
+		updateStyleUI(playerButton, e, 14, 9);
+		updateStyleUI(shipButton, e, 14, 9);
+		updateStyleUI(crewButton, e, 14, 9);
 	}
 
 	// Fullscreen button
-	if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 68, 72);
+	if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
 	// Sound button
 	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
 	updateStyleUI(infoTab, `padding:${state?'0 1%;border-radius:0;line-height:6px;margin:2%':'1%;margin:1%'} 1%${playerButton?`;top:${playerButton.offsetHeight}px`:''}`, state ? 20 : 32, -1);
@@ -225,21 +226,29 @@ function resizeUI(e) {
 		updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#0d4`);
 		title.innerHTML = getIcon(portrait ? 80*getSize() : 75*getSize());
 		updateStyleUI(title, `filter:drop-shadow(0 1vh 0 #127);top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
-		titleText.innerHTML = `<div style="text-shadow:#1268 .03em .01em;color:#23ac;font-size:${480*scale}px;margin-top:-${36*scale};margin-left:${368*scale
-			}">&#9881</div><div style="text-shadow:#24c .03em .01em;color:#49e;margin-top:-${44*scale}px;margin-left:${340*scale}px;font-size:${480*scale
-			}px">&#9881</div><div style="filter:drop-shadow(.2em .1em 0 #0067);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
+		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #0067);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
 			}px;font-size:${45*scale}px;color:#ff9"><i>The</i></div><div style="filter:drop-shadow(.15em .1em 0 #0067);text-shadow:#f74 .07em .03em;margin-top:-${95*scale}px;margin-left:${325*scale
-			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div><span style="filter:drop-shadow(.1em .05em 0 #0067);position:relative;text-shadow:#1be .06em .03em">O<b>dyssey</b></span>`;
-		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?320:250}%) translateX(-50%) scale(${getSize(500)})`, 220);
+			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div><span style="filter:drop-shadow(.1em .05em 0 #0067);color:#dff;text-shadow:#1be .06em .03em">O<b>dyssey</b></span>`;
+		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?340:260}%) translateX(-50%) scale(${getSize(500)})`, 220);
 	}
 }
 
-function addHealthbar(_health, _char = '&#9604') {
-	return `<br>${_char.repeat(_health/16|0)}<span style="color:red">${_char.repeat(6-(_health/16|0))}</span>`;
+function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
+	let str = '<br><br><br>';
+	const _step = _max / _num;
+	for (let i = 0; i < _num; i++) {
+		if (i * _step < _health) {
+			str += _char;
+		} else {
+			str += `<span style="color:red">${_char}</span>`;
+		}
+		if (i % 2) str += " ";
+	}
+	return str;
 }
 
 function updateStyleUI(element, _style, _size = 99, _space = 128) {
-	element.style = `text-shadow:#0068 0 .2rem;border-radius:2rem;position:absolute;text-align:center;${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
+	element.style = `text-shadow:#0068 0 .6vmin;border-radius:3vmax;position:absolute;text-align:center;${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
 }
 
 function switchState(event) {
@@ -268,8 +277,9 @@ function getIcon(size) {
 function createUI() {
 	uiDiv.innerHTML = '';
 	gameCanvas.style.pointerEvents = bgrCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
+	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
-	infoTab = generateUIButton(uiDiv, '<b>v0.</b>3', () => prepareDialog("", "Game by Noncho Savov<br>", "Got it!", () => displayDialog()));
+	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () => prepareDialog(0, "Game by Noncho Savov", () => displayDialog()));
 	
 	if (_debug) {
 		fpsElement = document.createElement('div');
@@ -284,15 +294,15 @@ function createUI() {
 		titleText = generateUIButton(uiDiv, "", switchState, "");
 		bgrCanvas.style.opacity = .5;
 	} else {
-		actButton = generateUIButton(uiDiv, '&#9935', e => action(6), "css_icon css_controls");
+		actButton = generateUIButton(uiDiv, 'i', e => action(6), "css_icon css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
 
 		closeButton = generateUIButton(uiDiv, '&#215', e => closeButtonClick());
-		playerButton = generateUIButton(uiDiv, '', e => closeButtonClick(), "css_icon");
-		shipButton = generateUIButton(uiDiv, '', e => closeButtonClick(), "css_icon");
-		crewButton = generateUIButton(uiDiv, '', e => closeButtonClick(), "css_icon");
+		playerButton = generateUIButton(uiDiv, '', e => infoButtonClick(), "css_icon");
+		shipButton = generateUIButton(uiDiv, '', e => infoButtonClick(1), "css_icon");
+		crewButton = generateUIButton(uiDiv, '', e => infoButtonClick(2), "css_icon");
 		bgrCanvas.style.opacity = 1;
 	}
 

@@ -68,7 +68,9 @@ function initBoard() {
 				// place trees if there is relief data on land
 				if (stageData.relief[y][x] > 1) {
 					t ++;
-					unitsList.push(createUnit(x, y, UnitType.TREE));
+					unit = createUnit(x, y, UnitType.TREE);
+					unit.apple = 3;
+					unitsList.push(unit);
 					unitsData[y][x] = UnitType.TREE;
 					//revealClouds(x, y);
 					// if (stageData.relief[y][x] > 2)
@@ -486,6 +488,7 @@ function drawBoard() {
 							unitScreen[y][x].movingX = _unit.movingX;
 							unitScreen[y][x].movingY = _unit.movingY;
 							unitScreen[y][x].origin = _unit.origin;
+							unitScreen[y][x].apple = _unit.apple;
 							// some units are visible in the fog, others not
 							shouldSkipDrawingUnit = visitedData[_y][_x] < (
 								_unit.type > UnitType.ENEMY2 &&
@@ -516,6 +519,10 @@ function drawBoard() {
 	}
 }
 
+function removeUnit(x, y) {
+	unitsList.splice(getUnitId(x, y), 1);
+}
+
 function getUnit(x, y) {
 	return unitsList[getUnitId(x, y)];
 }
@@ -523,7 +530,7 @@ function getUnit(x, y) {
 function getUnitId(x, y) {
 	let id = -1;
 	unitsList.forEach((unit, index) => {
-		if (unit.x == x && unit.y == y) {//unit != gamePlayer && unit != gameShip
+		if (unit.x == x && unit.y == y && unit != gamePlayer && unit != gameShip) {
 			id = index;
 		}
 	});

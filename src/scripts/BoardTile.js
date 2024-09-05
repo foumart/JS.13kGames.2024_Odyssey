@@ -59,17 +59,17 @@ class BoardTile extends BoardElement {
 
 	drawOverlay() {
 		if (this.visited < 2) {
-			bgrContext.globalAlpha = this.visited ? 0.5 : 1;
+			gameContext.globalAlpha = this.visited ? 0.5 : 1;
 			let odd = this.realX % 2 && this.realY % 2 || this.realX % 2 == 0 && this.realY % 2 == 0;
 			// use flipped cloud images every second tile
-			bgrContext.drawImage(
+			gameContext.drawImage(
 				odd ? offscreenBitmapsFlipped[15] : offscreenBitmaps[15], 0, 0, tileWidth+2, tileWidth+2,
 				this.getX() - (odd ? this.width/6 : this.width/6),
 				this.getY() - (odd ? this.width/6 : this.width/6),
 				this.width + this.width/3,
 				this.width + this.width/3
 			);
-			bgrContext.globalAlpha = 1;
+			gameContext.globalAlpha = 1;
 		}
 	}
 }

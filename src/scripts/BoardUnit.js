@@ -70,6 +70,24 @@ class BoardUnit extends BoardTile {
 			}
 
 			this.drawImage(this.type);
+
+			// draw apple on trees
+			if (this.type == UnitType.TREE && this.apple) {
+				gameContext.fillStyle = "#c00";
+				this.fillRect(_offsetX+3, _offsetY - 5, 2, 2);
+				gameContext.fillStyle = "#f22";
+				this.fillRect(_offsetX+3, _offsetY - 5, 1, 1);
+			}
+
+			// draw shine on gold
+			if (
+				(this.type == UnitType.GOLD || this.type == UnitType.WRECK) &&
+				(step / 9 | 0) % 6
+			) {
+				gameContext.fillStyle = "#fff" + (3 + ((step / 9 | 0) % 6));
+				this.fillRect(_offsetX , _offsetY + 9 - this.type, 3, 1);
+				this.fillRect(_offsetX  + 1, _offsetY + 10 - this.type, 1, 3);
+			}
 		}
 	}
 

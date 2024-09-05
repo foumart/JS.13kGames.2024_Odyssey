@@ -141,6 +141,7 @@ function app(callback) {
 	src(scripts, { allowEmpty: true })
 		.pipe(gulpif(pwa, replace('let _debug;', `let _debug = ${debug ? 'true' : 'false'};`, replaceOptions)))
 		.pipe(gulpif(pwa, replace('service_worker', 'sw', replaceOptions)))
+		.pipe(replace('{VERSION}', version, replaceOptions))
 		.pipe(gulpif(!pwa, replace('function init', 'window.addEventListener("load",init);function init', replaceOptions)))
 		.pipe(gulpif(!debug,
 			closureCompiler({
