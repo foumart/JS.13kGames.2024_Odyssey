@@ -5,7 +5,7 @@
 }
 
 body {
-	background-color: #124;
+	background: #124;
 	color: #fff;
 	overflow: hidden;
 }
@@ -19,13 +19,13 @@ div, canvas {
 }
 
 button {
-	background-color: #afc;
-	padding: 2vh 4vw;
-	margin: 2vh 2vw;
+	background: #afc;
+	padding: 1vmin 2vmax;
+	margin: 1vmax 1vmax;
 	font-size: 1em;
 	font-weight: 900;
 	border-radius: 1em;
-	border: 2vw solid #fff8;
+	border: 1vmax solid #fff8;
 	border-top: 0;
 	border-bottom: 0;
 	cursor: pointer;
@@ -42,7 +42,7 @@ button {
 
 .css_icon {
 	color: #fff;
-	background-color: #bcfc;
+	background: #bcfc;
 	filter: drop-shadow(1vmin 1vmin 0 #1269);
 	border-bottom: 1vmax solid #fff9;
 }

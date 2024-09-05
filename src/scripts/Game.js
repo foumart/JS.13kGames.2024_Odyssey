@@ -12,9 +12,9 @@ const colors = ["lime","red","aqua","white","magenta"];
 let stage = 1;
 let turn = 0;
 let gold = 100;
-let shipLeft = 99;
-let moveLeft = 99;
-let timeLeft = 13;
+let shipLeft = 40, shipLimit = 40;
+let moveLeft = 20, moveLimit = 20;
+let timeLeft = 13, timeLimit = 99
 let crewHealth = 20, crewHealthMax = 20,
 	playerHealth = 15, playerHealthMax = 20,
 	shipHealth = 30, shipHealthMax = 30;
@@ -132,12 +132,12 @@ function action(direction) {
 			break;
 		case 6: // Action
 			if (!turn) {
-				prepareDialog("Ahoy Corsair !", "Castle: Boost Ship Towns: Hire Crew Shrines: Earn Gold", displayDialog);
+				prepareDialog("Ahoy Corsair !", "Capitol: Upgrade Ship<br>Castles: Acquire Crew<br>Dungeons: Earn Gold", displayDialog);
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				prepareDialog("Capitol", "Increase ship HP", quitGame, "&#9737 500", displayDialog, "Exit");
 			} else if (gamePlayer.overlay == UnitType.SHINE) {
-				prepareDialog("Shrine", "Will you ?", quitGame, "Meditate", displayDialog, "Exit");
+				prepareDialog("Dungeon", "Will you ?", quitGame, "Journey", displayDialog, "Exit");
 			} else if (gamePlayer.overlay == UnitType.TREE) {
 				let applePoints = 10;
 				if (playerHealth < playerHealthMax - applePoints) {
@@ -233,23 +233,6 @@ function finalizeMove(dir) {
 	//debugBoard();
 }
 
-function updateInfoTab() {
-	//if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
-	//if (infoTab) {
-		let _char = "&#9608 ";
-		let _sp = "  ";
-		infoTab.innerHTML = `${_sp.repeat(timeLeft)}<span style="font-size:8vmax;color:#0c0">&#119113</span><br>${_char.repeat(17)}<span style="color:#ccc">${
-			_char.repeat(12)}</span><div style="font-size:4vmax;color:gold"><br><br><br><br>${stage}&#10091 &#9737 ${gold}</div>`
-
-	//}
-}
-
-function debugBoard() {
-	if (_debug) console.log(
-		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
-	);
-}
-
 function performEnemyMoves() {
 	paused = true;
 	gameContainer.style.display = "none";
@@ -277,29 +260,6 @@ function performEnemyMoves() {
 	});
 }
 
-function displayDialog() {
-	inDialog = !inDialog;
-	dialog.style.display = inDialog ? 'block' : 'none';
-	gameContainer.style.display = inDialog ? 'none' : 'block';
-	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
-	/*gameContainer.style.pointerEvents = inDialog ? 'none' : 'auto';
-	if (buttonScreen) {
-		for (let _y = 0; _y < buttonScreen.length; _y ++) {
-			for (let _x = 0; _x < buttonScreen[_y].length; _x ++) {
-				buttonScreen[_y][_x].btn.style.pointerEvents = inDialog ? "none" : "auto";
-			}
-		}
-	}*/
-}
-
-function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
-	dialog.innerHTML = `<u>${_label?_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background-color:#fda">${_btn1||"Okay"}</button>`;
-	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
-	if (!inDialog) displayDialog();
-	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1);
-	dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1);
-}
-
 function closeButtonClick(e) {
 	prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
 }
@@ -312,46 +272,6 @@ function infoButtonClick(e) {console.log(e)
 function quitGame() {
 	state = -1;
 	switchState();
-}
-
-
-function updateActionButton() {
-	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 | 〇 &#12295 |
-	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
-	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
-	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
-	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
-	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩
-
-	//unit = getUnit(playerX, playerY);
-
-	if (
-		gamePlayer.overlay >= UnitType.CASTLE &&
-		gamePlayer.overlay < UnitType.WRECK
-	) {
-		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881';
-		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'&#243':''}<div style='font-size:6vmin;position:relative;margin-top:-2vmax'>${gamePlayer.overlay==UnitType.TREE?'EAT':'ENTER'}</div>`;
-		if (gamePlayer.overlay==UnitType.TREE) {
-			
-		} else {
-			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
-		}
-		
-		offscreenBitmaps[gamePlayer.overlay-1].style = `margin-top:2vmax;border:1vmax solid #0000;border-radius:1vmax;background:#2266;position:relative;width:${(controls.offsetWidth*.4)}px`;
-		
-	} else if (gamePlayer.overlay == UnitType.WRECK) {//GOLD WRECK
-		gamePlayer.overlay = 0;
-		//console.log(getUnit(playerX, playerY), getUnitId(playerX, playerY));
-		removeUnit(playerX, playerY);
-		
-		gold += 50;
-		//updateActionButton();
-		action(6);
-	} else {
-		actButton.innerHTML = onFoot ? hasEvent ? 'E' : 'L' : hasEvent ? 'E' : 'S';
-		//actButton.style.opacity = hasEvent ? 1 : .5;
-	}
 }
 
 function isWalkable(x, y, mapId = UnitType.CASTLE) {

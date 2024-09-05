@@ -41,10 +41,7 @@ function doAnimationFrame(timeStamp) {
 				gameContainer.style.display = "block";//TODO: fix lag
 				
 				//action(6);
-				// debug visitedData
-				/*if (_debug) console.log(
-					visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
-				);*/
+				// ...
 			});
 		} else if (step % 7 == 0) {
 			gameDirty = 2;// only every seventh frame we update the units while idle
@@ -86,10 +83,6 @@ function doAnimationFrame(timeStamp) {
 		}
 
 		drawBoard();
-
-		/*if (_debug) console.log(
-			mapData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
-		);*/
 	}
 
 	gameLoop = requestAnimationFrame(() => doAnimationFrame());

@@ -374,8 +374,6 @@ function clickButton(event) {
 	}
 }
 
-
-
 function determineDirection(x, y) {
 	if (!x && !y) return -1;
 	return oddDirectionalArray[y][x];
@@ -516,6 +514,16 @@ function drawBoard() {
 				}
 			}
 		}
+	}
+}
+
+function onBoardZoom(event) {
+	if (state) {
+		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 2 - screenOut/(12+screenOut*.8) - screenWidth/9) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		boardScale = +boardScale.toFixed(2);
+		gameDirty = 2;
+		drawBoard();
 	}
 }
 
