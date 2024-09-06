@@ -9,15 +9,26 @@ let unit,
 	hasEvent = false;
 const colors = ["lime","red","aqua","white","magenta"];
 
-let stage = 1;
-let turn = 0;
-let gold = 100;
-let shipLeft = 40, shipLimit = 40;
-let moveLeft = 20, moveLimit = 20;
-let timeLeft = 13, timeLimit = 99
-let crewHealth = 20, crewHealthMax = 20,
+let stage, turn, gold,
+	shipLeft, shipLimit,
+	moveLeft, moveLimit,
+	timeLeft, timeLimit,
+	crewHealth, crewHealthMax,
+	playerHealth, playerHealthMax,
+	shipHealth, shipHealthMax;
+
+// initialize vars for new game
+function initVars() {
+	stage = 1;
+	turn = 0;
+	gold = 100;
+	shipLeft = 40, shipLimit = 40;
+	moveLeft = 20, moveLimit = 20;
+	timeLeft = 13, timeLimit = 99
+	crewHealth = 20, crewHealthMax = 20,
 	playerHealth = 15, playerHealthMax = 20,
 	shipHealth = 30, shipHealthMax = 30;
+}
 
 function createUnit(x, y, z) {
 	unit = new Unit(x, y, z);
@@ -136,7 +147,7 @@ function action(direction) {
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				prepareDialog("Capitol", "Increase ship HP", quitGame, "&#9737 500", displayDialog, "Exit");
-			} else if (gamePlayer.overlay == UnitType.SHINE) {
+			} else if (gamePlayer.overlay == UnitType.SHRINE) {
 				prepareDialog("Dungeon", "Will you ?", quitGame, "Journey", displayDialog, "Exit");
 			} else if (gamePlayer.overlay == UnitType.TREE) {
 				let applePoints = 10;
@@ -154,8 +165,8 @@ function action(direction) {
 				// PASS
 				if (inDialog) displayDialog();// hide the dialog
 				//infoTab.innerHTML = `<br>${onFoot ? 'Dug, nothing? pass' : 'Fish, nothing? pass'}`;
-				tween.transitionU = 1;
-				TweenFX.to(tween, 6, {transitionU: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
+				tween.transitionZ = 1;
+				TweenFX.to(tween, 6, {transitionZ: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
 				performEnemyMoves();
 			}
 
@@ -189,6 +200,7 @@ function prepareToMove(dir) {
 }
 
 function doFrameAnimationMove() {
+	boardZoom = tween.mapZoom;
 	gameDirty = 2;// set on each turn to redraw the map
 }
 
@@ -222,13 +234,7 @@ function finalizeMove(dir) {
 		updateInfoTab();
 	}
 
-	revealAround(playerX, playerY);
-	if (!onFoot) {
-		revealAround(playerX-1, playerY);
-		revealAround(playerX+1, playerY);
-		revealAround(playerX, playerY-1);
-		revealAround(playerX, playerY+1);
-	}
+	revealAroundUnit(playerX, playerY);
 
 	//debugBoard();
 }
@@ -239,12 +245,12 @@ function performEnemyMoves() {
 	// move enemies
 	enemies.forEach(enemy => {
 		if (((enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x + 1, enemy.y, 99) ||
-				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x+1]<TileType.SHINE && islandGenerator.rand(0,1)
+				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x+1]<TileType.LAND && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
 				enemy.movingX = 1; enemy.movingY = 0;
 		} else if ((
 				(enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x - 1, enemy.y, 99) ||
-				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x-1]<TileType.SHINE && islandGenerator.rand(0,1)
+				enemy.type == UnitType.ENEMY2 && mapData[enemy.y][enemy.x-1]<TileType.LAND && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
 				enemy.movingX = -1; enemy.movingY = 0;
 		} else if ((
@@ -253,7 +259,7 @@ function performEnemyMoves() {
 				enemy.movingY = 1; enemy.movingX = 0;
 		} else if ((
 				(enemy.type == UnitType.ENEMY3 || enemy.type == UnitType.ENEMY4) && isWalkable(enemy.x, enemy.y - 1, 99) ||
-				enemy.type == UnitType.ENEMY1 && mapData[enemy.y-1][enemy.x]<TileType.SHINE && islandGenerator.rand(0,1)
+				enemy.type == UnitType.ENEMY1 && mapData[enemy.y-1][enemy.x]<TileType.LAND && islandGenerator.rand(0,1)
 			) && islandGenerator.rand(0, enemy.y > playerY ? 1 : 3)) {
 				enemy.movingY = -1; enemy.movingX = 0;
 		}

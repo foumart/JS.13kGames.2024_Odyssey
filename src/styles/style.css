@@ -5,7 +5,7 @@
 }
 
 body {
-	background: #124;
+	background: #238;
 	color: #fff;
 	overflow: hidden;
 }
@@ -29,7 +29,7 @@ button {
 	border-top: 0;
 	border-bottom: 0;
 	cursor: pointer;
-	filter: drop-shadow(1vh 1vmin 0 #1246);
+	filter: drop-shadow(1vh 1vmin 0 #1267);
 }
 
 .css_button {
@@ -43,8 +43,8 @@ button {
 .css_icon {
 	color: #fff;
 	background: #bcfc;
-	filter: drop-shadow(1vmin 1vmin 0 #1269);
-	border-bottom: 1vmax solid #fff9;
+	filter: drop-shadow(1vmin 1vmin 0 #1267);
+	border-bottom: .6vmax solid #fff9;
 }
 
 .css_controls {

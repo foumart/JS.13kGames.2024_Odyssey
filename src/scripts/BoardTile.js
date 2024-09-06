@@ -10,12 +10,12 @@ class BoardTile extends BoardElement {
 
 	getOffsetX() {
 		return (portrait ? - screenOffsetX : screenOffsetX) - this.width*screenOut/2 -
-			((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / tween.zoom);
+			((this.width*screenWidth/2) - (this.width*screenWidth/2) / boardScale / boardZoom);
 	}
 	
 	getOffsetY() {
 		return (portrait ? screenOffsetY : -screenOffsetY) - this.height*screenOut/2 -
-			((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / tween.zoom);
+			((this.height*screenWidth/2) - (this.height*screenWidth/2) / boardScale / boardZoom);
 	}
 
 	getX() {
@@ -32,7 +32,7 @@ class BoardTile extends BoardElement {
 	}
 
 	reset() {
-		// reflected variables from the corresponding game unit
+		// reflected mapZooms from the corresponding game unit
 		// When performing a move all board elements are reset and new data is assigned
 		this.overlay = 0;
 		this.origin = 0;
@@ -47,8 +47,12 @@ class BoardTile extends BoardElement {
 
 	draw() {
 		//if (this.visited) {
+			let mirrored = [13,17,18,22].indexOf(this.type) > -1;
 			bgrContext.drawImage(
-				offscreenBitmaps[this.visited ? (this.type || 0) + 16 : 15], 0, 0, tileWidth, tileWidth,
+				(mirrored ? offscreenBitmapsFlipped : offscreenBitmaps)[
+					!state || this.visited ? (this.type || 0) + (mirrored ? 14 : 16) : 15
+				],
+				0, 0, tileWidth, tileWidth,
 				this.getX(),
 				this.getY(),
 				this.width,
@@ -59,7 +63,7 @@ class BoardTile extends BoardElement {
 
 	drawOverlay() {
 		if (this.visited < 2) {
-			gameContext.globalAlpha = this.visited ? 0.5 : 1;
+			gameContext.globalAlpha = this.visited || !state ? 0.5 : 1;
 			let odd = this.realX % 2 && this.realY % 2 || this.realX % 2 == 0 && this.realY % 2 == 0;
 			// use flipped cloud images every second tile
 			gameContext.drawImage(

@@ -3,7 +3,7 @@ const seaSize = 44, seaOffset = 9, titleMapSize = 38;
 let islandGenerator = new IslandGenerator(this);
 
 // game loop vars
-let gameLoop, step
+let gameLoop, step;
 let fpsElement, frame, startTime = Date.now();// debug fps
 let paused = false;
 
@@ -13,7 +13,7 @@ async function gameInit() {
 	
 	let data = await getStageData(!state ? titleMapSize : seaSize, seaOffset);
 	populateStageData(data);
-
+	initVars();
 	initBoard();
 	gameStart();
 }
@@ -35,13 +35,12 @@ function doAnimationFrame(timeStamp) {
 		step ++;
 		if (step == 1) {
 			gameContainer.style.display = "none";
+			
 			updateInfoTab();
-			// initial level zoomed in
-			TweenFX.to(tween, 6, {zoom: 1}, e => doFrameAnimationMove(), e => {
-				gameContainer.style.display = "block";//TODO: fix lag
-				
-				//action(6);
-				// ...
+			// initial level zoom in (level zoom is hooked to tween.mapZoom)
+			tween.mapZoom = .3;
+			TweenFX.to(tween, 6, {mapZoom: 0.5}, e => doFrameAnimationMove(), e => {
+				finalizeMove();
 			});
 		} else if (step % 7 == 0) {
 			gameDirty = 2;// only every seventh frame we update the units while idle
@@ -75,11 +74,9 @@ function doAnimationFrame(timeStamp) {
 		}
 
 		// reveal clouds around the title and the play button
-		for (waterId = 1; waterId < 5; waterId ++) {
-			revealAround(playerX - 5 + waterId * 2, playerY - 6 + waterId * 2);
-			revealAround(playerX + 5 - waterId * 2, playerY - 6 + waterId * 2);
-			revealAround(playerX, playerY-9 + waterId * 4);
-			revealAround(playerX -9 + waterId * 4, playerY);
+		for (waterId = 1; waterId < 6; waterId ++) {
+			revealAroundUnit(playerX - 6 + waterId * 2, playerY);
+			revealAroundUnit(playerX, playerY - 6 + waterId * 2);
 		}
 
 		drawBoard();

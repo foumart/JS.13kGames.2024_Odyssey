@@ -9,6 +9,7 @@ const
 let stageData,
 	boardWidth,// map total width x height
 	boardScale,
+	boardZoom,
 	unitsList,
 	tileScreen,
 	unitScreen,
@@ -33,12 +34,21 @@ let boardPlayer,
 	townX,
 	townY;
 
+function onBoardZoom(event) {
+	if (state) {
+		if (event.deltaY < 0 && boardScale < 2) boardScale += (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 0.7 ) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		boardScale = +boardScale.toFixed(2);
+		gameDirty = 2;
+		drawBoard();
+	}
+}
 
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
-	boardScale = mobile ? state ? 0.84 : 0.91 : state ? 0.7 : 0.84;
-	tween.zoom = state ? 0.6 : 0.8;
+	boardScale = mobile ? state ? 1 : 0.91 : state ? 0.7 : 0.84;
+	boardZoom = state ? 1 : 0.7;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
 	let t=0,
@@ -99,27 +109,27 @@ function initBoard() {
 				}
 
 				if (!visitedData[y][x-1] || idsData[y][x-1] != idsData[y][x]) {// <
-					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 18 : TileType.LAND;
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 16 : TileType.LAND;
 				}
 
 				if (!visitedData[y][x+1] || idsData[y][x+1] != idsData[y][x]) {// >
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 11 :
-					mapData[y][x] == 12 ? 16 :
+					mapData[y][x] == 12 ? 17 :
 					mapData[y][x] == 13 ? 23 :
-					mapData[y][x] == 14 ? 15 :
-					mapData[y][x] == 17 ? 21 :
-					mapData[y][x] == 18 ? 19 :
+					mapData[y][x] == 14 ? 18 :
+					mapData[y][x] == 15 ? 21 :
+					mapData[y][x] == 16 ? 19 :
 					mapData[y][x] == 22 ? 25 :
 					mapData[y][x] == 24 ? 20 : TileType.LAND;
 				}
 
 				if (!visitedData[y+1][x] || idsData[y+1][x] != idsData[y][x]) {// v
 					mapData[y][x] = mapData[y][x] == TileType.LAND ? 12 :
-					mapData[y][x] == 11 ? 16 :
-					mapData[y][x] == 13 ? 17 :
+					mapData[y][x] == 11 ? 17 :
+					mapData[y][x] == 13 ? 15 :
 					mapData[y][x] == 14 ? 24 :
-					mapData[y][x] == 15 ? 20 :
-					mapData[y][x] == 18 ? 22 :
+					mapData[y][x] == 18 ? 20 :
+					mapData[y][x] == 16 ? 22 :
 					mapData[y][x] == 19 ? 25 :
 					mapData[y][x] == 23 ? 21 : mapData[y][x];
 				}
@@ -145,9 +155,9 @@ function initBoard() {
 					mapData[y][x] = TileType.WATER;
 				}
 
-				// convert water tiles to riffs based on relief data
+				// convert water tiles to riffs based on relief data (stageData.relief[y][x] > 2 ? RIFF3)
 				if (stageData.relief[y][x]) {
-					mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : stageData.relief[y][x] > 2 ? TileType.RIFF3 : TileType.RIFF2;
+					mapData[y][x] = stageData.relief[y][x] == 1 ? TileType.RIFF1 : TileType.RIFF2;
 				}
 			}
 
@@ -295,9 +305,9 @@ function initBoard() {
 		unitScreen.push(unitArr);
 	}
 
-	revealAround(playerX, playerY);
-	revealAround(shipX, shipY);
-	revealAround(townX, townY);
+	revealAroundUnit(playerX, playerY);
+	revealAroundUnit(shipX, shipY);
+	revealAroundUnit(townX, townY);
 
 	//...
 }
@@ -405,13 +415,8 @@ function generateOddArray(size) {
 
 // Draw the board
 function drawBoard() {
-	// the game canvas context is cleared every 7 frames or each frame while moving
+	// the game canvas context is cleared every 7 frames or each frame while moving (doAnimationFrame, gameDirty)
 	// the map canvas context is cleared only when zooming or while moving
-	/*if (!tween.zoom) {
-		gameContext.fillStyle = "#4848e3";
-		gameContext.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-	}*/
-
 	let _unit, _x, _y, _z,
 		_ox = portrait ? screenSide : screenSide + screenOut/2,
 		_oy = !portrait ? screenSide : screenSide + screenOut/2;
@@ -420,11 +425,10 @@ function drawBoard() {
 		// Update base tiles
 		gameDirty --;
 		if (gameDirty) {
-			// hilight
-			//if (step%9==0) {
-				bgrContext.fillStyle = "#14f";//"#fff";
-				bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
-			//}
+			//bgrContext.globalAlpha = 0.5;
+			bgrContext.fillStyle = "#1f76b5";
+			bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
+			//bgrContext.globalAlpha = 1;
 			for(let y = 0; y < screenWidth + screenOut; y++) {
 				for(let x = 0; x < screenWidth + screenOut; x++) {
 					if (tileScreen[y]) {
@@ -437,7 +441,6 @@ function drawBoard() {
 							tileScreen[y][x].realY = _y;
 							if (visitedData[_y] && visitedData[_y][_x]) tileScreen[y][x].visited = visitedData[_y][_x];
 							tileScreen[y][x].update(_z);
-							if (!state) tileScreen[y][x].drawOverlay();
 						}
 					}
 				}
@@ -449,7 +452,7 @@ function drawBoard() {
 		gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 	}
 
-	if (!state || !gameDirty) return;// break here if we are still on the title screen or we dont have to draw units
+	if (!gameDirty) return;// break here if we are still on the title screen or we dont have to draw units
 
 	// Update units
 	for(let y = 0; y < screenWidth + screenOut; y++) {
@@ -465,10 +468,10 @@ function drawBoard() {
 					unitScreen[y][x].reset();
 
 					// draw units
-					if (_z) {
+					if (state && _z) {
 						if (_x == playerX && _y == playerY) {
 							boardPlayer = unitScreen[y][x];
-							if (!_player) {// drawing the player at the end of the row itteration to be on top
+							if (!_player) {// drawing the player at the end of the row itteration to be drawn on top
 								shouldSkipDrawingUnit = true;
 								_player = _z;
 							}
@@ -490,12 +493,12 @@ function drawBoard() {
 							// some units are visible in the fog, others not
 							shouldSkipDrawingUnit = visitedData[_y][_x] < (
 								_unit.type > UnitType.ENEMY2 &&
-								_unit.type < UnitType.TREE ? 1 : 2
+								_unit.type < UnitType.WRECK ? 1 : 2
 							);
 						}
 					}
 	
-					if (!shouldSkipDrawingUnit) unitScreen[y][x].update(_z);
+					if (state && !shouldSkipDrawingUnit) unitScreen[y][x].update(_z);
 
 					// draw tile clouds
 					tileScreen[y][x].drawOverlay();
@@ -514,16 +517,6 @@ function drawBoard() {
 				}
 			}
 		}
-	}
-}
-
-function onBoardZoom(event) {
-	if (state) {
-		if (event.deltaY < 0 && boardScale < 1.8) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 2 - screenOut/(12+screenOut*.8) - screenWidth/9) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
-		boardScale = +boardScale.toFixed(2);
-		gameDirty = 2;
-		drawBoard();
 	}
 }
 

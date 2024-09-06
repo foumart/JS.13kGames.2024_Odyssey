@@ -13,30 +13,7 @@ class TileType {
 	static get RIFF2() {
 		return 3;
 	}
-	static get RIFF3() {
-		return 4;
-	}
-	static get SHINE() {
-		return 5;
-	}
 
-	
-	static get TILE5() {
-		return 5;
-	}
-	static get TILE6() {
-		return 6;
-	}
-	static get TILE7() {
-		return 7;
-	}
-	static get TILE8() {
-		return 8;
-	}
-	static get TILE9() {
-		return 9;
-	}
-	
 	static get LAND() {
 		return 10;
 	}

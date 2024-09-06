@@ -37,3 +37,13 @@ function revealAround(x, y) {
 	revealArea(x, y-2);
 	revealArea(x, y+2);
 }
+
+function revealAroundUnit(x, y) {
+	revealAround(x, y);
+	if (!onFoot || !state) {
+		revealAround(x-1, y);
+		revealAround(x+1, y);
+		revealAround(x, y-1);
+		revealAround(x, y+1);
+	}
+}

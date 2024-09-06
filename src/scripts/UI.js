@@ -56,7 +56,7 @@ function createUI() {
 	if (!state) {
 		title = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
-		bgrCanvas.style.opacity = .5;
+		bgrCanvas.style.opacity = .6;
 	} else {
 		actButton = generateUIButton(uiDiv, '?', e => action(6), "css_icon css_controls");
 
@@ -146,13 +146,13 @@ function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 }
 
 function updateActionButton(e) {
-	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 | 〇 &#12295 |
+	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 | 〇 &#12295 | ⬤
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
 	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
-	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩
+	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜
 
 	//unit = getUnit(playerX, playerY);
 
@@ -161,10 +161,8 @@ function updateActionButton(e) {
 		gamePlayer.overlay < UnitType.WRECK
 	) {
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881';
-		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'&#243':''}<div style='font-size:6vmin;position:relative;margin-top:-2vmax'>${gamePlayer.overlay==UnitType.TREE?'EAT':'ENTER'}</div>`;
-		if (gamePlayer.overlay==UnitType.TREE) {
-			
-		} else {
+		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'<div style="font-size:2em;color:#3f3">&#8202`</div><span style="font-size:2em;color:#c36">&#11044</span>':''}<div style='font-size:6vmin;position:relative;margin-top:-2vmax'>${gamePlayer.overlay==UnitType.TREE?'EAT':'ENTER'}</div>`;
+		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
 
@@ -188,7 +186,7 @@ function updateInfoTab() {
 	//if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
 	//if (infoTab) {
 		let _char = "&#9608";
-		let _sp = "&nbsp; ";//timeLeft <span style="font-size:8vmax;color:#0c0">&#119113</span><br>
+		let _sp = "&#8202 ";//timeLeft <span style="font-size:8vmax;color:#0c0">&#119113</span><br>
 		infoTab.innerHTML = `<span style="font-size:2vmax;vertical-align:top">⚙</span> ${
 			_char.repeat(30)}<span style="color:#f00">${
 			_char.repeat(1)}</span><div style="font-size:3em;bottom:-150%"><span style="color:gold;margin-right:1rem">&#9881;${
