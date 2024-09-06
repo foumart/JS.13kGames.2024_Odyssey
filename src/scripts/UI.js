@@ -10,6 +10,10 @@ function getSize(limit = 600, strength = 3) {
 	return (portrait ? width : height) < limit ? 1 : (strength + (portrait ? width : height) / (portrait ? 960 : 540)) / (strength+1);
 }
 
+function getSpan(_txt, _clr, _fontSize, _style) {
+	return `<span style='${_clr ? 'color:' + _clr : ''}${_fontSize ? ';font-size:' + _fontSize : ''}${_style ? ';' + _style : ''}'>${_txt}</span>`;
+}
+
 function generateUIButton(div, code, handler, className = "css_icon css_space") {
 	const button = document.createElement('div');
 	button.innerHTML = code;
@@ -29,7 +33,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 		} else {
 			str += `<span style="color:red">${_char}</span>`;
 		}
-		if (i % 2) str += " ";
+		if ((i+1) % (8-_step|0) == 0) str += " ";
 	}
 	return str;
 }
@@ -43,7 +47,9 @@ function createUI() {
 	gameCanvas.style.pointerEvents = bgrCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
-	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () => prepareDialog(0, "Game by Noncho Savov", () => displayDialog()));
+	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () =>
+		prepareDialog(0, state ? "Ship Move left: " + moveLeft + "<br>Gold: " + gold : "Game by Noncho Savov", () => displayDialog())
+	);
 	
 	if (_debug) {
 		fpsElement = document.createElement('div');
@@ -54,11 +60,12 @@ function createUI() {
 	}
 
 	if (!state) {
-		title = generateUIButton(uiDiv, "", switchState, "");
+		titlePng = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
 		bgrCanvas.style.opacity = .6;
 	} else {
-		actButton = generateUIButton(uiDiv, '?', e => action(6), "css_icon css_controls");
+		hasTutorial = 1;
+		actButton = generateUIButton(uiDiv, '', e => action(6), "css_icon css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
@@ -138,7 +145,7 @@ function displayDialog() {
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
-	dialog.innerHTML = `<u>${_label?_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
+	dialog.innerHTML = `${_label?'<u style="font-size:4vmax;line-height:7vmax">'+_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
 	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
 	if (!inDialog) displayDialog();
 	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1);
@@ -150,9 +157,10 @@ function updateActionButton(e) {
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// █ &#9608" | ▀ &#9600" | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
+	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
-	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜
+	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 | ● &#183; |
+	// ꖜ &#42396 | |Ꙭ 🕀 | ᠅ &#6149;
 
 	//unit = getUnit(playerX, playerY);
 
@@ -161,7 +169,7 @@ function updateActionButton(e) {
 		gamePlayer.overlay < UnitType.WRECK
 	) {
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881';
-		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'<div style="font-size:2em;color:#3f3">&#8202`</div><span style="font-size:2em;color:#c36">&#11044</span>':''}<div style='font-size:6vmin;position:relative;margin-top:-2vmax'>${gamePlayer.overlay==UnitType.TREE?'EAT':'ENTER'}</div>`;
+		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'<div style="font-size:17vmin;color:#3f3">`'+getSpan('&#9687', '#fc6', 0, 'position:absolute;margin-left:-99%')+'</div>'+getSpan('&#11044','#f36','16vmin'):''}<div style='font-size:6vmin;position:relative;margin-top:-1vmax'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
@@ -175,7 +183,10 @@ function updateActionButton(e) {
 		//updateActionButton();
 		action(6);
 	} else {
-		actButton.innerHTML = onFoot ? hasEvent ? 'E' : 'L' : hasEvent ? 'E' : 'S';
+		actButton.innerHTML = hasTutorial ? "?" :
+			hasEvent ? 'E' :
+			onFoot ? '⧗' : 'S';
+
 		//actButton.style.opacity = hasEvent ? 1 : .5;
 	}
 
@@ -183,18 +194,11 @@ function updateActionButton(e) {
 }
 
 function updateInfoTab() {
-	//if (infoTab) infoTab.innerHTML = `<br>Position: ${playerX}x${playerY}<br>${idsData[playerY][playerX] ? 'Exploring Island '+idsData[playerY][playerX] : 'Sailing'}`;
-	//if (infoTab) {
-		let _char = "&#9608";
-		let _sp = "&#8202 ";//timeLeft <span style="font-size:8vmax;color:#0c0">&#119113</span><br>
-		infoTab.innerHTML = `<span style="font-size:2vmax;vertical-align:top">⚙</span> ${
-			_char.repeat(30)}<span style="color:#f00">${
-			_char.repeat(1)}</span><div style="font-size:3em;bottom:-150%"><span style="color:gold;margin-right:1rem">&#9881;${
-			gold}</span><span style="color:#8cf;margin-right:1rem">&#9737;${
-			shipLeft}</span><span style="color:#9fb">&#9737;${
-			moveLeft}</span></div>`
-
-	//}
+	let _char = "&#9608";
+	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '2vmax', 'vertical-align:top')} ${
+		getSpan(_char.repeat(moveLeft), '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
+		}<div style="font-size:3em;bottom:-99%">${
+		getSpan(gold, 'gold')}</div>`//'&#42396;' + 
 }
 
 function debugBoard() {

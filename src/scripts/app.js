@@ -43,7 +43,7 @@ let state = 0;
 let tween = { mapZoom: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, infoTab, dialog, title, titleText;
+let controls, infoTab, dialog, titlePng, titleText;
 let actButton, upButton, leftButton, rightButton, downButton;
 let playButton, fullscreenButton, soundButton, closeButton, playerButton, shipButton, crewButton;
 let installButton, installPrompt = null;
@@ -143,17 +143,17 @@ function resizeUI(e) {
 	}
 
 	// Resize the Dialog Menu
-	updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `padding-top:2vmax;border-top:3vh solid #fff9;border-bottom:3vh solid #fff9;width:${portrait?width*.9:!state?width*.5:width*.42}px;top:50%;left:50%;transform:translateY(-${!state?128:portrait?60:34}%) translateX(-${portrait||!state?50:44}%)`, 64, 99);
+	updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `border-top:3vh solid #fff9;border-bottom:3vh solid #fff9;width:${portrait?width*.9:width/2}px;top:50%;left:50%;transform:translateY(-${!state?128:portrait?60:34}%) translateX(-${portrait||!state?50:41}%)`, 64, 99);
 
 	// Resize in-game UI elements
 	if (upButton) {
-		updateStyleUI(controls, `bottom:1vmin;width:${portrait?54:28}%`);
-		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmin 2vmax;min-width:12vmax;min-height:9vmax`, 99, -1);
+		updateStyleUI(controls, `bottom:1vmin;width:${portrait?54:27}%`);
+		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmax 2vmax;min-width:9vmax;min-height:9vmax`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
-		if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin-top:2vmax;border:1vmax solid #0000;border-radius:1vmax;background:#2266;position:relative;width:16vmin`;
+		if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin:1vmax 0;border:2vmin solid #0000;border-radius:1vmax;background:#2266;position:relative;width:16vmin`;
 	}
 
 	gameContext.imageSmoothingEnabled = bgrContext.imageSmoothingEnabled = false;
@@ -167,7 +167,7 @@ function resizeUI(e) {
 		playerButton.prepend(offscreenBitmapsFlipped[0]);
 		shipButton.prepend(offscreenBitmapsFlipped[4]);
 		crewButton.prepend(offscreenBitmaps[8]);
-		offscreenBitmapsFlipped[0].style = offscreenBitmapsFlipped[4].style = offscreenBitmaps[8].style = `border:1vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:12vmin`;
+		//offscreenBitmapsFlipped[0].style = offscreenBitmapsFlipped[4].style = offscreenBitmaps[8].style = `border:1vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:12vmin`;
 		e = `padding:1vmax;position:relative;float:left;margin:1% 0 0 1%;border-radius:2vmin`;
 		updateStyleUI(playerButton, e, 14, 9);
 		updateStyleUI(shipButton, e, 14, 9);
@@ -178,14 +178,14 @@ function resizeUI(e) {
 	if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
 	// Sound button
 	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
-	updateStyleUI(infoTab, `padding:${state?'1vmax 1vmax 1vmin;line-height:6px;margin:2%':'2vmin;margin:1%'} 1%${playerButton?`;top:${playerButton.offsetHeight}px`:''}`, state ? 16 : 32, 1);
+	updateStyleUI(infoTab, `padding:${state?'1vmax;line-height:6px;margin:2%':'2vmin;margin:1%'} 1%${playerButton?`;top:${playerButton.offsetHeight}px`:''}`, state ? 18 : 32, 1);
 
 	// Install, Play and Title
 	if (playButton) {
 		if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
 		updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
-		title.innerHTML = getIcon(portrait ? 80*getSize() : 75*getSize());
-		updateStyleUI(title, `filter:drop-shadow(0 1vh 0 #127);top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
+		titlePng.innerHTML = getIcon(portrait ? 80*getSize() : 80*getSize());
+		updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #1267);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
 			}px;font-size:${45*scale}px;color:#ff9"><i>The</i></div><div style="filter:drop-shadow(.15em .1em 0 #1267);text-shadow:#f74 .07em .03em;margin-top:-${95*scale}px;margin-left:${325*scale
 			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div><span style="filter:drop-shadow(.1em .05em 0 #1267);color:#efe;text-shadow:#1bc .06em .03em">O<b>dyssey</b></span>`;

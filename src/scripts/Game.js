@@ -5,29 +5,31 @@ let unit,
 	landing,
 	holding,
 	onFoot = true,
-	inDialog = false,
-	hasEvent = false;
-const colors = ["lime","red","aqua","white","magenta"];
+	inDialog,
+	hasEvent,
+	hasTutorial;
+const colors = [, "red", ,"aqua", "yellow", "magenta"];
 
 let stage, turn, gold,
-	shipLeft, shipLimit,
+	//shipLeft, shipLimit,
 	moveLeft, moveLimit,
 	timeLeft, timeLimit,
-	crewHealth, crewHealthMax,
-	playerHealth, playerHealthMax,
-	shipHealth, shipHealthMax;
+	crewHealth, crewHealthMax, crewLevel,
+	playerHealth, playerHealthMax, playerLevel,
+	shipHealth, shipHealthMax, shipLevel;
 
 // initialize vars for new game
 function initVars() {
 	stage = 1;
 	turn = 0;
-	gold = 100;
-	shipLeft = 40, shipLimit = 40;
-	moveLeft = 20, moveLimit = 20;
-	timeLeft = 13, timeLimit = 99
-	crewHealth = 20, crewHealthMax = 20,
-	playerHealth = 15, playerHealthMax = 20,
-	shipHealth = 30, shipHealthMax = 30;
+	gold = 1000;
+	//shipLeft = 40, shipLimit = 40;
+	moveLeft = 24, moveLimit = 24;
+	timeLeft = 13, timeLimit = 99,
+	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
+	playerHealth = 20, playerHealthMax = 20, playerLevel = 1,
+	shipHealth = 22, shipHealthMax = 38, shipLevel = 1,// 38, 48, 60,  72
+	crewHealth = 24, crewHealthMax = 24, crewLevel = 1;// 36, 48, 60, 
 }
 
 function createUnit(x, y, z) {
@@ -37,13 +39,14 @@ function createUnit(x, y, z) {
 
 function action(direction) {
 	if (paused) return;
+	let _unit;
 	switch (direction) {
 		case 1: // Up
 			// check collision
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
-				let _unit = getUnit(playerX, playerY-1);
+				_unit = getUnit(playerX, playerY-1);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
 					console.log("break",_unit);
 					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
@@ -70,7 +73,7 @@ function action(direction) {
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
-				let _unit = getUnit(playerX+1, playerY);
+				_unit = getUnit(playerX+1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
@@ -94,7 +97,7 @@ function action(direction) {
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
-				let _unit = getUnit(playerX, playerY+1);
+				_unit = getUnit(playerX, playerY+1);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
@@ -118,7 +121,7 @@ function action(direction) {
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
-				let _unit = getUnit(playerX-1, playerY);
+				_unit = getUnit(playerX-1, playerY);
 				if (_unit && _unit.type == 10 && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
@@ -142,24 +145,52 @@ function action(direction) {
 
 			break;
 		case 6: // Action
-			if (!turn) {
-				prepareDialog("Ahoy Corsair !", "Capitol: Upgrade Ship<br>Castles: Acquire Crew<br>Dungeons: Earn Gold", displayDialog);
+			if (hasTutorial) {
+				hasTutorial = 'Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br>Conquer Castles ';
+				for (_unit = 2; _unit < colors.length; _unit++) {
+					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
+				}
+				prepareDialog("Ahoy Corsair !", hasTutorial, displayDialog);
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
-				prepareDialog("Capitol", "Increase ship HP", quitGame, "&#9737 500", displayDialog, "Exit");
-			} else if (gamePlayer.overlay == UnitType.SHRINE) {
-				prepareDialog("Dungeon", "Will you ?", quitGame, "Journey", displayDialog, "Exit");
-			} else if (gamePlayer.overlay == UnitType.TREE) {
-				let applePoints = 10;
-				if (playerHealth < playerHealthMax - applePoints) {
-					playerHealth += applePoints;
-					// reduce apples on tile
-				} else if (playerHealth < playerHealthMax) {
-					playerHealth = playerHealthMax;
-					// eating only part ?
+				prepareDialog(
+					"Capitol",
+					shipHealth < shipHealthMax ? "Repair Ship damage" :
+					shipLevel > 3 ? 'Ship maxed' :
+					`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} !`,
+					shipLevel < 4 ? upgradeShip : displayDialog,
+					shipLevel < 4 ? shipHealth < shipHealthMax ?
+						-(shipHealthMax - shipHealth) * 5 + " Repair" :
+						-[100,250,500][shipLevel-1] + " Upgrade" : 0,
+					displayDialog, "Exit"
+				);
+			} else
+			if (gamePlayer.overlay == UnitType.SHRINE) {
+				prepareDialog(
+					"Dungeon",
+					"Will you ?",
+					quitGame, "Journey",
+					displayDialog, "Exit"
+				);
+			} else
+			if (gamePlayer.overlay == UnitType.TREE) {
+				let _hp = 10;
+				if (playerHealth < playerHealthMax) {
+					playerHealth += _hp;
+					if (playerHealth > playerHealthMax) {
+						_hp -= playerHealthMax - playerHealth;
+						playerHealth = playerHealthMax;
+					} else _hp = 0;
 				}
+				if (crewHealth < crewHealthMax) {
+					crewHealth += _hp;
+					if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
+					_hp = 0;
+				}
+				if (!_hp) getUnit(playerX, playerY).apple = 0;
 				updateActionButton();
-			} else if (gamePlayer.overlay == UnitType.GOLD) {
+			} else
+			if (gamePlayer.overlay == UnitType.GOLD) {
 				prepareDialog("Gold Ore", "Will you ?", quitGame, "Mine", displayDialog, "Exit");
 			} else {
 				// PASS
@@ -179,6 +210,7 @@ function action(direction) {
 
 function prepareToMove(dir) {
 	if (inDialog) displayDialog();// hide the dialog
+	hasTutorial = 0;// disable tutorial presented as "?" at the beginning
 	gameDirty = 2;
 	gamePlayer.overlay = unitsData[playerY][playerX];
 	if (boarding) {
@@ -229,14 +261,23 @@ function finalizeMove(dir) {
 	if (holding && dir) {
 		action(dir);
 	} else {
-		gameContainer.style.display = "block";//TODO: fix lag
-		updateActionButton();
-		updateInfoTab();
+		backFromDialog();
+	}
+
+	if (!onFoot && dir) {
+		moveLeft -= 1;
 	}
 
 	revealAroundUnit(playerX, playerY);
 
 	//debugBoard();
+}
+
+function backFromDialog() {
+	if (inDialog) displayDialog();
+	gameContainer.style.display = "block";//TODO: fix lag
+	updateActionButton();
+	updateInfoTab();
 }
 
 function performEnemyMoves() {
@@ -266,13 +307,43 @@ function performEnemyMoves() {
 	});
 }
 
+function upgradeShip() {
+	if (shipHealth < shipHealthMax) {
+		gold -= (shipHealthMax - shipHealth) * 5;
+		shipHealth += shipHealthMax - shipHealth;
+		
+	} else {
+		gold -= [100,250,500][shipLevel-1];
+		shipLevel ++;
+		shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
+	}
+	
+	backFromDialog();
+	resizeUI();
+	infoButtonClick(1);
+}
+
+function upgradeCrew() {
+	crewLevel ++;
+	crewHealth += crewLevel < 3 ? 12 : 10;
+	backFromDialog();
+}
+
 function closeButtonClick(e) {
 	prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
 }
 
 
-function infoButtonClick(e) {console.log(e)
-	prepareDialog("Info", "You sure?", quitGame, "Yes", displayDialog, "No");
+function infoButtonClick(id) {
+	prepareDialog(
+		"<br>",// + (id == 1 ? "Ship" : id ? "Crew" : "Corsair"),
+		(id == 1 ? "Ship" : id ? "Crew" : "Corsair") + " HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
+			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax),
+		displayDialog
+	);
+	dialog.firstChild.append(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);
+	//dialog.firstChild.firstChild.style.marginTop = "2vmin";
+	dialog.firstChild.lastChild.style.transform = "scale(1.5) translateY(-30%)";
 }
 
 function quitGame() {

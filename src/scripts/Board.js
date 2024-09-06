@@ -37,7 +37,7 @@ let boardPlayer,
 function onBoardZoom(event) {
 	if (state) {
 		if (event.deltaY < 0 && boardScale < 2) boardScale += (boardScale < 1 ? 0.05 : 0.1);
-		else if (event.deltaY > 0 && boardScale > 0.7 ) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
+		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);
 		gameDirty = 2;
 		drawBoard();
@@ -47,7 +47,7 @@ function onBoardZoom(event) {
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
-	boardScale = mobile ? state ? 1 : 0.91 : state ? 0.7 : 0.84;
+	boardScale = 1;//mobile ? state ? 1 : 0.91 : state ? 0.7 : 0.84;
 	boardZoom = state ? 1 : 0.7;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
@@ -79,7 +79,7 @@ function initBoard() {
 				if (stageData.relief[y][x] > 1) {
 					t ++;
 					unit = createUnit(x, y, UnitType.TREE);
-					unit.apple = 3;
+					unit.apple = 1;
 					unitsList.push(unit);
 					unitsData[y][x] = UnitType.TREE;
 					//revealClouds(x, y);
