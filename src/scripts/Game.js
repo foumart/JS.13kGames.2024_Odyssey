@@ -6,15 +6,17 @@ let unit,
 	holding,
 	onFoot = true,
 	inDialog,
+	hardChoice,
 	hasEvent,
 	hasTutorial;
-const colors = [, "red", ,"aqua", "yellow", "magenta"];
+
+const colors = [, "red", "#fff", "aqua", "yellow", "magenta", "#000"];
+const enemyTypes = ["Bat", "Rat", "Wolf", "Skeleton", "Zombie", "Orc", "Troll", "Wizard", "Lich", "Dragon", "Balrog"];
 
 let stage, turn, gold,
-	//shipLeft, shipLimit,
 	moveLeft, moveLimit,
 	timeLeft, timeLimit,
-	crewHealth, crewHealthMax, crewLevel,
+	crewHealth, crewHealthMax, crewLevel, crewPaid,
 	playerHealth, playerHealthMax, playerLevel,
 	shipHealth, shipHealthMax, shipLevel;
 
@@ -23,12 +25,11 @@ function initVars() {
 	stage = 1;
 	turn = 0;
 	gold = 1000;
-	//shipLeft = 40, shipLimit = 40;
-	moveLeft = 24, moveLimit = 24;
-	timeLeft = 13, timeLimit = 99,
+	moveLeft = 2, moveLimit = 24;
+	timeLeft = 13, timeLimit = 99, crewPaid = 1,
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
 	playerHealth = 20, playerHealthMax = 20, playerLevel = 1,
-	shipHealth = 22, shipHealthMax = 38, shipLevel = 1,// 38, 48, 60,  72
+	shipHealth = 38, shipHealthMax = 38, shipLevel = 1,// 38, 48, 60,  72
 	crewHealth = 24, crewHealthMax = 24, crewLevel = 1;// 36, 48, 60, 
 }
 
@@ -157,7 +158,7 @@ function action(direction) {
 					"Capitol",
 					shipHealth < shipHealthMax ? "Repair Ship damage" :
 					shipLevel > 3 ? 'Ship maxed' :
-					`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} !`,
+					`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?`,
 					shipLevel < 4 ? upgradeShip : displayDialog,
 					shipLevel < 4 ? shipHealth < shipHealthMax ?
 						-(shipHealthMax - shipHealth) * 5 + " Repair" :
@@ -166,10 +167,21 @@ function action(direction) {
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
+				let notCleared, dungeonStages = "Stages: ";
+				_unit = getUnit(playerX, playerY);
+				console.log(_unit.dungeon)
+				_unit.dungeon.forEach((dungeon, index) => {
+					if (index > 2 && dungeon.length) notCleared = 1;
+					if (index < 3 || !dungeon.length) {
+						dungeonStages += !index || !_unit.dungeon[index-1].length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
+					}
+				});
+				if (_unit.dungeon.length > 3 && notCleared) dungeonStages += ' ⋯';
+
 				prepareDialog(
 					"Dungeon",
-					"Will you ?",
-					quitGame, "Journey",
+					dungeonStages,
+					descendInDungeon, "Descend",
 					displayDialog, "Exit"
 				);
 			} else
@@ -239,17 +251,16 @@ function doFrameAnimationMove() {
 function finalizeMove(dir) {
 	// move enemies
 	enemies.forEach(enemy => {
-		if (enemy.movingX) {
+		if (enemy.movingX || enemy.movingY) {
 			unitsData[enemy.y][enemy.x] = enemy.overlay;
-			enemy.x += enemy.movingX;
-			enemy.movingX = 0;
-			enemy.overlay = unitsData[enemy.y][enemy.x];
-			unitsData[enemy.y][enemy.x] = enemy.type;
-		}
-		if (enemy.movingY) {
-			unitsData[enemy.y][enemy.x] = enemy.overlay;
-			enemy.y += enemy.movingY;
-			enemy.movingY = 0;
+			if (enemy.movingX) {
+				enemy.x += enemy.movingX;
+				enemy.movingX = 0;
+			}
+			if (enemy.movingY) {
+				enemy.y += enemy.movingY;
+				enemy.movingY = 0;
+			}
 			enemy.overlay = unitsData[enemy.y][enemy.x];
 			unitsData[enemy.y][enemy.x] = enemy.type;
 		}
@@ -266,6 +277,22 @@ function finalizeMove(dir) {
 
 	if (!onFoot && dir) {
 		moveLeft -= 1;
+		if (moveLeft < 1) {
+			crewHealth -= shipHealthMax/9|0;
+			moveLeft += shipHealthMax/6|0;
+			if (crewHealth < 1) {
+				if (gold < crewHealthMax*2) {
+					prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
+				} else {
+					prepareDialog("Revolt!", "Crew demands:", () => {
+						crewPaid ++;
+						gold -= crewHealthMax * crewPaid;
+						crewHealth = crewHealthMax/2;
+						backFromDialog();
+					}, "Pay " + crewHealthMax * crewPaid);
+				}
+			}
+		}
 	}
 
 	revealAroundUnit(playerX, playerY);
@@ -327,6 +354,10 @@ function upgradeCrew() {
 	crewLevel ++;
 	crewHealth += crewLevel < 3 ? 12 : 10;
 	backFromDialog();
+}
+
+function descendInDungeon() {
+	//prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
 }
 
 function closeButtonClick(e) {

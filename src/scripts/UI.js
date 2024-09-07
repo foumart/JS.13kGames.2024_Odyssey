@@ -134,6 +134,7 @@ function displayDialog() {
 	dialog.style.display = inDialog ? 'block' : 'none';
 	gameContainer.style.display = inDialog ? 'none' : 'block';
 	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
+	//actButton.style.opacity = inDialog ? .6 : 1;
 	/*gameContainer.style.pointerEvents = inDialog ? 'none' : 'auto';
 	if (buttonScreen) {
 		for (let _y = 0; _y < buttonScreen.length; _y ++) {
@@ -145,6 +146,7 @@ function displayDialog() {
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
+	if (inDialog && hardChoice) return;
 	dialog.innerHTML = `${_label?'<u style="font-size:4vmax;line-height:7vmax">'+_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
 	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
 	if (!inDialog) displayDialog();
@@ -153,39 +155,43 @@ function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 }
 
 function updateActionButton(e) {
-	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ◯ | 〇 | 〇 &#12295 | ⬤
+	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 |
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | ❂ &#10050 |
+	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | 
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
-	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 | ● &#183; |
-	// ꖜ &#42396 | |Ꙭ 🕀 | ᠅ &#6149;
+	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈
+	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
+	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 |
 
 	//unit = getUnit(playerX, playerY);
 
 	if (
-		gamePlayer.overlay >= UnitType.CASTLE &&
-		gamePlayer.overlay < UnitType.WRECK
+		gamePlayer.overlay == UnitType.CASTLE ||
+		gamePlayer.overlay == UnitType.SHRINE ||
+		gamePlayer.overlay == UnitType.TREE
 	) {
-		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881';
-		actButton.innerHTML = `${gamePlayer.overlay==UnitType.TREE?'<div style="font-size:17vmin;color:#3f3">`'+getSpan('&#9687', '#fc6', 0, 'position:absolute;margin-left:-99%')+'</div>'+getSpan('&#11044','#f36','16vmin'):''}<div style='font-size:6vmin;position:relative;margin-top:-1vmax'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
+		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
+		actButton.innerHTML = `${
+			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:16vmin;color:#3f3">`</div>'+getSpan('&#11044','#f80','16vmin'):''
+		}<div style='font-size:6vmin;position:relative;margin-top:-1vmax'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
 
-	} else if (gamePlayer.overlay == UnitType.WRECK) {//GOLD WRECK
+	} else if (gamePlayer.overlay == UnitType.WRECK || gamePlayer.overlay == UnitType.GOLD) {//GOLD WRECK
 		gamePlayer.overlay = 0;
-		//console.log(getUnit(playerX, playerY), getUnitId(playerX, playerY));
 		removeUnit(playerX, playerY);
 		
 		gold += 50;
 		//updateActionButton();
-		action(6);
+		//action(6);
+		backFromDialog();
 	} else {
 		actButton.innerHTML = hasTutorial ? "?" :
 			hasEvent ? 'E' :
-			onFoot ? '⧗' : 'S';
+			onFoot ? '&#10003' : 'S';
 
 		//actButton.style.opacity = hasEvent ? 1 : .5;
 	}
@@ -196,7 +202,7 @@ function updateActionButton(e) {
 function updateInfoTab() {
 	let _char = "&#9608";
 	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '2vmax', 'vertical-align:top')} ${
-		getSpan(_char.repeat(moveLeft), '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
+		getSpan(_char.repeat(moveLeft), moveLeft < 9 ? '#fd6' : '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
 		}<div style="font-size:3em;bottom:-99%">${
 		getSpan(gold, 'gold')}</div>`//'&#42396;' + 
 }

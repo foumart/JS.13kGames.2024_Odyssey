@@ -91,12 +91,32 @@ function initBoard() {
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
 						//c ++;
-						unit = createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE);
+						// there are colors.length-1 castles available
+						unit = createUnit(x, y, index < colors.length ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
-						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
+						unitsData[y][x] = index < colors.length ? UnitType.CASTLE : UnitType.SHRINE;
 						// set castle origin color flag (0:none, 1:red player, 2:blue neutral, 3: black enemy)
-						unit.origin = index < 6 ? 2 + (index ? index % 3 : -1) : 0;
-						// TODO: define castle and shrine behaviors
+						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
+						// Add enemies to dungeons
+						if (index >= colors.length) {
+							unit.dungeon = [];
+							for (let i = 3; i < index-1; i++) {
+								let arr = [], rand;
+								for (let j = 4; j < i+2; j++) {
+									let newEnemy;
+									while (!newEnemy || arr.length && newEnemy == arr[arr.length-1][0]) {
+										rand = Math.random();
+										newEnemy = enemyTypes[islandGenerator.rand((j-3)*rand, i-3)];
+									}
+									arr.push(newEnemy);
+								}
+								if (i == 3) arr.push(enemyTypes[islandGenerator.rand(index/2-2, index-6)]);
+								if (i == index-3 && index != 12) arr.push(enemyTypes[index-3]);
+								if (i == index-2) arr.push(enemyTypes[index-2]);
+								//console.log(index-colors.length, i-3, arr);
+								unit.dungeon.push(arr);
+							}
+						}
 					}
 				});
 
@@ -490,6 +510,8 @@ function drawBoard() {
 							unitScreen[y][x].movingY = _unit.movingY;
 							unitScreen[y][x].origin = _unit.origin;
 							unitScreen[y][x].apple = _unit.apple;
+							unitScreen[y][x].dungeon = _unit.dungeon;
+							unitScreen[y][x].enemy = _unit.enemy;
 							// some units are visible in the fog, others not
 							shouldSkipDrawingUnit = visitedData[_y][_x] < (
 								_unit.type > UnitType.ENEMY2 &&
@@ -505,7 +527,9 @@ function drawBoard() {
 				}
 			}
 		}
-		if (_player) boardPlayer.update(_player);
+		if (_player) {
+			boardPlayer.update(_player);
+		}
 	}
 
 	if (gameDirty) {

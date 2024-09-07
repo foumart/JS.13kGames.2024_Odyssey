@@ -11,6 +11,8 @@ class Unit {
 		this.transitionY = 0;
 		this.selection = 0;// only for player (player marked with green contour)
 		//this.apple = 0;
+		//this.enemy = 0;
+		//this.dungeon = 0;
 	}
 	
 }

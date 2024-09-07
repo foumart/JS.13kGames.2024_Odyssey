@@ -73,10 +73,10 @@ class BoardUnit extends BoardTile {
 
 			// draw apple on trees
 			if (this.type == UnitType.TREE && this.apple) {
-				gameContext.fillStyle = "#c00";
-				this.fillRect(_offsetX+3, _offsetY - 5, 2, 2);
-				gameContext.fillStyle = "#f22";
-				this.fillRect(_offsetX+3, _offsetY - 5, 1, 1);
+				gameContext.fillStyle = "#f92";
+				this.fillRect(_offsetX+2, _offsetY - 4, 2, 2);
+				gameContext.fillStyle = "#fe6";
+				this.fillRect(_offsetX+2, _offsetY - 4, 1, 1);
 			}
 
 			// draw shine on gold
