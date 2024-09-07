@@ -6,16 +6,17 @@ let unit,
 	holding,
 	onFoot = true,
 	inDialog,
+	advanceMenu,
 	hardChoice,
 	hasEvent,
 	hasTutorial;
 
-const colors = [, "red", "#fff", "aqua", "yellow", "magenta", "#000"];
+const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta", "lime"];
 const enemyTypes = ["Bat", "Rat", "Wolf", "Skeleton", "Zombie", "Orc", "Troll", "Wizard", "Lich", "Dragon", "Balrog"];
+const shipPrices = [250,500,999];
 
 let stage, turn, gold,
-	moveLeft, moveLimit,
-	timeLeft, timeLimit,
+	moveLeft, moveLimit, timePassed,
 	crewHealth, crewHealthMax, crewLevel, crewPaid,
 	playerHealth, playerHealthMax, playerLevel,
 	shipHealth, shipHealthMax, shipLevel;
@@ -24,13 +25,13 @@ let stage, turn, gold,
 function initVars() {
 	stage = 1;
 	turn = 0;
-	gold = 1000;
-	moveLeft = 2, moveLimit = 24;
-	timeLeft = 13, timeLimit = 99, crewPaid = 1,
+	gold = 50;
+	moveLeft = 24; moveLimit = 24;
+	crewPaid = 1; timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
-	playerHealth = 20, playerHealthMax = 20, playerLevel = 1,
-	shipHealth = 38, shipHealthMax = 38, shipLevel = 1,// 38, 48, 60,  72
-	crewHealth = 24, crewHealthMax = 24, crewLevel = 1;// 36, 48, 60, 
+	playerHealth = 5; playerHealthMax = 20; playerLevel = 1;
+	shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
+	crewHealth = 4; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
 }
 
 function createUnit(x, y, z) {
@@ -38,7 +39,7 @@ function createUnit(x, y, z) {
 	return unit;
 }
 
-function action(direction) {
+function action(direction, additionalParam) {
 	if (paused) return;
 	let _unit;
 	switch (direction) {
@@ -146,29 +147,50 @@ function action(direction) {
 
 			break;
 		case 6: // Action
+			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
 				hasTutorial = 'Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br>Conquer Castles ';
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("Ahoy Corsair !", hasTutorial, displayDialog);
+				prepareDialog("Ahoy Corsair !", hasTutorial);
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
+				let _hp = !additionalParam && !isPlayerDamaged();
+				let _amount = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
+				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
 				prepareDialog(
-					"Capitol",
-					shipHealth < shipHealthMax ? "Repair Ship damage" :
-					shipLevel > 3 ? 'Ship maxed' :
-					`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?`,
-					shipLevel < 4 ? upgradeShip : displayDialog,
-					shipLevel < 4 ? shipHealth < shipHealthMax ?
+					_hp ? "Inn" : "Shipyard",
+					_hp ? "Heal wounds?" : secondMenu ?
+						shipHealth < shipHealthMax ? "Repair Ship damage" :
+						shipLevel > 3 ? 'Ship maxed' :
+						`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?` : 'Come Again!',
+
+					_hp ? e => {
+						gold -= _amount;
+						healPlayer(_amount);
+						backFromDialog();
+						action(6, isPlayerDamaged());
+					} : shipLevel < 4 ? upgradeShip : displayDialog,
+					_hp ? -_amount + " Rest" : shipLevel < 4 ? shipHealth < shipHealthMax ?
 						-(shipHealthMax - shipHealth) * 5 + " Repair" :
-						-[100,250,500][shipLevel-1] + " Upgrade" : 0,
-					displayDialog, "Exit"
+						-shipPrices[shipLevel-1] + " Deal" : 0,
+
+					_unit.rumors && !additionalParam ? () => action(6, 1) : secondMenu ? e => {
+						_hp = (_unit.origin)*(crewHealthMax / 5 | 0);
+						prepareDialog(
+							"Tavern",
+							_unit.rumors ? 'Hear the latest rumors?' : 'Come Again!',
+							_unit.rumors ? () => displayRumors(_unit.rumors, _hp) : displayDialog,
+							_unit.rumors ? -_hp + " Ale" : 0,
+							displayDialog, "Exit"
+						);
+					} : displayDialog,
+					secondMenu ? "Next" : "Exit"
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
 				let notCleared, dungeonStages = "Stages: ";
-				_unit = getUnit(playerX, playerY);
 				console.log(_unit.dungeon)
 				_unit.dungeon.forEach((dungeon, index) => {
 					if (index > 2 && dungeon.length) notCleared = 1;
@@ -186,19 +208,7 @@ function action(direction) {
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.TREE) {
-				let _hp = 10;
-				if (playerHealth < playerHealthMax) {
-					playerHealth += _hp;
-					if (playerHealth > playerHealthMax) {
-						_hp -= playerHealthMax - playerHealth;
-						playerHealth = playerHealthMax;
-					} else _hp = 0;
-				}
-				if (crewHealth < crewHealthMax) {
-					crewHealth += _hp;
-					if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
-					_hp = 0;
-				}
+				let _hp = healPlayer();
 				if (!_hp) getUnit(playerX, playerY).apple = 0;
 				updateActionButton();
 			} else
@@ -218,6 +228,26 @@ function action(direction) {
 			console.log("Default action:", direction);
 			break;
 	}
+}
+
+function isPlayerDamaged() {
+	return playerHealth < playerHealthMax || crewHealth < crewHealthMax ? 0: 1;
+}
+
+function healPlayer(_hp = 9) {
+	if (playerHealth < playerHealthMax) {
+		playerHealth += _hp;
+		if (playerHealth > playerHealthMax) {
+			_hp -= playerHealthMax - playerHealth;
+			playerHealth = playerHealthMax;
+		} else _hp = 1;
+	}
+	if (crewHealth < crewHealthMax) {
+		crewHealth += _hp;
+		if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
+		_hp = 0;
+	}
+	return _hp;
 }
 
 function prepareToMove(dir) {
@@ -281,6 +311,7 @@ function finalizeMove(dir) {
 			crewHealth -= shipHealthMax/9|0;
 			moveLeft += shipHealthMax/6|0;
 			if (crewHealth < 1) {
+				resizeUI();
 				if (gold < crewHealthMax*2) {
 					prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
 				} else {
@@ -340,7 +371,7 @@ function upgradeShip() {
 		shipHealth += shipHealthMax - shipHealth;
 		
 	} else {
-		gold -= [100,250,500][shipLevel-1];
+		gold -= shipPrices[shipLevel-1];
 		shipLevel ++;
 		shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
 	}

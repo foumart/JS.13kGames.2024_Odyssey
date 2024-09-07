@@ -97,6 +97,7 @@ function initBoard() {
 						unitsData[y][x] = index < colors.length ? UnitType.CASTLE : UnitType.SHRINE;
 						// set castle origin color flag (0:none, 1:red player, 2:blue neutral, 3: black enemy)
 						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
+						unit.rumors = 1;
 						// Add enemies to dungeons
 						if (index >= colors.length) {
 							unit.dungeon = [];

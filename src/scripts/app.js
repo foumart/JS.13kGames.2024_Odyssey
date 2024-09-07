@@ -148,7 +148,7 @@ function resizeUI(e) {
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `bottom:1vmin;width:${portrait?54:27}%`);
-		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmax 2vmax;min-width:9vmax;min-height:9vmax`, 99, -1);
+		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmax 3vmin;min-width:11vmax;min-height:9vmax`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =

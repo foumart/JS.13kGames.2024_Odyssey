@@ -48,7 +48,7 @@ function createUI() {
 	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () =>
-		prepareDialog(0, state ? "Ship Move left: " + moveLeft + "<br>Gold: " + gold : "Game by Noncho Savov", () => displayDialog())
+		prepareDialog("Day: " + timePassed, state ? "Sail left: " + moveLeft + "<br>Gold: " + gold : "Game by Noncho Savov", displayDialog)
 	);
 	
 	if (_debug) {
@@ -65,7 +65,7 @@ function createUI() {
 		bgrCanvas.style.opacity = .6;
 	} else {
 		hasTutorial = 1;
-		actButton = generateUIButton(uiDiv, '', e => action(6), "css_icon css_controls");
+		actButton = generateUIButton(uiDiv, '', e => action(6, isPlayerDamaged()), "css_icon css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
@@ -129,6 +129,12 @@ function hideInstallButton() {
 	installPrompt = null;
 }
 
+function displayRumors(_rumors, _amount) {console.log("displayRumors", _rumors)
+	gold -= _amount;
+	backFromDialog();
+	prepareDialog("Rumors", _rumors);
+}
+
 function displayDialog() {
 	inDialog = !inDialog;
 	dialog.style.display = inDialog ? 'block' : 'none';
@@ -147,11 +153,12 @@ function displayDialog() {
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 	if (inDialog && hardChoice) return;
+	advanceMenu = 0;
 	dialog.innerHTML = `${_label?'<u style="font-size:4vmax;line-height:7vmax">'+_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
 	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
 	if (!inDialog) displayDialog();
-	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1);
-	dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1);
+	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1 || displayDialog);
+	dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1 || displayDialog);
 }
 
 function updateActionButton(e) {
