@@ -56,7 +56,7 @@ function doAnimationFrame(timeStamp) {
 			var time = Date.now();
 			frame++;
 			if (time - startTime > 1000) {
-				fpsElement.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1) + " " + boardScale + " " + width+"x"+height+" "+scale;
+				fpsElement.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
 				startTime = time;
 				frame = 0;
 			}

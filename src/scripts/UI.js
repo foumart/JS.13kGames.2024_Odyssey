@@ -85,9 +85,9 @@ function createUI() {
 	dialog = generateUIButton(uiDiv, '');
 
 	// Fullscreen and Sound buttons
-	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
+	//if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
 
-	soundButton = generateUIButton(uiDiv, '', e => toggleSound());
+	soundButton = generateUIButton(uiDiv, '', toggleSound);
 
 	if (!state) {
 		// Create Play Button
@@ -104,34 +104,8 @@ function createUI() {
 		downButton.style = "margin:2% auto;overflow:hidden";
 	}
 
-	toggleSound();
+	setupSoundButton();//just update the button, sound initialization needs to happen with user input
 	resizeUI();
-}
-
-function tryToShowInstallButton() {
-	if (!state && installPrompt) {
-		installButton = generateUIButton(uiDiv, `Install`, e => displayInstallPrompt(), 'css_icon');
-	}
-}
-
-async function displayInstallPrompt() {
-	if (!installPrompt) {
-		return;
-	}
-	await installPrompt.prompt()
-		.then(results => {console.log(results)
-			if (results.outcome == "accepted") {
-				hideInstallButton();
-			}
-		})
-		.catch(error => {
-			hideInstallButton();
-		});
-};
-
-function hideInstallButton() {
-	installButton.display = "none";
-	installPrompt = null;
 }
 
 function displayRumors(_rumors, _amount) {console.log("displayRumors", _rumors)
@@ -220,9 +194,9 @@ function updateInfoTab() {
 }
 
 function debugBoard() {
-	if (_debug) console.log(
+	/*if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
-	);
+	);*/
 }
 
 // debug visitedData
@@ -233,3 +207,30 @@ function debugBoard() {
 /*if (_debug) console.log(
 	visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
 );*/
+
+
+/*function tryToShowInstallButton() {
+	if (!state && installPrompt) {
+		installButton = generateUIButton(uiDiv, `Install`, e => displayInstallPrompt(), 'css_icon');
+	}
+}*/
+
+/*async function displayInstallPrompt() {
+	if (!installPrompt) {
+		return;
+	}
+	await installPrompt.prompt()
+		.then(results => {console.log(results)
+			if (results.outcome == "accepted") {
+				hideInstallButton();
+			}
+		})
+		.catch(error => {
+			hideInstallButton();
+		});
+};
+
+function hideInstallButton() {
+	installButton.display = "none";
+	installPrompt = null;
+}*/

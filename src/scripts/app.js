@@ -21,13 +21,13 @@ function isTouchDevice() {
 }
 
 // toggle fullscreen mode
-function toggleFullscreen(e) {
+/*function toggleFullscreen(e) {
 	if (!document.fullscreenElement) {
 		document.documentElement.requestFullscreen();
 	} else if (document.exitFullscreen) {
 		document.exitFullscreen();
 	}
-}
+}*/
 
 // global sizes
 let width;
@@ -45,17 +45,19 @@ let tween = { mapZoom: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
 // ui stuff
 let controls, infoTab, dialog, titlePng, titleText;
 let actButton, upButton, leftButton, rightButton, downButton;
-let playButton, fullscreenButton, soundButton, closeButton, playerButton, shipButton, crewButton;
-let installButton, installPrompt = null;
+let playButton, soundButton; //fullscreenButton
+let closeButton, playerButton, shipButton, crewButton;
+//let installButton, installPrompt = null;
 
 // save the install prompt event
-window.addEventListener("beforeinstallprompt", (event) => {
+/*window.addEventListener("beforeinstallprompt", (event) => {
 	event.preventDefault();
 	installPrompt = event;
 
 	tryToShowInstallButton();
 	resizeUI(1);
-});
+});*/
+
 // prevent long tap on mobile
 document.oncontextmenu = function() {return false;};
 
@@ -74,7 +76,7 @@ function init() {
 
 	gameInit();
 	createUI();
-	tryToShowInstallButton();
+	//tryToShowInstallButton();
 	resizeUI(1);
 }
 
@@ -84,22 +86,23 @@ function initSound() {
 	}
 }
 
-function toggleSound(event) {
-	if (event) {
-		initSound();
-		if (SoundFXvolume == 1) {
-			SoundFXvolume = 0;
-		} else {
-			SoundFXvolume += SoundFXvolume || 0.25;
-			SoundFXmute();
-		}
+function toggleSound() {
+	initSound();
+	if (SoundFXvolume == 1) {
+		SoundFXvolume = 0;
+	} else {
+		SoundFXvolume += SoundFXvolume || 0.25;
+		SoundFXmute();
 	}
+	setupSoundButton();
+}
 
+function setupSoundButton() {
 	soundButton.innerHTML = (
 		!SoundFXvolume ? "&#215"
 			: (
 				SoundFXvolume == 1 ? "&#8901&#8901" :
-				SoundFXvolume > 0.25 ? "&#8901&#8901" : ""
+				SoundFXvolume > 0.25 ? "&#8901" : ""
 			) + "&#8901"
 	) + "&#10919";
 }
@@ -175,15 +178,16 @@ function resizeUI(e) {
 	}
 
 	// Fullscreen button
-	if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
+	//if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
 	// Sound button
 	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
 	updateStyleUI(infoTab, `padding:${state?'1vmax;line-height:6px;margin:2%':'2vmin;margin:1%'} 1%${playerButton?`;top:${playerButton.offsetHeight}px`:''}`, state ? 18 : 32, 1);
 
 	// Install, Play and Title
 	if (playButton) {
-		if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
-		updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
+		//if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
+		//updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
+		updateStyleUI(playButton, `top:${(portrait?75:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
 		titlePng.innerHTML = getIcon(portrait ? 80*getSize() : 80*getSize());
 		updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #1267);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
@@ -200,7 +204,7 @@ function switchState(event) {
 	state ++;
 	gameInit();
 	createUI();
-	tryToShowInstallButton();
+	//tryToShowInstallButton();
 	resizeUI(1);
 }
 

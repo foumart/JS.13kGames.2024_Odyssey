@@ -230,26 +230,6 @@ function action(direction, additionalParam) {
 	}
 }
 
-function isPlayerDamaged() {
-	return playerHealth < playerHealthMax || crewHealth < crewHealthMax ? 0: 1;
-}
-
-function healPlayer(_hp = 9) {
-	if (playerHealth < playerHealthMax) {
-		playerHealth += _hp;
-		if (playerHealth > playerHealthMax) {
-			_hp -= playerHealthMax - playerHealth;
-			playerHealth = playerHealthMax;
-		} else _hp = 1;
-	}
-	if (crewHealth < crewHealthMax) {
-		crewHealth += _hp;
-		if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
-		_hp = 0;
-	}
-	return _hp;
-}
-
 function prepareToMove(dir) {
 	if (inDialog) displayDialog();// hide the dialog
 	hasTutorial = 0;// disable tutorial presented as "?" at the beginning
@@ -331,13 +311,6 @@ function finalizeMove(dir) {
 	//debugBoard();
 }
 
-function backFromDialog() {
-	if (inDialog) displayDialog();
-	gameContainer.style.display = "block";//TODO: fix lag
-	updateActionButton();
-	updateInfoTab();
-}
-
 function performEnemyMoves() {
 	paused = true;
 	gameContainer.style.display = "none";
@@ -363,6 +336,33 @@ function performEnemyMoves() {
 				enemy.movingY = -1; enemy.movingX = 0;
 		}
 	});
+}
+
+function isPlayerDamaged() {
+	return playerHealth < playerHealthMax || crewHealth < crewHealthMax ? 0: 1;
+}
+
+function healPlayer(_hp = 9) {
+	if (playerHealth < playerHealthMax) {
+		playerHealth += _hp;
+		if (playerHealth > playerHealthMax) {
+			_hp -= playerHealthMax - playerHealth;
+			playerHealth = playerHealthMax;
+		} else _hp = 1;
+	}
+	if (crewHealth < crewHealthMax) {
+		crewHealth += _hp;
+		if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
+		_hp = 0;
+	}
+	return _hp;
+}
+
+function backFromDialog() {
+	if (inDialog) displayDialog();
+	gameContainer.style.display = "block";//TODO: fix lag
+	updateActionButton();
+	updateInfoTab();
 }
 
 function upgradeShip() {

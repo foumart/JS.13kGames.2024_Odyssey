@@ -1,63 +1,56 @@
 const keysHeld = [];
 function onKeyDown(event) {
-	console.log(event.keyCode);
-
-	/*if (event.keyCode == 71) {// G toggle grid
-		grid = !grid;
-	} else*/
+	//console.log(event.keyCode);
 	
 	if (event.keyCode == 77) {// M change Sound
-		toggleSound(1);
+		toggleSound();
 	} else
-	
-	/*if (event.keyCode == 78) {// N toggle animateWater
-		animateWater = !animateWater;
+
+	/*if (event.keyCode == 27) { // esc
+		console.log("ESC");
 	} else*/
 
-	if (event.keyCode == 82 && state) {// R reset stage
-		//cleanOrResetStage();
-		console.log("cleanOrResetStage");
-	} else
-
-	if (event.keyCode == 27) { // esc
-		console.log("ESC");
-	} else
-
 	if (event.keyCode == 13 || event.keyCode == 32) {
-		console.log("ENTER SPACE");
+		if (!state) {
+			switchState();
+		} else {
+			action(6, isPlayerDamaged());
+		}
 	} else
 
 	if (event.keyCode == 38 || event.keyCode == 87) { // up
-		if (!state) {
+		/*if (!state) {
 			console.log("Menu up");
-		} else {
+		} else {*/
 			action(1);
-		}
+		//}
 	} else
 
 	if (event.keyCode == 40 || event.keyCode == 83) { // down
-		if (!state) {
+		/*if (!state) {
 			console.log("Menu down");
-		} else {
+		} else {*/
 			action(3);
-		}
+		//}
 	} else
 
 	if (event.keyCode == 37 || event.keyCode == 65) { // left
-		if (!state) {
+		/*if (!state) {
 			console.log("Menu left");
-		} else {
+		} else {*/
 			action(4);
-		}
+		//}
 	} else
 
 	if (event.keyCode == 39 || event.keyCode == 68) { // right
-		if (!state) {
+		/*if (!state) {
 			console.log("Menu right");
-		} else {
+		} else {*/
 			action(2);
-		}
+		//}
 	}
+
+	holding = false;
 }
 
 /*function onKeyUp(event) {
