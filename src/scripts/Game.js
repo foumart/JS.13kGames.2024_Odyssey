@@ -161,7 +161,7 @@ function action(direction, additionalParam) {
 				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
 				prepareDialog(
 					_hp ? "Inn" : "Shipyard",
-					_hp ? "Heal wounds?" : secondMenu ?
+					_hp ? "Rest?" : secondMenu ?
 						shipHealth < shipHealthMax ? "Repair Ship damage" :
 						shipLevel > 3 ? 'Ship maxed' :
 						`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?` : 'Come Again!',
@@ -172,17 +172,17 @@ function action(direction, additionalParam) {
 						backFromDialog();
 						action(6, isPlayerDamaged());
 					} : shipLevel < 4 ? upgradeShip : displayDialog,
-					_hp ? -_amount + " Rest" : shipLevel < 4 ? shipHealth < shipHealthMax ?
-						-(shipHealthMax - shipHealth) * 5 + " Repair" :
-						-shipPrices[shipLevel-1] + " Deal" : 0,
+					_hp ? "Heal &#9737;" + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
+						"Repair &#9737;" + (shipHealthMax - shipHealth) * 5 :
+						"Deal &#9737;" + shipPrices[shipLevel-1] : 0,
 
 					_unit.rumors && !additionalParam ? () => action(6, 1) : secondMenu ? e => {
 						_hp = (_unit.origin)*(crewHealthMax / 5 | 0);
 						prepareDialog(
 							"Tavern",
-							_unit.rumors ? 'Hear the latest rumors?' : 'Come Again!',
-							_unit.rumors ? () => displayRumors(_unit.rumors, _hp) : displayDialog,
-							_unit.rumors ? -_hp + " Ale" : 0,
+							'Hear the latest rumors?',
+							() => displayRumors(_unit.rumors, _hp),
+							"Ale &#9737;" + _hp,
 							displayDialog, "Exit"
 						);
 					} : displayDialog,
@@ -320,7 +320,7 @@ function finalizeMove(dir) {
 						gold -= crewHealthMax * crewPaid;
 						crewHealth = crewHealthMax/2;
 						backFromDialog();
-					}, "Pay " + crewHealthMax * crewPaid);
+					}, "Pay &#9737;" + crewHealthMax * crewPaid);
 				}
 			}
 		}
@@ -389,6 +389,8 @@ function upgradeCrew() {
 
 function descendInDungeon() {
 	//prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
+	//prepareDialog("Floor", "You sure?", quitGame, "Yes", displayDialog, "No");
+	// TODO ... 
 }
 
 function closeButtonClick(e) {
@@ -400,7 +402,8 @@ function infoButtonClick(id) {
 	prepareDialog(
 		"<br>",// + (id == 1 ? "Ship" : id ? "Crew" : "Corsair"),
 		(id == 1 ? "Ship" : id ? "Crew" : "Corsair") + " HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
-			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax),
+			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax) +
+			"<br>Level: " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel),
 		displayDialog
 	);
 	dialog.firstChild.append(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);

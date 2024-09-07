@@ -137,6 +137,7 @@ function app(callback) {
 	if (pwa) {
 		scripts.unshift('resources/sw_init.js');
 	}
+	scripts.unshift('resources/app_init.js');
 
 	src(scripts, { allowEmpty: true })
 		.pipe(gulpif(pwa, replace('let _debug;', `let _debug = ${debug ? 'true' : 'false'};`, replaceOptions)))

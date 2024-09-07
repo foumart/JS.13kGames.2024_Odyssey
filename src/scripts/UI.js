@@ -48,7 +48,12 @@ function createUI() {
 	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () =>
-		prepareDialog("Day: " + timePassed, state ? "Sail left: " + moveLeft + "<br>Gold: " + gold : "Game by Noncho Savov", displayDialog)
+		prepareDialog(
+			state ? "Day: " + timePassed : "",
+			state ? getSpan("&#9881 Sail points left: " + moveLeft, "#dff") + getSpan("<br>&#9737 Gold: " + gold, "#ff9")
+				: "Game by Noncho Savov",
+			displayDialog
+		)
 	);
 	
 	if (_debug) {
@@ -170,7 +175,7 @@ function updateActionButton(e) {
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
 	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
-	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 |
+	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788
 
 	//unit = getUnit(playerX, playerY);
 
@@ -211,7 +216,7 @@ function updateInfoTab() {
 	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '2vmax', 'vertical-align:top')} ${
 		getSpan(_char.repeat(moveLeft), moveLeft < 9 ? '#fd6' : '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
 		}<div style="font-size:3em;bottom:-99%">${
-		getSpan(gold, 'gold')}</div>`//'&#42396;' + 
+		getSpan("&#9737;" + gold, 'gold')}</div>`//'&#42396;' + 
 }
 
 function debugBoard() {

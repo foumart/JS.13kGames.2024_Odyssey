@@ -3,7 +3,7 @@ assets/temp
 assets/media
 zip
 public
-resources
+
 src/scripts/IslandGenerator.js
 temp
 package-lock.json

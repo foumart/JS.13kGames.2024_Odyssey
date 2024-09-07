@@ -1,9 +1,5 @@
 // Progressive Web App service worker initialization script - feel free to remove if you are not going to build a PWA.
-
-// Set debug to true if you want to see logs about caching / fetching of resources and other output.
-let _debug;
-
-// Progressive web apps can work only with secure connections.
+// PWAs can work only with secure connections.
 const _online = location.protocol.substring(0, 5) === "https";
 
 // Service worker detection and installation script:
@@ -48,9 +44,6 @@ if ("serviceWorker" in navigator && _online) {
 
 	window.addEventListener("load", pwaInit);
 }
-
-// Record if the game is being run as a PWA in its own window, separate from the browser.
-let _standalone;
 
 function pwaInit() {
 	// if matching, we are running in browser; alternatives: (display-mode: standalone)
