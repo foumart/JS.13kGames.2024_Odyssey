@@ -108,10 +108,15 @@ function createUI() {
 	resizeUI();
 }
 
-function displayRumors(_rumors, _amount) {console.log("displayRumors", _rumors)
-	gold -= _amount;
+function displayRumors(_rumors, _amount) {
+	if (spendGold(_amount)) return;
 	backFromDialog();
 	prepareDialog("Rumors", _rumors);
+}
+
+function displayNoFunds() {
+	backFromDialog();
+	prepareDialog(0, "Not enough gold", () => action(6));
 }
 
 function displayDialog() {
@@ -132,7 +137,6 @@ function displayDialog() {
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 	if (inDialog && hardChoice) return;
-	advanceMenu = 0;
 	dialog.innerHTML = `${_label?'<u style="font-size:4vmax;line-height:7vmax">'+_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
 	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
 	if (!inDialog) displayDialog();
@@ -145,7 +149,7 @@ function updateActionButton(e) {
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
-	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | 
+	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | ◦ ∘
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
 	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
@@ -160,7 +164,7 @@ function updateActionButton(e) {
 	) {
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
 		actButton.innerHTML = `${
-			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:16vmin;color:#3f3">`</div>'+getSpan('&#11044','#f80','16vmin'):''
+			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
 		}<div style='font-size:6vmin;position:relative;margin-top:-1vmax'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
@@ -176,7 +180,7 @@ function updateActionButton(e) {
 		backFromDialog();
 	} else {
 		actButton.innerHTML = hasTutorial ? "?" :
-			hasEvent ? 'E' :
+			//hasEvent ? 'E' :
 			onFoot ? '&#10003' : 'S';
 
 		//actButton.style.opacity = hasEvent ? 1 : .5;
@@ -187,10 +191,12 @@ function updateActionButton(e) {
 
 function updateInfoTab() {
 	let _char = "&#9608";
-	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '2vmax', 'vertical-align:top')} ${
+	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:top')} ${
 		getSpan(_char.repeat(moveLeft), moveLeft < 9 ? '#fd6' : '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
-		}<div style="font-size:3em;bottom:-99%">${
-		getSpan("&#9737;" + gold, 'gold')}</div>`//'&#42396;' + 
+		}<div style="font-size:3em;top:35%;left:16%">${
+		getSpan(moveLeft, '#8ff')
+		}</div><div style="font-size:4em;top:200%;margin-left:-1vmax">${
+		getSpan("&#9737;" + gold, 'gold')}</div>`
 }
 
 function debugBoard() {

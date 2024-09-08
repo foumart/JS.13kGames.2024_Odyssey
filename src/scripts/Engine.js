@@ -37,10 +37,14 @@ function doAnimationFrame(timeStamp) {
 			gameContainer.style.display = "none";
 			
 			updateInfoTab();
-			// initial level zoom in (level zoom is hooked to tween.mapZoom)
-			tween.mapZoom = .3;
-			TweenFX.to(tween, 6, {mapZoom: 0.5}, e => doFrameAnimationMove(), e => {
-				finalizeMove();
+			// initial level zoom in (level zoom is hooked to tween.transitionZ)
+			tween.transitionZ = .3;
+			TweenFX.to(tween, 6, {transitionZ: 0.5}, e => doFrameAnimationMove(1), e => {
+				//finalizeMove();
+				tween.transitionZ = 1;
+				TweenFX.to(tween, 6, {transitionZ: 1.2}, e => doFrameAnimationMove(0, 1), e => {
+					finalizeMove();
+				}, 1);
 			});
 		} else if (step % 7 == 0) {
 			gameDirty = 2;// only every seventh frame we update the units while idle

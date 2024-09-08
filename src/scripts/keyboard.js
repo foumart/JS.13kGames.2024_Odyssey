@@ -1,6 +1,27 @@
 const keysHeld = [];
 function onKeyDown(event) {
 	//console.log(event.keyCode);
+
+	if (event.keyCode == 49) {// M change Sound
+		SoundFXmoveStep();
+	} else
+	if (event.keyCode == 50) {// M change Sound
+		SoundFXdisabled();
+	} else
+	if (event.keyCode == 51) {// M change Sound
+		SoundFXhilight();
+	} else
+	if (event.keyCode == 52) {// M change Sound
+		soundFXdecline();
+	} else
+	if (event.keyCode == 53) {// M change Sound
+		SoundFXremoveHilight();
+	} else
+	if (event.keyCode == 54) {// M change Sound
+		soundFXraise();
+	} else
+
+
 	
 	if (event.keyCode == 77) {// M change Sound
 		toggleSound();

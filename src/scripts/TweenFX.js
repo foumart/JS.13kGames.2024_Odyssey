@@ -1,6 +1,6 @@
 class TweenFX {
 
-	static to(_element, _duration, _object, _update, _callback) {
+	static to(_element, _duration, _object, _update, _callback, _ease) {
 		const tweenedKeys = [];
 		const tweenedStart = [];
 		const tweenedEnd = [];
@@ -19,7 +19,11 @@ class TweenFX {
 			if (count < duration) {
 				count ++;
 				tweenedKeys.forEach((key, i) => {
-					const eased = duration * Math.pow(count / duration, 1.675);
+					const eased = duration * (
+						_ease
+							? (1 - Math.pow(1 - count / duration, 1.675))
+							: Math.pow(count / duration, 1.675)
+					)
 					if (tweenedStart[i] > tweenedEnd[i]) {
 						element[key] = tweenedEnd[i] + (tweenedStart[i] - tweenedEnd[i]) / duration * (duration - eased);
 					} else {

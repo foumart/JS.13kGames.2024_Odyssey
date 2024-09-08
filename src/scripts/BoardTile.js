@@ -32,10 +32,10 @@ class BoardTile extends BoardElement {
 	}
 
 	reset() {
-		// reflected mapZooms from the corresponding game unit
+		// reflected variables from the corresponding game unit
 		// When performing a move all board elements are reset and new data is assigned
 		/*if (this.overlay) {
-			console.log("GGG")
+			console.log("GGG");// TODO
 		}*/
 		this.overlay = 0;
 		this.origin = 0;

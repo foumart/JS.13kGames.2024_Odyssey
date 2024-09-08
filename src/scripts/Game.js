@@ -3,12 +3,10 @@ let unit,
 	gameShip,
 	boarding,
 	landing,
-	holding,
+	holding,// is player holding a direction button for constant moving
 	onFoot = true,
-	inDialog,
-	advanceMenu,
-	hardChoice,
-	hasEvent,
+	inDialog,// is a dialog on screen
+	hardChoice,//TODO: make some dialogs permanent
 	hasTutorial;
 
 const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta", "lime"];
@@ -25,13 +23,14 @@ let stage, turn, gold,
 function initVars() {
 	stage = 1;
 	turn = 0;
-	gold = 50;
-	moveLeft = 24; moveLimit = 24;
-	crewPaid = 1; timePassed = 1;
+	gold = 5;
+	moveLeft = 25; moveLimit = 25;// 35
+	crewPaid = 2;// it's 2 initialy for optimization purposes
+	timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
-	playerHealth = 5; playerHealthMax = 20; playerLevel = 1;
+	playerHealth = 10; playerHealthMax = 20; playerLevel = 1;
 	shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
-	crewHealth = 4; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
+	crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
 }
 
 function createUnit(x, y, z) {
@@ -167,7 +166,7 @@ function action(direction, additionalParam) {
 						`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?` : 'Come Again!',
 
 					_hp ? e => {
-						gold -= _amount;
+						if (spendGold(_amount)) return;
 						healPlayer(_amount);
 						backFromDialog();
 						action(6, isPlayerDamaged());
@@ -190,15 +189,16 @@ function action(direction, additionalParam) {
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
+				dungeon = _unit.dungeon;
 				let notCleared, dungeonStages = "Stages: ";
-				console.log(_unit.dungeon)
-				_unit.dungeon.forEach((dungeon, index) => {
+				//console.log(_unit.dungeon)
+				dungeon.forEach((dungeon, index) => {
 					if (index > 2 && dungeon.length) notCleared = 1;
 					if (index < 3 || !dungeon.length) {
-						dungeonStages += !index || !_unit.dungeon[index-1].length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
+						dungeonStages += !index || !dungeon[index-1].length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
 					}
 				});
-				if (_unit.dungeon.length > 3 && notCleared) dungeonStages += ' ⋯';
+				if (dungeon.length > 3 && notCleared) dungeonStages += ' ⋯';
 
 				prepareDialog(
 					"Dungeon",
@@ -253,8 +253,14 @@ function prepareToMove(dir) {
 	performEnemyMoves();
 }
 
-function doFrameAnimationMove() {
-	boardZoom = tween.mapZoom;
+function doFrameAnimationMove(_zoom, _scale) {
+	if (_zoom) {
+		boardZoom = tween.transitionZ;
+	}
+	if (_scale) {
+		boardScale = tween.transitionZ;
+	}
+
 	gameDirty = 2;// set on each turn to redraw the map
 }
 
@@ -277,6 +283,7 @@ function finalizeMove(dir) {
 	});
 
 	turn ++;
+	tween.transitionZ = 0;
 	gameDirty = 2;
 	paused = false;
 	if (holding && dir) {
@@ -296,8 +303,8 @@ function finalizeMove(dir) {
 					prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
 				} else {
 					prepareDialog("Revolt!", "Crew demands:", () => {
+						if (spendGold(crewHealthMax * crewPaid)) return;
 						crewPaid ++;
-						gold -= crewHealthMax * crewPaid;
 						crewHealth = crewHealthMax/2;
 						backFromDialog();
 					}, "Pay &#9737;" + crewHealthMax * crewPaid);
@@ -338,6 +345,15 @@ function performEnemyMoves() {
 	});
 }
 
+function spendGold(_amount) {
+	if (gold < _amount) {
+		displayNoFunds();
+		return 1;
+	}
+	gold -= _amount;
+	return 0;
+}
+
 function isPlayerDamaged() {
 	return playerHealth < playerHealthMax || crewHealth < crewHealthMax ? 0: 1;
 }
@@ -367,11 +383,10 @@ function backFromDialog() {
 
 function upgradeShip() {
 	if (shipHealth < shipHealthMax) {
-		gold -= (shipHealthMax - shipHealth) * 5;
+		if (spendGold((shipHealthMax - shipHealth) * 5)) return;
 		shipHealth += shipHealthMax - shipHealth;
-		
 	} else {
-		gold -= shipPrices[shipLevel-1];
+		if (spendGold(shipPrices[shipLevel-1])) return;
 		shipLevel ++;
 		shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
 	}
@@ -385,12 +400,6 @@ function upgradeCrew() {
 	crewLevel ++;
 	crewHealth += crewLevel < 3 ? 12 : 10;
 	backFromDialog();
-}
-
-function descendInDungeon() {
-	//prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
-	//prepareDialog("Floor", "You sure?", quitGame, "Yes", displayDialog, "No");
-	// TODO ... 
 }
 
 function closeButtonClick(e) {

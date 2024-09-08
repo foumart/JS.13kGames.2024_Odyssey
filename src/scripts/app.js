@@ -40,7 +40,7 @@ let screenOffsetY = 0;
 // game state, 0: menu, 1: in-game
 let state = 0;
 
-let tween = { mapZoom: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
+let tween = { transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
 let controls, infoTab, dialog, titlePng, titleText;
@@ -59,7 +59,7 @@ let closeButton, playerButton, shipButton, crewButton;
 });*/
 
 // prevent long tap on mobile
-document.oncontextmenu = function() {return false;};
+document.oncontextmenu = e => 0;
 
 
 // Game initialization

@@ -8,8 +8,8 @@ const
 // board vars
 let stageData,
 	boardWidth,// map total width x height
-	boardScale,
-	boardZoom,
+	boardScale,// board user zoom amount
+	boardZoom,// board engine zoom amount
 	unitsList,
 	tileScreen,
 	unitScreen,
@@ -48,7 +48,7 @@ function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
 	boardScale = 1;//mobile ? state ? 1 : 0.91 : state ? 0.7 : 0.84;
-	boardZoom = state ? 1 : 0.7;
+	boardZoom = state ? 0 : 0.7;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
 	let t=0,
