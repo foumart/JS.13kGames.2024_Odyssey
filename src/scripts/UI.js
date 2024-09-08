@@ -108,6 +108,20 @@ function createUI() {
 	resizeUI();
 }
 
+function addBitmapToDialog(bitmap) {
+	let bitmapContainer = document.createElement("div");
+	bitmapContainer.style.position = "relative";
+	bitmapContainer.style.fontSize = "1vmax";
+	bitmapContainer.style.lineHeight = "0";
+	bitmapContainer.innerHTML = addHealthbar(10, 10);
+	dialog.firstChild.prepend(bitmapContainer);
+	dialog.firstChild.style.display = "inline-flex";
+
+	bitmapContainer.prepend(bitmap);
+	bitmap.style.transform = "scale(1.5) translateY(-30%)";
+	bitmap.style.margin = "6vmax 3vmax 0";
+}
+
 function displayRumors(_rumors, _amount) {
 	if (spendGold(_amount)) return;
 	backFromDialog();

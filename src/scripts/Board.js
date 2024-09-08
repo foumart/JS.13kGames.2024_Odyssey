@@ -110,16 +110,17 @@ function initBoard() {
 									while (!rand || arr.length && newEnemy == arr[arr.length-1]) {
 										rand = Math.random();
 										newEnemy = islandGenerator.rand(i/2 + (j-3)*rand, i + 1);
+										if (newEnemy > 9) newEnemy = 9;
 									}
 									arr.push(newEnemy);
 								}
 								// generate 1st floor boss
 								if (!i) arr.push(islandGenerator.rand(index/2-2, index-6));
 								// generate pre-final boss
-								if (i == index-5) arr.push(index-2);
+								if (i == index-5 && arr[arr.length-1] < index-3) arr.push(index-3);
 								// generate final floor boss
 								if (i == index-4) arr.push(index-1);//&& index != 12
-								console.log(index-colors.length, i, arr);
+								//console.log(index-colors.length, i, arr);
 								unit.dungeon.push(arr);
 							}
 						}

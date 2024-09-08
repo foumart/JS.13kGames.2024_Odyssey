@@ -401,9 +401,7 @@ function infoButtonClick(id) {
 			"<br>Level: " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel),
 		displayDialog
 	);
-	dialog.firstChild.append(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);
-	//dialog.firstChild.firstChild.style.marginTop = "2vmin";
-	dialog.firstChild.lastChild.style.transform = "scale(1.5) translateY(-30%)";
+	addBitmapToDialog(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);
 }
 
 function quitGame() {
@@ -414,7 +412,7 @@ function quitGame() {
 function isWalkable(x, y, mapId = UnitType.CASTLE) {
 	// check if current unit tile is player or empty, or walkable item as gold, tree, etc.
 	// also check if current map tile is land
-	return (unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] >= mapId) &&
+	return (unitsData[y][x] < UnitType.SHIPUP || (unitsData[y][x] >= mapId && unitsData[y][x] <= UnitType.WRECK)) &&
 			(mapData[y][x] >= TileType.LAND);
 }
 

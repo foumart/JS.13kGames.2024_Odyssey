@@ -1,63 +1,64 @@
 const unitWidth = 8;
 const tileWidth = 6;
+const enemyWidth = 7;
 const offscreenBitmaps = [];
 const offscreenBitmapsFlipped = [];
 
 const offscreenPixelData = [
 	// UNITS
 	"ff2b00c926062a2a3f565662da8763ffb08effffff",// 00 player left
-	"",// player right (mirrored)
+	"",// 01 player right (mirrored 00)
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// 02 ship up
-	"",// ship down (m)
+	"",// 03 ship down (m 02)
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// 04 ship left
-	"",// ship right (m)
+	"",// 05 ship right (m 04)
 	
 	"008c4600a55309498719548e2296e74dbafd4ddffd",// 06 enemy 1 - fish
 	"c92606ff3d1700970b00b90d5aff0023d61e19548e",// 07 enemy 2 - serpent
 	"ff2b00c926062a2a3f565662da8763ffb08effffff",// 08 enemy 3 - Knight
 	"832c15452d15d1641caf4b31ff6c2bffa02fffffff",// 09 enemy 4 - Crab
 
-	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// 0A castle 11
-	"32323200ca100d85375a605b899589a9b9a9ffffff",// 0B shrine 12
-	"864404452d1512510d00ca1024a9210d853700e912",// 0C tree 13
-	"712c0eb25800dd8700e4ae1efff115ffca3a",//       0D gold pile 14
-	"b25800dd8700008c46fff115ffca3a09498719548e",// 0E gold wreck 15
-	"09619f53a6ce79bfe0a9d5e8c3f3fee2ffffffffff",// 0F clouds ovelay 16
+	"864404f77b003338335c655f9d9da7d2d2e1ffffff",// 0A castle 10
+	"32323200ca100d85375a605b899589a9b9a9ffffff",// 0B shrine 11
+	"864404452d1512510d00ca1024a9210d853700e912",// 0C tree 12
+	"712c0eb25800dd8700e4ae1efff115ffca3a",//       0D gold pile 13
+	"b25800dd8700008c46fff115ffca3a09498719548e",// 0E gold wreck 14
+	"09619f53a6ce79bfe0a9d5e8c3f3fee2ffffffffff",// 0F clouds ovelay 15
 
 	// TILES
-	"075992095f9d1066a4176fb0",// 10 depths
-	"095f9d1066a4176fb01f76b5",// 11 water
-	"176fb01f76b52d81bd4088bc",// 12 riff1
-	"93791f2db22d3d963d1066a4176fb01f76b52d81bd4088bc",// 13 riff2
+	"075992095f9d1066a4176fb0",// 16 depths
+	"095f9d1066a4176fb01f76b5",// 17 water
+	"176fb01f76b52d81bd4088bc",// 18 riff1
+	"93791f2db22d3d963d1066a4176fb01f76b52d81bd4088bc",// 19 riff2
 
-	"2db22d3d963d2bc82b32db32",// 14 land
-	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 15 coasts
-	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 16
-	"",// 17 (m 15)
-	"2db22d3d963d2bc82b32db32ffb069176fb04088bc",// 18
-	"2e8b2e2db22d3d963d32db32ffb069075992176fb01f76b5",// 19
-	"2db22d3d963d2bc82b32db32ffb069075992176fb04088bc",// 20
-	"",// 21 (m 19)
-	"",// 22 (m 20)
-	"2db22d3d963d2bc82b32db32ffb0690759921f76b54088bc",// 23
-	"2db22d3d963d2bc82b32db32ffb069075992176fb01f76b5",// 24
-	"2e8b2e2db22d3d963d32db32ffb069075992176fb04088bc",// 25
-	"",// 26 (m24)
-	"2db22d3d963d2bc82b32db32ffb0694088bc176fb01f76b5",// 27
-	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 28
-	"2db22d3d963d2bc82b32db32ffb0691066a4176fb01f76b5",//  29
+	"2db22d3d963d2bc82b32db32",// 20 land
+	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 21 coasts
+	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 22
+	"",// 23 (m 21)
+	"2db22d3d963d2bc82b32db32ffb069176fb04088bc",// 24
+	"2e8b2e2db22d3d963d32db32ffb069075992176fb01f76b5",// 25
+	"2db22d3d963d2bc82b32db32ffb069075992176fb04088bc",// 26
+	"",// 27 (m 25)
+	"",// 28 (m 26)
+	"2db22d3d963d2bc82b32db32ffb0690759921f76b54088bc",// 29
+	"2db22d3d963d2bc82b32db32ffb069075992176fb01f76b5",// 30
+	"2e8b2e2db22d3d963d32db32ffb069075992176fb04088bc",// 31
+	"",// 32 (m 30)
+	"2db22d3d963d2bc82b32db32ffb0694088bc176fb01f76b5",// 33
+	"2e8b2e2db22d3d963d2bc82b32db32ffb069075992176fb0",// 34
+	"2db22d3d963d2bc82b32db32ffb0691066a4176fb01f76b5",// 35
 
-	// dungeon enemies
-	"ff004d7e25534e48421d2b535f574f333e5f85807b",
-	"ff004d7e25531d2b535f574f333e5f85807b",
-	"ff004d4e48425f574f85807b",
-	"ff004d4e48421d2b535f574f333e5f85807b",
-	"ff004d7e25534e48421d2b535f574f333e5f85807b",
-	"ff004d4e48425f574f333e5f85807b",
-	"7e25534e48421d2b535f574f333e5f85807b",
-	"ff004d4e48421d2b535f574f333e5f",
-	"7e25534e48421d2b535f574f333e5f85807b",
-	"ff004d4e48421d2b535f574f333e5f"
+	// DUNGEON ENEMIES
+	"ff004d7e25534e48421d2b535f574f333e5f85807b",// 36
+	"ff004d7e25531d2b535f574f333e5f85807b",// 37
+	"ff004d4e48425f574f85807b",// 38
+	"ff004d4e48421d2b535f574f333e5f85807b",// 39
+	"ff004d7e25534e48421d2b535f574f333e5f85807b",// 40
+	"ff004d4e48425f574f333e5f85807b",// 41
+	"7e25534e48421d2b535f574f333e5f85807b",// 42
+	"ff004d4e48421d2b535f574f333e5f",// 43
+	"7e25534e48421d2b535f574f333e5f85807b",// 44
+	"ff004d4e48421d2b535f574f333e5f"// 45
 ];
 
 const offscreenColorData = [
@@ -82,43 +83,43 @@ const offscreenColorData = [
 	"@YS@\`s]BPmlTX\\}^PQue\\JbZSAPCH@@@",//15 clouds overlay
 
 	// TILES
-	"\\JZZSISJRJQ[RIZSRc",// 00 depths
-	"SQcbSQ\\\\ZSccJZT\\JZ",// 01 water
-	"RZJKRRRR\\JZRSIJbSQ",// 02 riff1
-	"npl]zunl~yupl^zuol",// 03 riff3
+	"\\JZZSISJRJQ[RIZSRc",// 16 depths
+	"SQcbSQ\\\\ZSccJZT\\JZ",// 17 water
+	"RZJKRRRR\\JZRSIJbSQ",// 18 riff1
+	"npl]zunl~yupl^zuol",// 19 riff3
 
-	"IKQIIIJaIIIYYQIIII",// 04 land
-	"bRsRRqS]~RJ~bZqRRs",// 05 coasts
-	"RRUjRRRbRRYbKvKvv",// 06 
-	"",// 07
-	"lwoYdKSIIIaQaIYJIL",// 08
-	"MRR]bRMSbnYQwmKvm",// ◳ 09
-	"w%cnLIUISMLIUIaUYI",// ◲ 0A
-	"",// ◰ 17
-	"",// ◱ 18
-	"w\\nI!UYjUIjML5UIi",// 19
-	"m\\}IIjIKjQQujm~uv",// ] 1A 20
-	"UTk#Ri]bkMSunm~wv",// [ 1B 21
-	"",// 1C 22
-	"UYjMLuUIjnJkUIjMai",// ║ 1D 23
-	"ueuSZRjRbRKSYv^vw",// ═ 1E 24
-	"nLuMRiUbj]Zunm~wv",// ⧈ 0F 25
+	"IKQIIIJaIIIYYQIIII",// 20 land
+	"bRsRRqS]~RJ~bZqRRs",// 21 coasts
+	"RRUjRRRbRRYbKvKvv",// 22
+	"",// 23
+	"lwoYdKSIIIaQaIYJIL",// 24
+	"MRR]bRMSbnYQwmKvm",// ◳ 25
+	"w%cnLIUISMLIUIaUYI",// ◲ 26
+	"",// ◰ 27
+	"",// ◱ 28
+	"w\\nI!UYjUIjML5UIi",// 29
+	"m\\}IIjIKjQQujm~uv",// ] 1A 30
+	"UTk#Ri]bkMSunm~wv",// [ 1B 31
+	"",// 1C 32
+	"UYjMLuUIjnJkUIjMai",// ║ 1D 33
+	"ueuSZRjRbRKSYv^vw",// ═ 1E 34
+	"nLuMRiUbj]Zunm~wv",// ⧈ 0F 35
 
-	// dungeon enemies
-	"@EEpPUpfQav\\_t\`me@hh@@@@@",
-	"@hE@tD@jmmXMkYmmmEkmC@DD@",
-	"\`@Dd@X\\cdYAd\\[dd\\dP\`PDCDC",
-	"tf\`HLTedd]ERT[@tDCddFdP\`F",
-	"@]ExHOEGmuxff_htWE\`f]hG_@",
-	"@mE@HM@mkkmbcj]d\\EUSE\`Dd@",
-	"@mE@mmEm[kELMDhTtmtvtBfT@",
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@",
-	"@mE@mmEm[kELMDhTtmtvtBfT@",
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@"
+	// DUNGEON ENEMIES
+	"@EEpPUpfQav\\_t\`me@hh@@@@@",// 36
+	"@hE@tD@jmmXMkYmmmEkmC@DD@",// 37
+	"\`@Dd@X\\cdYAd\\[dd\\dP\`PDCDC",// 38
+	"tf\`HLTedd]ERT[@tDCddFdP\`F",// 39
+	"@]ExHOEGmuxff_htWE\`f]hG_@",// 40
+	"@mE@HM@mkkmbcj]d\\EUSE\`Dd@",// 41
+	"@mE@mmEm[kELMDhTtmtvtBfT@",// 42
+	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@",// 43
+	"@mE@mmEm[kELMDhTtmtvtBfT@",// 44
+	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@"// 45
 ];
 
 for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
-	l = k < 16 || k > 35 ? unitWidth : tileWidth;
+	l = k < 16 ? unitWidth : k > 35 ? enemyWidth : tileWidth;
 	const offscreenCanvas = document.createElement('canvas');
 	offscreenCanvas.width = l;
 	offscreenCanvas.height = l;

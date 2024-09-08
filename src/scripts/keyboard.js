@@ -2,7 +2,7 @@ const keysHeld = [];
 function onKeyDown(event) {
 	//console.log(event.keyCode);
 
-	if (event.keyCode == 49) {// M change Sound
+	/*if (event.keyCode == 49) {// M change Sound
 		SoundFXmoveStep();
 	} else
 	if (event.keyCode == 50) {// M change Sound
@@ -19,7 +19,16 @@ function onKeyDown(event) {
 	} else
 	if (event.keyCode == 54) {// M change Sound
 		soundFXraise();
-	} else
+	} else*/
+	if (event.keyCode == 55) {// M change Sound
+		unitsList.forEach(_unit => {
+			if (_unit.dungeon && !dungeon) {
+				dungeon = _unit.dungeon
+			}
+		})
+		
+		displayDungeon();
+	}
 
 
 	
