@@ -50,7 +50,7 @@ class BoardTile extends BoardElement {
 
 	draw() {
 		//if (this.visited) {
-			let mirrored = [13,17,18,22].indexOf(this.type) > -1;
+			let mirrored = [7,11,12,16].indexOf(this.type) > -1;
 			bgrContext.drawImage(
 				(mirrored ? offscreenBitmapsFlipped : offscreenBitmaps)[
 					!state || this.visited ? (this.type || 0) + (mirrored ? 14 : 16) : 15

@@ -1,9 +1,8 @@
 class TileType {
 	
-
-	static get DEPTHS() {
+	/*static get DEEPWATER() {
 		return 0;
-	}
+	}*/
 	static get WATER() {
 		return 1;
 	}
@@ -15,9 +14,11 @@ class TileType {
 	}
 
 	static get LAND() {
-		return 10;
+		return 4;
 	}
 
-	// LAND 11 - 25
+	// LAND different tiles: 5 - 19
+
+	// Dungeon enemy sprites: 20 - 30
 	
 }

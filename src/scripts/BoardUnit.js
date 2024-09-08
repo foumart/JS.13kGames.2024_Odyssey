@@ -52,7 +52,7 @@ class BoardUnit extends BoardTile {
 				_offsetY -= tileWidth * tween.transitionY;
 			}
 
-			// draw a wide colored rectangle behind unit as a selection
+			// draw a wide colored rectangle behind unit as a selection (TODO: improve or scrap)
 			if (this.selection) {
 				gameContext.fillStyle = colors[this.selection-1];
 				this.fillRect(-2, -3, unitWidth+2, unitWidth-2);

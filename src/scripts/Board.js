@@ -91,30 +91,35 @@ function initBoard() {
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
 						//c ++;
-						// there are colors.length-1 castles available
+						// there are colors.length-2 castles available
 						unit = createUnit(x, y, index < colors.length ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
 						unitsData[y][x] = index < colors.length ? UnitType.CASTLE : UnitType.SHRINE;
-						// set castle origin color flag (0:none, 1:red player, 2:blue neutral, 3: black enemy)
+						// set castle origin color flag
 						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
 						unit.rumors = 1;
 						// Add enemies to dungeons
-						if (index >= colors.length) {
+						if (index >= colors.length) {// colors.length = 6
 							unit.dungeon = [];
-							for (let i = 3; i < index-1; i++) {
-								let arr = [], rand;
-								for (let j = 4; j < i+2; j++) {
-									let newEnemy;
-									while (!newEnemy || arr.length && newEnemy == arr[arr.length-1][0]) {
+							// generate at least 3 floors per dungeon up to 9 floors for the last 7th dungeon
+							for (let i = 0; i < index-3; i++) {
+								let arr = [], rand, newEnemy;
+								for (let j = 4; j < i+6; j++) {
+									// add different enemies on each floor
+									rand = 0;
+									while (!rand || arr.length && newEnemy == arr[arr.length-1]) {
 										rand = Math.random();
-										newEnemy = enemyTypes[islandGenerator.rand((j-3)*rand, i-3)];
+										newEnemy = islandGenerator.rand(i/2 + (j-3)*rand, i + 1);
 									}
 									arr.push(newEnemy);
 								}
-								if (i == 3) arr.push(enemyTypes[islandGenerator.rand(index/2-2, index-6)]);
-								if (i == index-3 && index != 12) arr.push(enemyTypes[index-3]);
-								if (i == index-2) arr.push(enemyTypes[index-2]);
-								//console.log(index-colors.length, i-3, arr);
+								// generate 1st floor boss
+								if (!i) arr.push(islandGenerator.rand(index/2-2, index-6));
+								// generate pre-final boss
+								if (i == index-5) arr.push(index-2);
+								// generate final floor boss
+								if (i == index-4) arr.push(index-1);//&& index != 12
+								console.log(index-colors.length, i, arr);
 								unit.dungeon.push(arr);
 							}
 						}
@@ -126,33 +131,33 @@ function initBoard() {
 				}
 
 				if (!visitedData[y-1][x] || idsData[y-1][x] != idsData[y][x]) {// ^
-					mapData[y][x] = mapData[y][x] == TileType.LAND ? 14 : TileType.LAND;
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? TileType.LAND+4 : TileType.LAND;
 				}
 
 				if (!visitedData[y][x-1] || idsData[y][x-1] != idsData[y][x]) {// <
-					mapData[y][x] = mapData[y][x] == TileType.LAND ? 13 : mapData[y][x] == 14 ? 16 : TileType.LAND;
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? TileType.LAND+3 : mapData[y][x] == TileType.LAND+4 ? TileType.LAND+6 : TileType.LAND;
 				}
 
 				if (!visitedData[y][x+1] || idsData[y][x+1] != idsData[y][x]) {// >
-					mapData[y][x] = mapData[y][x] == TileType.LAND ? 11 :
-					mapData[y][x] == 12 ? 17 :
-					mapData[y][x] == 13 ? 23 :
-					mapData[y][x] == 14 ? 18 :
-					mapData[y][x] == 15 ? 21 :
-					mapData[y][x] == 16 ? 19 :
-					mapData[y][x] == 22 ? 25 :
-					mapData[y][x] == 24 ? 20 : TileType.LAND;
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? TileType.LAND+1 :
+					mapData[y][x] == TileType.LAND+2 ? TileType.LAND+7 :
+					mapData[y][x] == TileType.LAND+3 ? TileType.LAND+13 :
+					mapData[y][x] == TileType.LAND+4 ? TileType.LAND+8 :
+					mapData[y][x] == TileType.LAND+5 ? TileType.LAND+11 :
+					mapData[y][x] == TileType.LAND+6 ? TileType.LAND+9 :
+					mapData[y][x] == TileType.LAND+12 ? TileType.LAND+15 :
+					mapData[y][x] == TileType.LAND+14 ? TileType.LAND+10 : TileType.LAND;
 				}
 
 				if (!visitedData[y+1][x] || idsData[y+1][x] != idsData[y][x]) {// v
-					mapData[y][x] = mapData[y][x] == TileType.LAND ? 12 :
-					mapData[y][x] == 11 ? 17 :
-					mapData[y][x] == 13 ? 15 :
-					mapData[y][x] == 14 ? 24 :
-					mapData[y][x] == 18 ? 20 :
-					mapData[y][x] == 16 ? 22 :
-					mapData[y][x] == 19 ? 25 :
-					mapData[y][x] == 23 ? 21 : mapData[y][x];
+					mapData[y][x] = mapData[y][x] == TileType.LAND ? TileType.LAND+2 :
+					mapData[y][x] == TileType.LAND+1 ? TileType.LAND+7 :
+					mapData[y][x] == TileType.LAND+3 ? TileType.LAND+5 :
+					mapData[y][x] == TileType.LAND+4 ? TileType.LAND+14 :
+					mapData[y][x] == TileType.LAND+8 ? TileType.LAND+10 :
+					mapData[y][x] == TileType.LAND+6 ? TileType.LAND+12 :
+					mapData[y][x] == TileType.LAND+9 ? TileType.LAND+15 :
+					mapData[y][x] == TileType.LAND+13 ? TileType.LAND+11 : mapData[y][x];
 				}
 
 			} else {
@@ -206,8 +211,9 @@ function initBoard() {
 				getUnitId(x+1, y-1)==-1 && getUnitId(x-1, y+1)==-1
 			) {
 				if (isWalkable(x, y)) {
-					if (idsData[y][x] > 5 && treasures.indexOf(idsData[y][x]) == -1) {
-						// place gold piles on isles 6-13
+					let dungeonId = colors.length-1;// 5
+					if (idsData[y][x] > dungeonId && treasures.indexOf(idsData[y][x]) == -1) {
+						// place gold piles on isles 7-13
 						treasures.push(idsData[y][x]);
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
@@ -215,12 +221,12 @@ function initBoard() {
 						//g1 ++;
 					} else if (mapData[y][x] >= TileType.LAND && idsData[y][x] > 1 && treasures.indexOf(-idsData[y][x]) == -1) {
 						// place knight (isles 2-6) or crab (isles 7-13) enemies on 
-						unit = createUnit(x, y, idsData[y][x] > 6 ? UnitType.ENEMY4 : UnitType.ENEMY3);
+						unit = createUnit(x, y, idsData[y][x] > dungeonId ? UnitType.ENEMY4 : UnitType.ENEMY3);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
 						treasures.push(-idsData[y][x]);
 						unitsList.push(unit);
-						unitsData[y][x] = idsData[y][x] > 6 ? UnitType.ENEMY4 : UnitType.ENEMY3;
+						unitsData[y][x] = idsData[y][x] > dungeonId ? UnitType.ENEMY4 : UnitType.ENEMY3;
 						//console.log("E3", unitsList.length+"("+treasures.length+")", -idsData[y][x], x+"x"+y);
 						//e3 ++;
 					}
@@ -277,7 +283,7 @@ function initBoard() {
 		playerY --;
 	}
 	// setting the ship around on a water tile
-	while (mapData[shipY][shipX] > 9) {
+	while (mapData[shipY][shipX] > TileType.LAND) {
 		if (Math.random() < .5) shipX ++;
 		else shipY ++;
 	}

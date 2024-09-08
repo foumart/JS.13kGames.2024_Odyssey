@@ -9,8 +9,7 @@ let unit,
 	hardChoice,//TODO: make some dialogs permanent
 	hasTutorial;
 
-const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta", "lime"];
-const enemyTypes = ["Bat", "Rat", "Wolf", "Skeleton", "Zombie", "Orc", "Troll", "Wizard", "Lich", "Dragon", "Balrog"];
+const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta"];
 const shipPrices = [250,500,999];
 
 let stage, turn, gold,
@@ -48,7 +47,7 @@ function action(direction, additionalParam) {
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
 				_unit = getUnit(playerX, playerY-1);
-				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					console.log("break",_unit);
 					//infoTab.innerHTML = `<br>Opponent "${colors[_unit.origin-2]}"'s castle is ahead.`;
 					//prepareCastleSiegeDialog(_unit.origin);
@@ -75,7 +74,7 @@ function action(direction, additionalParam) {
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				_unit = getUnit(playerX+1, playerY);
-				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
 				}
@@ -99,7 +98,7 @@ function action(direction, additionalParam) {
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				_unit = getUnit(playerX, playerY+1);
-				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
 				}
@@ -123,7 +122,7 @@ function action(direction, additionalParam) {
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				_unit = getUnit(playerX-1, playerY);
-				if (_unit && _unit.type == 10 && _unit.origin > 1) {
+				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", quitGame, "Attack", displayDialog, "Retreat");
 					return;
 				}
@@ -189,23 +188,10 @@ function action(direction, additionalParam) {
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
-				dungeon = _unit.dungeon;
-				let notCleared, dungeonStages = "Stages: ";
-				//console.log(_unit.dungeon)
-				dungeon.forEach((dungeon, index) => {
-					if (index > 2 && dungeon.length) notCleared = 1;
-					if (index < 3 || !dungeon.length) {
-						dungeonStages += !index || !dungeon[index-1].length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
-					}
-				});
-				if (dungeon.length > 3 && notCleared) dungeonStages += ' ⋯';
 
-				prepareDialog(
-					"Dungeon",
-					dungeonStages,
-					descendInDungeon, "Descend",
-					displayDialog, "Exit"
-				);
+				dungeon = _unit.dungeon;
+				displayDungeon();
+
 			} else
 			if (gamePlayer.overlay == UnitType.TREE) {
 				let _hp = healPlayer();
