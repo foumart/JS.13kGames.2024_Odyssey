@@ -33,9 +33,6 @@ function displayDungeon() {
 }
 
 function descendInDungeon() {
-	//prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
-	//prepareDialog("Floor", "You sure?", quitGame, "Yes", displayDialog, "No");
-	// TODO ...
 	dungeonFloor = -1;
 	dungeon.forEach((_dungeon, _index) => {
 		if (_dungeon.length && dungeonFloor < 0) {
@@ -48,7 +45,7 @@ function descendInDungeon() {
 		"Level " + dungeonFloor + "<br>",
 		`You see a ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, "Fight",
-		displayDialog, "Run"
+		displayDialog, "Exit"
 	);
 
 	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
@@ -57,19 +54,18 @@ function descendInDungeon() {
 
 function dungeonBattle() {
 	inBattle = true;
+	if (inDialog) displayDialog();// hide dialog screen
 
-	prepareDialog(
+	prepareBattleScreen(
 		"<br>",
 		"<br>Slime hits Corsair for 2dmg<br>",
 		dungeonBattle, "Attack",
 		displayDialog, "Flee"
 	);
 
-	addBitmapToDialog(offscreenBitmaps[36 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
-	addBitmapToDialog(offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
-	addBitmapToDialog(offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
-
-	//Slime hits Corsair for 2dmg
+	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[36 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
 
 	resizeUI();
 	updateInfoTab();

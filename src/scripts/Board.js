@@ -284,7 +284,7 @@ function initBoard() {
 		playerY --;
 	}
 	// setting the ship around on a water tile
-	while (mapData[shipY][shipX] > TileType.LAND) {
+	while (mapData[shipY][shipX] > TileType.RIFF2) {
 		if (Math.random() < .5) shipX ++;
 		else shipY ++;
 	}

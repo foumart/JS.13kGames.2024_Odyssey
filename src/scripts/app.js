@@ -43,7 +43,7 @@ let state = 0;
 let tween = { transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, infoTab, dialog, titlePng, titleText;
+let controls, infoTab, dialog, battleScreen, titlePng, titleText;
 let actButton, upButton, leftButton, rightButton, downButton;
 let playButton, soundButton; //fullscreenButton
 let closeButton, playerButton, shipButton, crewButton;
@@ -151,21 +151,33 @@ function resizeUI(e) {
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.9 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			!state ? 128 : portrait ? inBattle ? 70 : 60 : inBattle ? 50 : 41
+			!state ? portrait ? 90 : 80 : portrait ? 60 : 41
 		}%) translateX(-${
-			portrait || !state || inBattle ? 50 : 42
+			portrait || !state ? 50 : 42
+		}%)`, 60, 60
+	);
+
+	// Resize the Dialog Menu
+	updateStyleUI(battleScreen,
+		(inBattle ? '' : 'display:none;') +
+		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
+			portrait ? width*.9 : width/2
+		}px;top:50%;left:50%;transform:translateY(-${
+			portrait ? 80 : 50
+		}%) translateX(-${
+			50
 		}%)`, 60, 60
 	);
 
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
-		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmax 3vmin;min-width:11vmax;min-height:9vmax`, 99, -1);
+		updateStyleUI(actButton, `bottom:3vmin;right:3vmin;width:auto;padding:2vmin 3vmin;min-width:16vmin;min-height:12vmin`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
-		if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin:1vmax 0;border:2vmin solid #0000;border-radius:1vmax;background:#2266;position:relative;width:16vmin`;
+		if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin:2vmin 0;border:2vmin solid #0000;border-radius:2vmin;background:#2266;position:relative;width:16vmin`;
 	}
 
 	gameContext.imageSmoothingEnabled = bgrContext.imageSmoothingEnabled = false;
@@ -190,7 +202,7 @@ function resizeUI(e) {
 
 		updateStyleUI(
 			playerButton,
-			e + (inBattle?portrait?'bottom:16%;left:45%;transform:translateX(-100%)':`top:15%`:''),
+			e + (inBattle?portrait?'bottom:16%;left:45%;transform:translateX(-100%)':`top:10%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
@@ -200,7 +212,7 @@ function resizeUI(e) {
 		);
 		updateStyleUI(
 			crewButton,
-			e + (inBattle?portrait?'bottom:16%;left:50%':`top:50%`:''),
+			e + (inBattle?portrait?'bottom:16%;left:50%':`top:45%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		shipButton.style.display = inBattle ? "none" : "block";
@@ -210,7 +222,11 @@ function resizeUI(e) {
 	//if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
 	// Sound button
 	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
-	updateStyleUI(infoTab, `padding:${state?`3vmin 2vmin;margin:${inBattle?2:4}vmin`:'2vmin;margin:1%'} 1%${playerButton?`;top:${inBattle?0:playerButton.offsetHeight}px`:''}`, state ? 18 : 32, 1);
+	updateStyleUI(infoTab,
+		`padding:${state?`3vmin 2vmin;margin:${inBattle?"1%":'4vmin'}`:'2vmin;margin:1%'} 1%${playerButton?`;top:${
+			inBattle ? 0 : playerButton.offsetHeight}px`:''
+		}`, state ? 18 : 32, 1
+	);
 
 	// Install, Play and Title
 	if (playButton) {

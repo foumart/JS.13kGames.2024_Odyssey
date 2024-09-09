@@ -1,3 +1,5 @@
+const goldIcon = "&#10022;";
+
 function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
 }
@@ -39,7 +41,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 }
 
 function updateStyleUI(element, _style, _size = 99, _space = 128) {
-	element.style = `text-shadow:#0068 0 .6vmin;border-radius:3vmax;position:absolute;text-align:center;${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
+	element.style = `text-shadow:#0068 0 .6vmin;border-radius:5vmin;position:absolute;text-align:center;${_space?`line-height:${_space*scale}px;`:''}font-size:${_size*scale}px;` + _style;
 }
 
 function createUI() {
@@ -47,13 +49,20 @@ function createUI() {
 	gameCanvas.style.pointerEvents = bgrCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
-	infoTab = generateUIButton(uiDiv, 'v{VERSION}', () =>
-		prepareDialog(
-			state ? "Day: " + timePassed : "",
-			state ? getSpan("&#9881 Sail points left: " + moveLeft, "#dff") + getSpan("<br>&#9737 Gold: " + gold, "#ff9")
-				: "Game by Noncho Savov",
-			displayDialog
-		)
+	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
+		() => {
+			prepareDialog(
+				state ? "Day: " + timePassed : "",
+				state ? getSpan("<br>&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}<br>`)
+					: "<br><br>Game by Noncho Savov<br>",
+				displayDialog
+			);
+			if (!state) {
+				let bitmap = offscreenBitmaps[islandGenerator.rand(36,45)];
+				dialog.firstChild.prepend(bitmap);
+				bitmap.style.marginTop = "4vmin";
+			}
+		}
 	);
 	
 	if (_debug) {
@@ -82,6 +91,8 @@ function createUI() {
 		bgrCanvas.style.opacity = 1;
 	}
 
+	battleScreen = generateUIButton(uiDiv, '');
+
 	dialog = generateUIButton(uiDiv, '');
 
 	// Fullscreen and Sound buttons
@@ -108,27 +119,63 @@ function createUI() {
 	resizeUI();
 }
 
-function addBitmapToDialog(bitmap, name, healthBar, transform = "scale(1.5) translateY(-30%)") {
+function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "scale(1.5) translateY(-30%)") {
 	let bitmapContainer = document.createElement("div");
 	bitmapContainer.style.position = "relative";
 	bitmapContainer.style.fontSize = "2vmin";
 	bitmapContainer.style.lineHeight = "0";
-	if (name) bitmapContainer.innerHTML = `<div style="margin-top:4vmin;font-size:2em;position:relative">${name}</div>`;
-	dialog.firstChild.prepend(bitmapContainer);
-	dialog.firstChild.style.display = "inline-flex";
-	bitmap.style.margin = healthBar ? '6vmin' : '13vmin 0 0';
-	bitmapContainer.append(bitmap);
+	if (_name) bitmapContainer.innerHTML = `<div style="margin-top:5vmin;font-size:3em;position:relative">${_name}</div>`;
+	_dialog.prepend(bitmapContainer);
+	_dialog.style.display = "inline-flex";
+	_bitmap.style.margin = _healthBar ? '8vmin' : '13vmin 0 0';
+	bitmapContainer.append(_bitmap);
 
-	if (healthBar) {
+	if (_healthBar) {
 		const healthBarElement = document.createElement("span");
-		healthBarElement.innerHTML = healthBar;
+		healthBarElement.innerHTML = _healthBar;
 		bitmapContainer.appendChild(healthBarElement);
 	}
 
-	//if (healthBar) bitmapContainer.innerHTML += "<br>" + healthBar;
-	//bitmapContainer.innerHTML = "<div>Wolf</div>" + bitmapContainer.innerHTML;
-	
-	if (transform) bitmap.style.transform = transform;
+	if (_transform) _bitmap.style.transform = _transform;
+}
+
+function addLabelToDialog(_dialog, _label, _label2) {
+	_dialog.innerHTML = `${_label?'<span style="font-size:6vmin;line-height:9vmin">'+_label+'</span><br>':''}<b>${_label2}</b><br>`;
+}
+
+function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
+	if (inDialog && hardChoice) return;
+	addLabelToDialog(dialog, _label, _label2);
+	prepareDialogButtons(dialog, displayDialog, _callback1, _btn1, _callback2, _btn2);
+	if (!inDialog) displayDialog();
+}
+
+function prepareBattleScreen(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
+	addLabelToDialog(battleScreen, _label, _label2);
+	prepareDialogButtons(battleScreen, displayBattleScreen, _callback1, _btn1, _callback2, _btn2);
+	if (!inBattle) displayBattleScreen();
+}
+
+function prepareDialogButtons(_dialog, _close, _callback1, _btn1, _callback2, _btn2) {
+	_dialog.innerHTML += `<button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
+	if (_callback2) _dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
+	if (_callback2) _dialog.children[_dialog.children.length - 2].addEventListener(interactionTap, _callback1 || _close);
+	_dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1 || _close);
+}
+
+function displayDialog() {
+	inDialog = !inDialog;
+	dialog.style.display = inDialog ? 'block' : 'none';
+	gameContainer.style.display = inDialog ? 'none' : 'block';
+	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
+	battleScreen.style.opacity = inDialog ? 0.5 : 1;
+}
+
+function displayBattleScreen() {
+	inBattle = !inBattle;
+	battleScreen.style.display = inDialog ? 'block' : 'none';
+	gameContainer.style.display = inDialog ? 'none' : 'block';
+	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
 }
 
 function displayRumors(_rumors, _amount) {
@@ -139,32 +186,7 @@ function displayRumors(_rumors, _amount) {
 
 function displayNoFunds() {
 	backFromDialog();
-	prepareDialog(0, "Not enough gold", () => action(6));
-}
-
-function displayDialog() {
-	inDialog = !inDialog;
-	dialog.style.display = inDialog ? 'block' : 'none';
-	gameContainer.style.display = inDialog ? 'none' : 'block';
-	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
-	//actButton.style.opacity = inDialog ? .6 : 1;
-	/*gameContainer.style.pointerEvents = inDialog ? 'none' : 'auto';
-	if (buttonScreen) {
-		for (let _y = 0; _y < buttonScreen.length; _y ++) {
-			for (let _x = 0; _x < buttonScreen[_y].length; _x ++) {
-				buttonScreen[_y][_x].btn.style.pointerEvents = inDialog ? "none" : "auto";
-			}
-		}
-	}*/
-}
-
-function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
-	if (inDialog && hardChoice) return;
-	dialog.innerHTML = `${_label?'<span style="font-size:4vmax;line-height:7vmax">'+_label+'</span><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
-	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
-	if (!inDialog) displayDialog();
-	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1 || displayDialog);
-	dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1 || displayDialog);
+	prepareDialog(0, "<br>Not enough gold<br><br>", () => action(6));
 }
 
 function updateActionButton(e) {
@@ -189,7 +211,7 @@ function updateActionButton(e) {
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
 		actButton.innerHTML = `${
 			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
-		}<div style='font-size:6vmin;position:relative;margin-top:-1vmax'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
+		}<div style='font-size:6vmin;position:relative;margin-top:-2vmin'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
@@ -216,7 +238,7 @@ function updateActionButton(e) {
 function updateInfoTab() {
 	let _char = "&#9608";
 	if (inBattle) {
-		infoTab.innerHTML = getSpan("Dungeon Floor 1 - Battle!", 0, '3em', '');
+		infoTab.innerHTML = getSpan("Dungeon Floor 1 Battle!", 0, '3em', 'line-height:2vmin');
 	} else {
 		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
 			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')
@@ -225,7 +247,7 @@ function updateInfoTab() {
 		}<div style="font-size:3em;top:42%;left:16%">${
 			getSpan(moveLeft, '#8ff')
 		}</div><div style="font-size:4em;top:180%">${
-			getSpan("&#10022;" + gold, 'gold')
+			getSpan(goldIcon + gold, 'gold')
 		}</div>`;
 	}
 }

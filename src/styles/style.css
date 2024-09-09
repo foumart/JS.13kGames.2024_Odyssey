@@ -25,7 +25,7 @@ button {
 	font-size: 1em;
 	font-weight: 900;
 	border-radius: 1em;
-	border: 1vmax solid #fff8;
+	border: 2vmin solid #fff8;
 	border-top: 0;
 	border-bottom: 0;
 	cursor: pointer;
@@ -44,7 +44,7 @@ button {
 	color: #fff;
 	background: #adfb;
 	filter: drop-shadow(1vmin 1vmin 0 #1267);
-	border-bottom: .6vmax solid #fff9;
+	border-bottom: 1vmin solid #fff9;
 }
 
 .css_controls {

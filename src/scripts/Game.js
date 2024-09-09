@@ -3,8 +3,8 @@ let unit,
 	gameShip,
 	boarding,
 	landing,
+	onFoot = true,// player starts on foot
 	holding,// is player holding a direction button for constant moving
-	onFoot = true,
 	inDialog,// is a dialog on screen
 	inBattle,// is player in battle
 	hardChoice,//TODO: make some dialogs permanent
@@ -29,7 +29,7 @@ function initVars() {
 	timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
 	playerHealth = 10; playerHealthMax = 20; playerLevel = 1;
-	shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
+	shipHealth = 30; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
 	crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
 }
 
@@ -148,11 +148,11 @@ function action(direction, additionalParam) {
 		case 6: // Action
 			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
-				hasTutorial = 'Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br>Conquer Castles ';
+				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Castles ';
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("Ahoy Corsair !", hasTutorial);
+				prepareDialog("<u>Ahoy Corsair !</u>", hasTutorial + "<br>");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				let _hp = !additionalParam && !isPlayerDamaged();
@@ -160,10 +160,10 @@ function action(direction, additionalParam) {
 				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
 				prepareDialog(
 					_hp ? "Inn" : "Shipyard",
-					_hp ? "Rest?" : secondMenu ?
-						shipHealth < shipHealthMax ? "Repair Ship damage" :
+					_hp ? "<br>Recovers HP<br>Restores Ship movement<br>" : secondMenu ?
+						shipHealth < shipHealthMax ? "<br>Repair Ship damage<br><br>" :
 						shipLevel > 3 ? 'Ship maxed' :
-						`Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?` : 'Come Again!',
+						`<br>Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?<br><br>` : '',
 
 					_hp ? e => {
 						if (spendGold(_amount)) return;
@@ -171,17 +171,17 @@ function action(direction, additionalParam) {
 						backFromDialog();
 						action(6, isPlayerDamaged());
 					} : shipLevel < 4 ? upgradeShip : displayDialog,
-					_hp ? "Heal &#9737;" + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
-						"Repair &#9737;" + (shipHealthMax - shipHealth) * 5 :
-						"Deal &#9737;" + shipPrices[shipLevel-1] : 0,
+					_hp ? "Rest " + goldIcon + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
+						"Repair " + goldIcon + (shipHealthMax - shipHealth) * 2 :
+						"Deal " + goldIcon + shipPrices[shipLevel-1] : 0,
 
 					_unit.rumors && !additionalParam ? () => action(6, 1) : secondMenu ? e => {
 						_hp = (_unit.origin)*(crewHealthMax / 5 | 0);
 						prepareDialog(
 							"Tavern",
-							'Hear the latest rumors?',
+							'<br>Hear the latest rumors?<br><br>',
 							() => displayRumors(_unit.rumors, _hp),
-							"Ale &#9737;" + _hp,
+							"Ale " + goldIcon + _hp,
 							displayDialog, "Exit"
 						);
 					} : displayDialog,
@@ -294,7 +294,7 @@ function finalizeMove(dir) {
 						crewPaid ++;
 						crewHealth = crewHealthMax/2;
 						backFromDialog();
-					}, "Pay &#9737;" + crewHealthMax * crewPaid);
+					}, "Pay " + goldIcon + crewHealthMax * crewPaid);
 				}
 			}
 		}
@@ -403,7 +403,7 @@ function infoButtonClick(id) {
 			"<br>",
 		displayDialog
 	);
-	addBitmapToDialog(
+	addBitmapToDialog(dialog.firstChild,
 		id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]
 	);
 }
