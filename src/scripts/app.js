@@ -146,11 +146,20 @@ function resizeUI(e) {
 	}
 
 	// Resize the Dialog Menu
-	updateStyleUI(dialog, (inDialog ? '' : 'display:none;') + `border-top:3vh solid #fff9;border-bottom:3vh solid #fff9;width:${portrait?width*.9:width/2}px;top:50%;left:50%;transform:translateY(-${!state?128:portrait?60:34}%) translateX(-${portrait||!state?50:41}%)`, 64, 99);
+	updateStyleUI(dialog,
+		(inDialog ? '' : 'display:none;') +
+		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
+			portrait ? width*.9 : width/2
+		}px;top:50%;left:50%;transform:translateY(-${
+			!state ? 128 : portrait ? inBattle ? 70 : 60 : inBattle ? 50 : 41
+		}%) translateX(-${
+			portrait || !state || inBattle ? 50 : 42
+		}%)`, 60, 60
+	);
 
 	// Resize in-game UI elements
 	if (upButton) {
-		updateStyleUI(controls, `bottom:1vmin;width:${portrait?54:27}%`);
+		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
 		updateStyleUI(actButton, `bottom:2vmax;right:2vmax;width:auto;padding:1vmax 3vmin;min-width:11vmax;min-height:9vmax`, 99, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
@@ -170,18 +179,38 @@ function resizeUI(e) {
 		playerButton.prepend(offscreenBitmapsFlipped[0]);
 		shipButton.prepend(offscreenBitmapsFlipped[4]);
 		crewButton.prepend(offscreenBitmaps[8]);
-		//offscreenBitmapsFlipped[0].style = offscreenBitmapsFlipped[4].style = offscreenBitmaps[8].style = `border:1vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:12vmin`;
-		e = `padding:1vmax;position:relative;float:left;margin:1% 0 0 1%;border-radius:2vmin`;
-		updateStyleUI(playerButton, e, 14, 9);
-		updateStyleUI(shipButton, e, 14, 9);
-		updateStyleUI(crewButton, e, 14, 9);
+		if (inBattle) {
+			offscreenBitmapsFlipped[0].style.width = "18vmin";
+			offscreenBitmapsFlipped[4].style.width = "18vmin";
+			offscreenBitmaps[8].style.width = "18vmin";
+		}
+		e = inBattle
+			? `padding:3vmin;position:absolute;margin:6vmin;border-radius:3vmin;`
+			: `padding:2vmin;position:relative;float:left;margin:1% 0 0 1%;border-radius:2vmin`;
+
+		updateStyleUI(
+			playerButton,
+			e + (inBattle?portrait?'bottom:16%;left:45%;transform:translateX(-100%)':`top:15%`:''),
+			inBattle ? 18 : 14, inBattle ? 12 : 9
+		);
+		updateStyleUI(
+			shipButton,
+			e + (inBattle?portrait?'':`top:${infoTab.offsetHeight}px`:''),
+			inBattle ? 18 : 14, inBattle ? 12 : 9
+		);
+		updateStyleUI(
+			crewButton,
+			e + (inBattle?portrait?'bottom:16%;left:50%':`top:50%`:''),
+			inBattle ? 18 : 14, inBattle ? 12 : 9
+		);
+		shipButton.style.display = inBattle ? "none" : "block";
 	}
 
 	// Fullscreen button
 	//if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
 	// Sound button
 	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
-	updateStyleUI(infoTab, `padding:${state?'1vmax;line-height:6px;margin:2%':'2vmin;margin:1%'} 1%${playerButton?`;top:${playerButton.offsetHeight}px`:''}`, state ? 18 : 32, 1);
+	updateStyleUI(infoTab, `padding:${state?`3vmin 2vmin;margin:${inBattle?2:4}vmin`:'2vmin;margin:1%'} 1%${playerButton?`;top:${inBattle?0:playerButton.offsetHeight}px`:''}`, state ? 18 : 32, 1);
 
 	// Install, Play and Title
 	if (playButton) {

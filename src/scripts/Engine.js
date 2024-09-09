@@ -44,6 +44,14 @@ function doAnimationFrame(timeStamp) {
 				tween.transitionZ = 1;
 				TweenFX.to(tween, 6, {transitionZ: 1.2}, e => doFrameAnimationMove(0, 1), e => {
 					finalizeMove();
+					// TODO: remove
+					unitsList.forEach(_unit => {
+						if (_unit.dungeon && !dungeon) {
+							dungeon = _unit.dungeon
+						}
+					});
+					descendInDungeon();
+					
 				}, 1);
 			});
 		} else if (step % 7 == 0) {

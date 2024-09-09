@@ -15,7 +15,7 @@ function getSurfaceEnemyName(_id) {
 }
 
 function displayDungeon() {
-	let notCleared, dungeonStages = "Stages: ";
+	let notCleared, dungeonStages = "Dungeon<br>Stages: ";
 	dungeon.forEach((dungeon, index) => {
 		if (index > 2 && dungeon.length) notCleared = 1;
 		if (index < 3 || !dungeon.length) {
@@ -25,8 +25,8 @@ function displayDungeon() {
 	if (dungeon.length > 3 && notCleared) dungeonStages += ' &#8943';
 
 	prepareDialog(
-		"Dungeon",
 		dungeonStages,
+		"",
 		descendInDungeon, "Descend",
 		displayDialog, "Exit"
 	);
@@ -45,43 +45,34 @@ function descendInDungeon() {
 	});
 
 	prepareDialog(
-		"Level " + dungeonFloor,
-		"You see " + getEnemyName(dungeonEnemy),
+		"Level " + dungeonFloor + "<br>",
+		`You see a ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, "Fight",
 		displayDialog, "Run"
 	);
+
+	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
+	
 }
 
 function dungeonBattle() {
-	// enemy hit
-	/*prepareDialog(
-		"Fighting " + dungeonEnemy,
-		!dungeonEnemy || dungeonEnemy == 2 || dungeonEnemy > 8 ? dungeonEnemy + " attacks first!<br>" : "You face " + dungeonEnemy + ". Will you?",
-		dungeonBattle, "Fight",
-		displayDialog, "Retreat"
-	);*/
-
-	//if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin:1vmax 0;border:2vmin solid #0000;border-radius:1vmax;background:#2266;position:relative;width:16vmin`;
-	//actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
+	inBattle = true;
 
 	prepareDialog(
-		"<br>",//getEnemyName(dungeonEnemy),//"Fighting " + dungeonEnemy,
 		"<br>",
+		"<br>Slime hits Corsair for 2dmg<br>",
 		dungeonBattle, "Attack",
-		displayDialog, "Item"
+		displayDialog, "Flee"
 	);
 
-	addBitmapToDialog(offscreenBitmaps[36 + dungeonEnemy]);
-	addBitmapToDialog(offscreenBitmaps[37 + dungeonEnemy]);
-	addBitmapToDialog(offscreenBitmaps[38 + dungeonEnemy]);
+	addBitmapToDialog(offscreenBitmaps[36 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	addBitmapToDialog(offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	addBitmapToDialog(offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
 
-	//dialog.firstChild.innerHTML = addHealthbar(playerHealth, playerHealthMax);
-	//addBitmapToDialog(offscreenBitmaps[36 + dungeonEnemy]);
-	//addHealthbar(playerHealth, playerHealthMax);
+	//Slime hits Corsair for 2dmg
 
-	//dialog.firstChild.append(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);
-	//dialog.firstChild.firstChild.style.marginTop = "2vmin";
-	//dialog.firstChild.lastChild.style.transform = "scale(1.5) translateY(-30%)";
+	resizeUI();
+	updateInfoTab();
 }
 
 function enemyTurn() {

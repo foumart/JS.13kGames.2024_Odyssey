@@ -6,6 +6,7 @@ let unit,
 	holding,// is player holding a direction button for constant moving
 	onFoot = true,
 	inDialog,// is a dialog on screen
+	inBattle,// is player in battle
 	hardChoice,//TODO: make some dialogs permanent
 	hasTutorial;
 
@@ -396,12 +397,15 @@ function closeButtonClick(e) {
 function infoButtonClick(id) {
 	prepareDialog(
 		"<br>",// + (id == 1 ? "Ship" : id ? "Crew" : "Corsair"),
-		(id == 1 ? "Ship" : id ? "Crew" : "Corsair") + " HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
+		(id == 1 ? "Ship" : id ? "Crew" : "Corsair") + " Level " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +
+			" &nbsp HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
 			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax) +
-			"<br>Level: " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel),
+			"<br>",
 		displayDialog
 	);
-	addBitmapToDialog(id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]);
+	addBitmapToDialog(
+		id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]
+	);
 }
 
 function quitGame() {

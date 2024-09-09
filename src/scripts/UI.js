@@ -33,7 +33,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 		} else {
 			str += `<span style="color:red">${_char}</span>`;
 		}
-		if ((i+1) % (8-_step|0) == 0) str += " ";
+		if ((i+1) % (8-_step|0) == 0) str += _max > 23 ? " " : "";
 	}
 	return str;
 }
@@ -108,18 +108,27 @@ function createUI() {
 	resizeUI();
 }
 
-function addBitmapToDialog(bitmap) {
+function addBitmapToDialog(bitmap, name, healthBar, transform = "scale(1.5) translateY(-30%)") {
 	let bitmapContainer = document.createElement("div");
 	bitmapContainer.style.position = "relative";
-	bitmapContainer.style.fontSize = "1vmax";
+	bitmapContainer.style.fontSize = "2vmin";
 	bitmapContainer.style.lineHeight = "0";
-	bitmapContainer.innerHTML = addHealthbar(10, 10);
+	if (name) bitmapContainer.innerHTML = `<div style="margin-top:4vmin;font-size:2em;position:relative">${name}</div>`;
 	dialog.firstChild.prepend(bitmapContainer);
 	dialog.firstChild.style.display = "inline-flex";
+	bitmap.style.margin = healthBar ? '6vmin' : '13vmin 0 0';
+	bitmapContainer.append(bitmap);
 
-	bitmapContainer.prepend(bitmap);
-	bitmap.style.transform = "scale(1.5) translateY(-30%)";
-	bitmap.style.margin = "6vmax 3vmax 0";
+	if (healthBar) {
+		const healthBarElement = document.createElement("span");
+		healthBarElement.innerHTML = healthBar;
+		bitmapContainer.appendChild(healthBarElement);
+	}
+
+	//if (healthBar) bitmapContainer.innerHTML += "<br>" + healthBar;
+	//bitmapContainer.innerHTML = "<div>Wolf</div>" + bitmapContainer.innerHTML;
+	
+	if (transform) bitmap.style.transform = transform;
 }
 
 function displayRumors(_rumors, _amount) {
@@ -151,7 +160,7 @@ function displayDialog() {
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 	if (inDialog && hardChoice) return;
-	dialog.innerHTML = `${_label?'<u style="font-size:4vmax;line-height:7vmax">'+_label+'</u><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
+	dialog.innerHTML = `${_label?'<span style="font-size:4vmax;line-height:7vmax">'+_label+'</span><br>':''}<b>${_label2}</b><br><button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
 	if (_callback2) dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
 	if (!inDialog) displayDialog();
 	if (_callback2) dialog.children[dialog.children.length - 2].addEventListener(interactionTap, _callback1 || displayDialog);
@@ -165,7 +174,8 @@ function updateActionButton(e) {
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
 	// █ &#9608 | ▀ &#9600 | ▄ &#9604 | ■ &#9632 | □ &#9633 | ▐ &#9616 | ▌ &#9612 | ⬞ &#11038 | ⬝ &#11037 | ◦ ∘
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
-	// ⫝ &#10973 | ⥀ &#10560 | ⛀ | ⬭ | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 | ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈
+	// ⫝ &#10973 | ⥀ &#10560 | ⛀ ⛃ | ⬭ &#11053; | ⬬ &#11052 | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 |
+	// ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈  ✠  ✡  ✢  ✣  ✤  ✥  ✦&#10022  ✧  ✰  ✱  ✲  ✳  ✴  ✵  ✶  ✷  ✸
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788
 
@@ -205,12 +215,19 @@ function updateActionButton(e) {
 
 function updateInfoTab() {
 	let _char = "&#9608";
-	infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:top')} ${
-		getSpan(_char.repeat(moveLeft), moveLeft < 9 ? '#fd6' : '#68f')}&#9612${getSpan(_char.repeat(moveLimit-moveLeft), '#57f8')
-		}<div style="font-size:3em;top:35%;left:16%">${
-		getSpan(moveLeft, '#8ff')
-		}</div><div style="font-size:4em;top:200%;margin-left:-1vmax">${
-		getSpan("&#9737;" + gold, 'gold')}</div>`
+	if (inBattle) {
+		infoTab.innerHTML = getSpan("Dungeon Floor 1 - Battle!", 0, '3em', '');
+	} else {
+		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
+			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')
+		}&#9612${
+			getSpan(_char.repeat(moveLimit - moveLeft), '#57f8')
+		}<div style="font-size:3em;top:42%;left:16%">${
+			getSpan(moveLeft, '#8ff')
+		}</div><div style="font-size:4em;top:180%">${
+			getSpan("&#10022;" + gold, 'gold')
+		}</div>`;
+	}
 }
 
 function debugBoard() {
