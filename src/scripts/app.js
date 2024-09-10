@@ -113,10 +113,10 @@ function setupUI() {
 	scale = getScale();
 }
 
-function resizeUI(e) {
+function resizeUI(event) {
 	setupUI();
-	if (e-1) updateActionButton(e);
-	if (e-1) updateInfoTab();
+	if (event-1) updateActionButton(event);
+	if (event-1) updateInfoTab();
 	// Set HTML positionings
 	mainDiv.style.width = uiDiv.style.width = width + 'px';
 	mainDiv.style.height = uiDiv.style.height = height + 'px';
@@ -212,7 +212,7 @@ function resizeUI(e) {
 		);
 		updateStyleUI(
 			crewButton,
-			e + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:48%`:''),
+			e + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:50%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		shipButton.style.display = inBattle ? "none" : "block";

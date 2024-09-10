@@ -142,6 +142,7 @@ function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 	}
 
 	if (_transform) _bitmap.style.transform = _transform;
+	return bitmapContainer;
 }
 
 /*function enemyClicked(e) {
@@ -199,7 +200,7 @@ function displayNoFunds() {
 	prepareDialog(0, "<br>Not enough gold<br><br>", () => action(6));
 }
 
-function updateActionButton(e) {
+function updateActionButton(event) {
 	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 |
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
@@ -234,14 +235,12 @@ function updateActionButton(e) {
 		backFromDialog();
 	} else {
 		actButton.innerHTML = inBattle ? "&#9876<br>" + getSpan("ATTACK", 0, "5vmin") : hasTutorial ? "?" :
-			
-			//hasEvent ? 'E' :
 			onFoot ? '&#10003' : 'S';
 
 		//actButton.style.opacity = hasEvent ? 1 : .5;
 	}
 
-	resizeUI(e);
+	resizeUI(event);
 }
 
 function updateInfoTab() {

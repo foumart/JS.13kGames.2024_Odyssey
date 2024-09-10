@@ -35,7 +35,7 @@ let boardPlayer,
 	townY;
 
 function onBoardZoom(event) {
-	if (state) {
+	if (state && !inBattle) {
 		if (event.deltaY < 0 && boardScale < 2) boardScale += (boardScale < 1 ? 0.05 : 0.1);
 		else if (event.deltaY > 0 && boardScale > 0.7) boardScale -= (boardScale < 1 ? 0.05 : 0.1);
 		boardScale = +boardScale.toFixed(2);

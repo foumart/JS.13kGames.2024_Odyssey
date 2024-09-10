@@ -3,7 +3,9 @@ let dungeon,
 	dungeonEnemy,
 	dungeonEnemyHP,
 	dungeonEnemyAttack,
-	dungeonFight;
+	dungeonEnemyBitmap,
+	dungeonFight,
+	dungeonFlee;
 
 function getEnemyName(_id) {
 	return [
@@ -43,8 +45,6 @@ function getDungeonStagesString(label = "") {
 }
 
 function displayDungeon() {
-	
-
 	prepareDialog(
 		getDungeonStagesString("<br>Dungeon<br>"),
 		"",
@@ -56,7 +56,7 @@ function displayDungeon() {
 function descendInDungeon() {
 	//tween.transitionZ = boardScale;
 	//TweenFX.to(tween, 9, {transitionZ: 4}, e => doFrameAnimationMove(0, 1), e => { }, 1);
-
+	dungeonFlee = 0;
 	dungeonFloor = -1;
 	dungeon.forEach((_dungeon, _index) => {
 		if (_dungeon.length && dungeonFloor < 0) {
@@ -88,7 +88,7 @@ function dungeonBattle() {
 		tryToFleeBattle, "Flee"
 	);
 
-	addBitmapToDialog(
+	dungeonEnemyBitmap = addBitmapToDialog(
 		battleScreen.firstChild,
 		offscreenBitmaps[36 + dungeonEnemy],
 		getEnemyName(dungeonEnemy),
@@ -114,32 +114,70 @@ function battleItem() {
 	
 }
 
+function closeAllScreens() {
+	displayBattleScreen();
+	displayDialog();
+	resizeUI();
+	updateInfoTab();
+}
+
 function tryToFleeBattle() {
-	if (Math.random() * 9 > dungeonEnemy) {
+	let _level = dungeonFloor + 1;
+	if (Math.random() * _level > dungeonEnemy && dungeonFlee > -1) {
 		// player will escape
-		if (Math.random() * 9 < dungeonEnemy) {
+		//console.log(1, Math.random() * _level , dungeonEnemy)
+		if (Math.random() * _level < dungeonEnemy) {
 			// player will however suffer a hit
-			enemyHit();
+			animateUnitHit(e => prepareDialog("Fled", "<br>Not after an enemy hit.<br>", closeAllScreens));
+		} else {
+			prepareDialog("<br>Fled", "<br>", closeAllScreens);
 		}
 	} else {
 		// player cannot escape
-		if (Math.random() * 9 < dungeonEnemy) {
+		//console.log(2, Math.random() * _level , dungeonEnemy)
+		if (Math.random() * _level < dungeonEnemy && dungeonFlee < _level) {
 			// player will receive a hit on top of that
-			enemyHit();
+			dungeonFlee ++;
+			animateUnitHit(e => prepareDialog("Escaping...", "<br>The enemy hits you while trying.<br>", displayDialog));
+		} else {
+			dungeonFlee = -1;
+			prepareDialog("<br>Cannot flee battle!", "<br>", displayDialog);
 		}
 	}
 }
 
-function enemyHit() {
-	
-	
-	if (Math.random() < .5) {
+function animateUnitHit(_callback) {
+	tween.transitionZ = 1;
+	TweenFX.to(tween, 3, {transitionZ: 1.2},
+		e => {
+			dungeonEnemyBitmap.style.transform = `scale(${tween.transitionZ})`;
+		},
+		e => {
+			TweenFX.to(tween, 9, {transitionZ: 1},
+				e => {
+					dungeonEnemyBitmap.style.transform = `scale(${tween.transitionZ})`;
+				},
+				e => {
+					if (Math.random() < .5) {
+						// atacks the hero
+						playerHealth -= dungeonEnemyAttack;
+					} else {
+						// atacks the crew
+						crewHealth -= dungeonEnemyAttack;
+					}
 
+					resizeUI();
 
-	} else {
-
-	}
+					_callback();
+				}
+			);
+		}
+	);
 }
+
+/*function enemyHit(_callback) {
+	animateUnitHit(_callback);
+}*/
 
 function enemyTurn() {
 	
