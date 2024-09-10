@@ -54,11 +54,12 @@ const offscreenPixelData = [
 	"ff004d4e48425f574f918b85",// 38
 	"ff004d4e48421d2b535f574f333e5f918b85",// 39
 	"ff004d7e25534e48421d2b535f574f333e5f918b85",// 40
-	"ff004d4e48425f574f333e5f918b85",// 41
+	"ff004d4e48421d2b535f574f333e5f918b85",// 41
 	"7e25534e48421d2b535f574f333e5f918b85",// 42
-	"ff004d4e48421d2b535f574f333e5f",// 43
-	"7e25534e48421d2b535f574f333e5f918b85",// 44
-	"ff004d4e48421d2b535f574f333e5f"// 45
+	"ff004d4e48425f574f333e5f918b85",// 43
+	"ff004d4e48421d2b535f574f333e5f",// 44
+	"7e25534e48421d2b535f574f333e5f918b85",// 45
+	"ff004d4e48421d2b535f574f333e5f"// 46
 ];
 
 const offscreenColorData = [
@@ -106,16 +107,17 @@ const offscreenColorData = [
 	"nLuMRiUbj]Zunm~wv",// ⧈ 0F 35
 
 	// DUNGEON ENEMIES
-	"@EEpPUpfQav\\_t\`me@hh@@@@@",// 36
-	"@hE@tD@jmmXMkYmmmEkmC@DD@",// 37
-	"\`@Dd@X\\cdYAd\\[dd\\dP\`PDCDC",// 38
-	"tf\`HLTedd]ERT[@tDCddFdP\`F",// 39
-	"@]ExHOEGmuxff_htWE\`f]hG_@",// 40
-	"@mE@HM@mkkmbcj]d\\EUSE\`Dd@",// 41
-	"@mE@mmEm[kELMDhTtmtvtBfT@",// 42
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@",// 43
-	"@mE@mmEm[kELMDhTtmtvtBfT@",// 44
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@"// 45
+	"@EEpPUpfQav\\_t\`me@hh@@@@@",// 36 1 bat
+	"@hE@tD@jmmXMkYmmmEkmC@DD@",// 37 2 slime
+	"\`@Dd@X\\cdYAd\\[dd\\dP\`PDCDC",// 38 3 wolf
+	"@]ExHOEGmuxff_htWE\`f]hG_@",// 39 4 goblin
+	"tf\`HLTedd]ERT[@tDCddFdP\`F",// 40 5 imp
+	"@]ExHOEGmuxff_htWE\`f]hG_@",// 41 6 orc
+	"@mE@mmEm[kELMDhTtmtvtBfT@",// 42 7 wizard
+	"@mE@HM@mkkmbcj]d\\EUSE\`Dd@",// 43 8 troll
+	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@",// 44 lich
+	"@mE@mmEm[kELMDhTtmtvtBfT@",// 45 dragon
+	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@"// 46 balrog
 ];
 
 for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {

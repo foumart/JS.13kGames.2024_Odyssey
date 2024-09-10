@@ -1,4 +1,4 @@
-const goldIcon = "&#10022;";//&#10022;
+const goldIcon = "&#164;";//"₪";//"ϵ";// + getSpan(":", 0, "11vmin") + "&#183;";//"&#10022;"
 
 function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
@@ -36,7 +36,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 		} else {
 			str += `<span style="color:red">${_char}</span>`;
 		}
-		if ((i+1) % (8-_step|0) == 0) str += _max > 23 ? " " : "";
+		if ((i+1) % (8-_step|0) == 0) str += _max > 19 ? " " : "";
 	}
 	return str;
 }
@@ -183,7 +183,7 @@ function displayBattleScreen() {
 	battleScreen.style.display = inBattle ? 'block' : 'none';
 	gameContainer.style.display = inBattle ? 'none' : 'block';
 	uiDiv.style.pointerEvents = inBattle ? 'auto' : 'none';
-	uiDiv.style.background = inBattle ? "#222b" : "0";
+	//uiDiv.style.background = inBattle ? "#222b" : "0";
 }
 
 function displayRumors(_rumors, _amount) {
@@ -207,7 +207,7 @@ function updateActionButton(event) {
 	// ⫝ &#10973 | ⥀ &#10560 | ⛀ ⛃ | ⬭ &#11053; | ⬬ &#11052 | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 |
 	// ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈  ✠  ✡  ✢  ✣  ✤  ✥  ✦&#10022  ✧  ✰  ✱  ✲  ✳  ✴  ✵  ✶  ✷  ✸
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
-	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788
+	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
 
 	//unit = getUnit(playerX, playerY);
 
@@ -243,7 +243,7 @@ function updateActionButton(event) {
 function updateInfoTab() {
 	let _char = "&#9608";
 	if (inBattle) {
-		infoTab.innerHTML = getSpan(`Dungeon Stage ${dungeonStage}, Room ${dungeonRoom}`, 0, '3em', 'line-height:2vmin');
+		infoTab.innerHTML = getSpan(`Stage ${dungeonStage}, Room ${dungeonRoom}`, 0, '3em', 'line-height:2vmin');
 	} else {
 		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
 			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')

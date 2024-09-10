@@ -45,13 +45,13 @@ function doAnimationFrame(timeStamp) {
 				TweenFX.to(tween, 6, {transitionZ: 1.2}, e => doFrameAnimationMove(0, 1), e => {
 					finalizeMove();
 					// TODO: to be removed after dungeon battles completion
-					unitsList.forEach(_unit => {
+					/*unitsList.forEach(_unit => {
 						if (_unit.dungeon && !dungeon) {
 							dungeon = _unit.dungeon
 						}
 					});
-					descendInDungeon();
-					
+					//descendInDungeon();
+					displayDungeon();*/
 				}, 1);
 			});
 		} else if (step % 7 == 0) {

@@ -163,7 +163,7 @@ function resizeUI(event) {
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			portrait ? 68 : 44
+			portrait ? 64 : 44
 		}%) translateX(-${
 			portrait ? 50 : 47
 		}%)`, 60, 60
@@ -202,23 +202,23 @@ function resizeUI(event) {
 		crewButton.prepend(crewBitmap);
 		playerBitmap.style.width = shipBitmap.style.width = crewBitmap.style.width = `${inBattle?18:12}vmin`;
 
-		e = inBattle
+		event = inBattle
 			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;
 
 		updateStyleUI(
 			playerButton,
-			e + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
+			event + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
 			shipButton,
-			e + (inBattle?portrait?'':`top:${infoTab.offsetHeight}px`:''),
+			event + (inBattle?portrait?'':`top:${infoTab.offsetHeight}px`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
 			crewButton,
-			e + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:50%`:''),
+			event + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:50%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		shipButton.style.display = inBattle ? "none" : "block";

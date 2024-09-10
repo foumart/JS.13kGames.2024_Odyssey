@@ -31,8 +31,8 @@ function initVars() {
 	crewPaid = 2;// it's 2 initialy for optimization purposes
 	timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
-	playerHealth = 10; playerHealthMax = 20; playerLevel = 1;
-	shipHealth = 30; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
+	playerHealth = 20; playerHealthMax = 20; playerLevel = 1;
+	shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
 	crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
 
 	enemiesKilled = [];
@@ -169,7 +169,7 @@ function action(direction, additionalParam) {
 				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
 				prepareDialog(
 					_hp ? "Inn" : "Shipyard",
-					_hp ? "Restores Hero and Crew HP, advances time by 1 day,<br>and refreshes Ship movement.<br>" : secondMenu ?
+					_hp ? "Restores Hero and Crew HP, refreshes Ship movement and advances time by 1 day.<br>" : secondMenu ?
 						shipHealth < shipHealthMax ? "<br>Repair Ship damage ("+(shipHealthMax-shipHealth)+")<br><br>" :
 						shipLevel > 3 ? '<br>Ship maxed<br>' :
 						`<br>Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?<br><br>` : '',
@@ -403,8 +403,8 @@ function closeButtonClick(e) {
 }
 
 function getAttackDamage(id) {
-	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel  : !id
-		? playerLevel + 1
+	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel*3 : !id
+		? playerLevel + 10
 		: getEnemyAttack(id - 3)
 	);
 }

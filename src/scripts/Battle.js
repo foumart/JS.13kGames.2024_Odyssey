@@ -12,21 +12,21 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 function getEnemyName(_id) {
 	return [
 		"Bat", "Slime", "Wolf", "Goblin", "Imp",
-		"Orc", "Troll", "Wizard", "Lich", "Dragon", "Balrog"
+		"Orc", "Wizard", "Troll", "Lich", "Dragon", "Balrog"
 	][_id > 9 ? _id - 20 : _id];
 }
 
 function getEnemyAttack(_id) {
 	return [
 		1, 2, 2, 2, 1,
-		3, 5, 6, 9, 12, 16
+		3, 3, 6, 5, 12, 16
 	][_id > 9 ? _id - 20 : _id];
 }
 
 function getEnemyHP(_id) {
 	return [
-		5, 10, 12, 16, 16,
-		24, 32, 28, 42, 60, 90
+		6, 10, 12, 16, 16,
+		24, 20, 42, 32, 60, 90
 	][_id > 9 ? _id - 20 : _id];
 }
 
@@ -35,23 +35,31 @@ function getSurfaceEnemyName(_id) {
 }
 
 function getDungeonStagesString(label = "") {
-	let notCleared, dungeonStages = label + "Stages: ";
-	dungeon.forEach((dungeon, index) => {//console.log(index, dungeon, dungeon.length);
-		if (index > 2 && dungeon.length) notCleared = 1;
-		if (index < 3 || !dungeon.length) {
-			dungeonStages += !index || !dungeon.length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
+	let haveEnemies, notCleared, previousEmpty, dungeonStages = label + "Stages: ";
+	dungeon.forEach((_nextStage, _index) => {console.log(_index, _nextStage, _nextStage.length);
+		haveEnemies = !_nextStage.every(x => x == -1);
+		if (_index > 2 && haveEnemies) {
+			notCleared = 1;
 		}
+		if (_index < 3 || !haveEnemies || previousEmpty) {
+			// add current, cleared and rooms that are ahead
+			dungeonStages += (!_index || previousEmpty) && haveEnemies ? ' &#128853' : ' &#974' + (haveEnemies ? 4 : 5);
+		}
+		previousEmpty = !haveEnemies;
 	});
-	if (dungeon.length > 3 && notCleared) dungeonStages += ' &#8943';
-	return dungeonStages;
+	if (dungeon.length > 3 && notCleared) {
+		dungeonStages += ' &#8943';// add ⋯ after stages if there are unexplored dungeon rooms
+	}
+	return [dungeonStages, haveEnemies];
 }
 
-function displayDungeon() {
+function displayDungeon(_dungeon) {
+	_dungeon = getDungeonStagesString("<br>Dungeon<br>");
 	prepareDialog(
-		getDungeonStagesString("<br>Dungeon<br>"),
+		_dungeon[0],
 		"",
-		descendInDungeon, "Descend",
-		displayDialog, "Exit"
+		_dungeon[1] ? descendInDungeon : displayDialog, _dungeon[1] ? "Descend" : "Exit",
+		_dungeon[1] ? displayDialog : 0, _dungeon[1] ? "Exit" : 0
 	);
 }
 
@@ -65,31 +73,31 @@ function descendInDungeon(_skip) {
 	dungeonFlee = 0;
 	dungeonStage = -1;
 	dungeonRoom = -1;
-	dungeon.forEach((_dungeon, _index) => {// TODO: fix dungeon stage advancing
-		if (_dungeon.length && dungeonStage < 0) {
+	dungeon.forEach((_nextStage, _index) => {// TODO: fix dungeon stage advancing
+		let haveEnemies = !_nextStage.every(x => x == -1);
+		if (haveEnemies && dungeonStage < 0) {
 			dungeonStage = _index + 1;
-			_dungeon.forEach((_enemy, _enemyIndex) => {
-				if (_enemy > -1 && dungeonRoom == -1) dungeonRoom = _enemyIndex + 1;
-			});
-			dungeonEnemy = _dungeon[dungeonRoom-1];
+			dungeonRoom = _nextStage.findIndex(e => e > -1) + 1;
+			dungeonEnemy = _nextStage[dungeonRoom-1];
 			dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
 			dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
 		}
 	});
 
-	if (_skip) {
+	if (_skip == 1) {
 		dungeonBattle();
 	} else {
+		updateInfoTab();
 		prepareDialog(
-			`Stage ${dungeonStage}, Room ${dungeonRoom}<br>`,
-			`You see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
+			`<br>`,//Stage ${dungeonStage}, Room ${dungeonRoom}
+			`<br>Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
 			dungeonBattle, "Fight",
-			displayDialog, "Exit"
+			closeAllScreens, "Exit"
 		);
 	}
 
 	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
-	uiDiv.style.background = "#222b";
+	uiDiv.style.background = "#2228";
 }
 
 function dungeonBattle() {
@@ -127,7 +135,8 @@ function getEnemyHealthBar() {
 }
 
 function closeAllScreens() {
-	displayBattleScreen();// close the battle screen
+	uiDiv.style.background = "0";
+	if (inBattle) displayBattleScreen();// close the battle screen
 	if (inDialog) displayDialog();// close any visible dialogs
 	resizeUI();
 	updateInfoTab();
@@ -135,6 +144,7 @@ function closeAllScreens() {
 }
 
 function tryToFleeBattle() {
+	if (dungeonFighting) return;
 	let _level = dungeonStage + 1;
 	if (Math.random() * _level > dungeonEnemy && dungeonFlee > -1) {
 		// player will escape
@@ -205,6 +215,7 @@ function disableBattleInteractions() {
 }
 
 function beginNewRound() {
+	if (dungeonFighting) return;
 	disableBattleInteractions();
 	// hero attacks
 	animateUnitHit(0, e => {
@@ -229,24 +240,30 @@ function battleVictory() {
 			dungeonEnemyBitmap.style.opacity = (2 - tween.transitionZ);
 		},
 		e => {
-			console.log(dungeon, dungeonStage);
+			enableBattleInteractions();
 
 			enemiesKilled.push(dungeonEnemy)
 			dungeon[dungeonStage - 1][dungeonRoom - 1] = -1;// mark the enemy as destroyed
 			let stageCleared = dungeonRoom == dungeon[dungeonStage - 1].length;
-			let bonus = islandGenerator.rand(1, getEnemyHP(dungeonEnemy)/2) * (stageCleared ? 2 : 1);
+			let bonus = islandGenerator.rand(dungeonStage, getEnemyHP(dungeonEnemy)/2) * (stageCleared ? 2 : 1) + (stageCleared ? dungeonStage*9 : 0);
 			gold += bonus;
+			let lastStage = dungeonStage == dungeon.length && stageCleared;
 
 			prepareBattleScreen(
-				stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!",
-				`<br>Found ${bonus} gold.<br>`,
-				
-				stageCleared ? descendInDungeon : e => descendInDungeon(1),
-				stageCleared ? "Descend" : "Advance",
-				closeAllScreens, "Exit"
+				getSpan(stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
+				`<br>Found ${bonus} gold.<br>` + (lastStage ? "<br>Found Healing Potion.<br>" : ""),
+				lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(1),
+				lastStage ? "Complete" : stageCleared ? "Descend" : "Advance",
+				lastStage ? 0 : closeAllScreens, "Exit"
 			);
 		}
 	);
+}
+
+function completeDungeon() {
+	console.log(getUnit(playerX, playerY));
+	getUnit(playerX, playerY).origin = 1;
+	closeAllScreens();
 }
 
 /*function clearDungeonStage() {
