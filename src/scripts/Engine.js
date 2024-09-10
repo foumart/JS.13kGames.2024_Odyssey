@@ -68,7 +68,7 @@ function doAnimationFrame(timeStamp) {
 			var time = Date.now();
 			frame++;
 			if (time - startTime > 1000) {
-				fpsElement.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1);
+				fpsElement.innerHTML = (frame / ((time - startTime) / 1000)).toFixed(1) + " " + width + "x" + height;
 				startTime = time;
 				frame = 0;
 			}

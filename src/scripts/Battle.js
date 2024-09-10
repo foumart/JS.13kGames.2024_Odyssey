@@ -1,12 +1,28 @@
 let dungeon,
 	dungeonFloor,
 	dungeonEnemy,
+	dungeonEnemyHP,
+	dungeonEnemyAttack,
 	dungeonFight;
 
 function getEnemyName(_id) {
 	return [
 		"Bat", "Slime", "Wolf", "Goblin", "Imp",
 		"Orc", "Troll", "Wizard", "Lich", "Dragon", "Balrog"
+	][_id > 9 ? _id - 20 : _id];
+}
+
+function getEnemyAttack(_id) {
+	return [
+		1, 2, 2, 2, 1,
+		3, 5, 6, 9, 12, 16
+	][_id > 9 ? _id - 20 : _id];
+}
+
+function getEnemyHP(_id) {
+	return [
+		5, 10, 12, 16, 16,
+		24, 32, 28, 42, 60, 90
 	][_id > 9 ? _id - 20 : _id];
 }
 
@@ -46,6 +62,8 @@ function descendInDungeon() {
 		if (_dungeon.length && dungeonFloor < 0) {
 			dungeonFloor = _index + 1;
 			dungeonEnemy = _dungeon[0];
+			dungeonEnemyHP = getEnemyHP(dungeonEnemy);
+			dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
 		}
 	});
 
@@ -65,12 +83,21 @@ function dungeonBattle() {
 
 	prepareBattleScreen(
 		"<br>",
-		"<br>Enemies prepared for fight!<br><br>",
+		"<br>Enemies prepared for fight!<br>",
 		battleItem, "Item",
 		tryToFleeBattle, "Flee"
 	);
 
-	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[36 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	addBitmapToDialog(
+		battleScreen.firstChild,
+		offscreenBitmaps[36 + dungeonEnemy],
+		getEnemyName(dungeonEnemy),
+		addHealthbar(dungeonEnemyHP, getEnemyHP(dungeonEnemy)),
+		"scale(1.5)",
+		() => infoButtonClick(dungeonEnemy + 3, dungeonEnemyHP, dungeonEnemyAttack)
+	);
+
+	// TODO: battles with multiple enemies
 	//addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
 	//addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
 
@@ -79,19 +106,41 @@ function dungeonBattle() {
 	updateActionButton();
 }
 
-function battleAttack() {
-	
-}
+/*function battleAttack(id, hp, att) {
+	infoButtonClick(id + 2, hp, att);
+}*/
 
 function battleItem() {
 	
 }
 
 function tryToFleeBattle() {
+	if (Math.random() * 9 > dungeonEnemy) {
+		// player will escape
+		if (Math.random() * 9 < dungeonEnemy) {
+			// player will however suffer a hit
+			enemyHit();
+		}
+	} else {
+		// player cannot escape
+		if (Math.random() * 9 < dungeonEnemy) {
+			// player will receive a hit on top of that
+			enemyHit();
+		}
+	}
+}
+
+function enemyHit() {
 	
+	
+	if (Math.random() < .5) {
+
+
+	} else {
+
+	}
 }
 
 function enemyTurn() {
-//!dungeonEnemy || dungeonEnemy == 2 || dungeonEnemy > 8 ? dungeonEnemy + " attacks first!<br>" : "You face " + dungeonEnemy + ". Will you?",
-		
+	
 }

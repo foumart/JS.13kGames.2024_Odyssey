@@ -398,21 +398,24 @@ function closeButtonClick(e) {
 }
 
 function getAttackDamage(id) {
-	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel  : !id ? playerLevel + 1
-		: id
+	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel  : !id
+		? playerLevel + 1
+		: getEnemyAttack(id - 3)
 	);
 }
 
-function infoButtonClick(id) {
+function infoButtonClick(id, _hp, _att) {
 	prepareDialog(
-		(id == 1 ? "Ship" : id ? "Crew" : "Hero") + " <b>(lvl: " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +")</b><br>",
-		//(id == 1 ? "Ship" : id ? "Crew" : "Hero") +// " (" + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +
-			"HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
-			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax) +
-			" &nbsp Attack: " + getAttackDamage() + "<br>(" + (id == 1 ? "marine battles only" : id ? "strikes all enemies" : "hits single target") + ")<br>",
+		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) +
+			(id < 3 ? " <b>(lvl: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') + "<br>",
+		"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
+			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
+			" &nbsp Attack: " + getAttackDamage() + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
 		displayDialog
 	);
-	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0];
+	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
+		: offscreenBitmapsFlipped[33 + id];
+
 	bmp.style.marginBottom = "1vmin";
 	dialog.firstChild.append(bmp)
 }

@@ -149,11 +149,11 @@ function resizeUI(e) {
 	updateStyleUI(dialog,
 		(inDialog ? '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
-			portrait ? width*.9 : width/2
+			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			!state ? portrait ? 90 : 80 : portrait ? 60 : 41
+			!state ? portrait ? 88 : 80 : portrait ? 60 : 40
 		}%) translateX(-${
-			portrait || !state ? 50 : 42
+			portrait || !state ? 50 : inBattle ? 47 : 42
 		}%)`, 60, 60
 	);
 
@@ -161,18 +161,18 @@ function resizeUI(e) {
 	updateStyleUI(battleScreen,
 		(inBattle ? inDialog ? 'opacity:.5;' : '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
-			portrait ? width*.9 : width/2
+			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			portrait ? 60 : 44
+			portrait ? 68 : 44
 		}%) translateX(-${
-			portrait ? 50 : 42
+			portrait ? 50 : 47
 		}%)`, 60, 60
 	);
 
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
-		updateStyleUI(actButton, `bottom:3vmin;right:3vmin;width:auto;padding:2vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
+		updateStyleUI(actButton, `bottom:${inBattle?5:3}vmin;right:${inBattle?5:3}vmin;width:auto;padding:2vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -182,7 +182,7 @@ function resizeUI(e) {
 
 	gameContext.imageSmoothingEnabled = bgrContext.imageSmoothingEnabled = false;
 
-	if (closeButton) updateStyleUI(closeButton, `position:relative;float:right;margin:1%;margin-left:0;background:#faac`, 68, 72);
+	if (closeButton) updateStyleUI(closeButton, `position:relative;float:right;margin:2vmin;margin-left:0;background:#faac`, 68, 72);
 
 	if (playerButton) {
 		playerButton.innerHTML = addHealthbar(playerHealth, playerHealthMax);
@@ -197,12 +197,12 @@ function resizeUI(e) {
 			offscreenBitmaps[8].style.width = "18vmin";
 		}
 		e = inBattle
-			? `padding:3vmin;position:absolute;margin:9vmin;border-radius:3vmin;`
-			: `padding:2vmin;position:relative;float:left;margin:1% 0 0 1%;border-radius:2vmin`;
+			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
+			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;
 
 		updateStyleUI(
 			playerButton,
-			e + (inBattle?portrait?`bottom:5%;left:45%;margin-left:-${playerButton.offsetWidth}px`:`top:12%`:''),
+			e + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
@@ -212,18 +212,18 @@ function resizeUI(e) {
 		);
 		updateStyleUI(
 			crewButton,
-			e + (inBattle?portrait?'bottom:5%;left:48%':`top:48%`:''),
+			e + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:48%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		shipButton.style.display = inBattle ? "none" : "block";
 	}
 
 	// Fullscreen button
-	//if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:1% 1% 1% 0`, 72, 72);
+	//if (fullscreenButton) updateStyleUI(fullscreenButton, `position:relative;float:right;margin:2vmin 2vmin 2vmin 0`, 72, 72);
 	// Sound button
-	updateStyleUI(soundButton, `position:relative;float:right;margin:1% 1% 1% 0;`, 68, 72);
+	updateStyleUI(soundButton, `position:relative;float:right;margin:2vmin 2vmin 2vmin 0;`, 68, 72);
 	updateStyleUI(infoTab,
-		`padding:${state?`3vmin 2vmin;margin:${inBattle?"1%":'4vmin'}`:'2vmin;margin:1%'} 1%${playerButton?`;top:${
+		`padding:${state?`3vmin 2vmin;margin:${inBattle?"2vmin":'4vmin'}`:'2vmin;margin:2vmin'} 2vmin${playerButton?`;top:${
 			inBattle ? 0 : playerButton.offsetHeight}px`:''
 		}`, state ? 18 : 32, 1
 	);

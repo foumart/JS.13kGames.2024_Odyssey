@@ -158,6 +158,6 @@ for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
 	offscreenBitmapsFlipped.push(flippedCanvas);
 
 	offscreenCanvas.style = flippedCanvas.style =
-		`border:1vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:12vmin`;
+		`border:2vmin solid #1160;border-radius:2vmin;background:#1166;position:relative;width:12vmin`;
 }
 

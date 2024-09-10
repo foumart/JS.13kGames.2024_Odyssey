@@ -52,7 +52,7 @@ function createUI() {
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
 			prepareDialog(
-				state ? "Day: " + timePassed : "",
+				state ? inBattle ? "<br>Dungeon floor " + dungeonFloor : "Day: " + timePassed : "",
 				"<br>" + (
 					state
 					? inBattle
@@ -123,7 +123,7 @@ function createUI() {
 	resizeUI();
 }
 
-function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "scale(1.5) translateY(-30%)") {
+function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "scale(1.5) translateY(-30%)", _callback = 0) {
 	let bitmapContainer = document.createElement("div");
 	bitmapContainer.style.position = "relative";
 	bitmapContainer.style.fontSize = "2vmin";
@@ -131,8 +131,9 @@ function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 	if (_name) bitmapContainer.innerHTML = `<div style="margin-top:5vmin;font-size:3em;position:relative">${_name}</div>`;
 	_dialog.prepend(bitmapContainer);
 	_dialog.style.display = "inline-flex";
-	_bitmap.style.margin = _healthBar ? '7vmin' : '13vmin 0 0';
+	_bitmap.style.margin = _healthBar ? '8vmin' : '13vmin 0 0';
 	bitmapContainer.append(_bitmap);
+	if (_callback) bitmapContainer.addEventListener(interactionTap, _callback);
 
 	if (_healthBar) {
 		const healthBarElement = document.createElement("span");
@@ -142,6 +143,10 @@ function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 
 	if (_transform) _bitmap.style.transform = _transform;
 }
+
+/*function enemyClicked(e) {
+	console.log(e, dungeonEnemy);
+}*/
 
 function addLabelToDialog(_dialog, _label, _label2) {
 	_dialog.innerHTML = `${_label?'<span style="font-size:6vmin;line-height:9vmin">'+_label+'</span><br>':''}<b>${_label2}</b><br>`;
