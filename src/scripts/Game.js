@@ -147,6 +147,10 @@ function action(direction, additionalParam) {
 			break;
 		case 6: // Action
 			_unit = getUnit(playerX, playerY);
+			if (inBattle) {
+				// Attack button clicked
+
+			} else
 			if (hasTutorial) {
 				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Castles ';
 				for (_unit = 2; _unit < colors.length; _unit++) {
@@ -160,9 +164,9 @@ function action(direction, additionalParam) {
 				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
 				prepareDialog(
 					_hp ? "Inn" : "Shipyard",
-					_hp ? "<br>Recovers HP<br>Restores Ship movement<br>" : secondMenu ?
-						shipHealth < shipHealthMax ? "<br>Repair Ship damage<br><br>" :
-						shipLevel > 3 ? 'Ship maxed' :
+					_hp ? "Restores Hero and Crew HP, advances time by 1 day,<br>and refreshes Ship movement.<br>" : secondMenu ?
+						shipHealth < shipHealthMax ? "<br>Repair Ship damage ("+(shipHealthMax-shipHealth)+")<br><br>" :
+						shipLevel > 3 ? '<br>Ship maxed<br>' :
 						`<br>Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?<br><br>` : '',
 
 					_hp ? e => {
@@ -390,22 +394,27 @@ function upgradeCrew() {
 }
 
 function closeButtonClick(e) {
-	prepareDialog("Close", "You sure?", quitGame, "Yes", displayDialog, "No");
+	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
 }
 
+function getAttackDamage(id) {
+	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel  : !id ? playerLevel + 1
+		: id
+	);
+}
 
 function infoButtonClick(id) {
 	prepareDialog(
-		"<br>",// + (id == 1 ? "Ship" : id ? "Crew" : "Corsair"),
-		(id == 1 ? "Ship" : id ? "Crew" : "Corsair") + " Level " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +
-			" &nbsp HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
+		(id == 1 ? "Ship" : id ? "Crew" : "Hero") + " <b>(lvl: " + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +")</b><br>",
+		//(id == 1 ? "Ship" : id ? "Crew" : "Hero") +// " (" + (id == 1 ? shipLevel : id ? crewLevel : playerLevel) +
+			"HP: " + (id == 1 ? shipHealth : id ? crewHealth : playerHealth) +
 			"/" + (id == 1 ? shipHealthMax : id ? crewHealthMax : playerHealthMax) +
-			"<br>",
+			" &nbsp Attack: " + getAttackDamage() + "<br>(" + (id == 1 ? "marine battles only" : id ? "strikes all enemies" : "hits single target") + ")<br>",
 		displayDialog
 	);
-	addBitmapToDialog(dialog.firstChild,
-		id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0]
-	);
+	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id ? offscreenBitmapsFlipped[8] : offscreenBitmaps[0];
+	bmp.style.marginBottom = "1vmin";
+	dialog.firstChild.append(bmp)
 }
 
 function quitGame() {

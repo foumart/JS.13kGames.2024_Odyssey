@@ -14,18 +14,23 @@ function getSurfaceEnemyName(_id) {
 	return ["Squid", "Serpent", "Knight", "Crab"][_id];
 }
 
-function displayDungeon() {
-	let notCleared, dungeonStages = "Dungeon<br>Stages: ";
-	dungeon.forEach((dungeon, index) => {
+function getDungeonStagesString(label = "") {
+	let notCleared, dungeonStages = label + "Stages: ";
+	dungeon.forEach((dungeon, index) => {//console.log(index, dungeon, dungeon.length);
 		if (index > 2 && dungeon.length) notCleared = 1;
 		if (index < 3 || !dungeon.length) {
-			dungeonStages += !index || !dungeon[index-1].length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
+			dungeonStages += !index || !dungeon.length ? ' &#128853' : ' &#974' + (dungeon.length ? 4 : 5);
 		}
 	});
 	if (dungeon.length > 3 && notCleared) dungeonStages += ' &#8943';
+	return dungeonStages;
+}
+
+function displayDungeon() {
+	
 
 	prepareDialog(
-		dungeonStages,
+		getDungeonStagesString("<br>Dungeon<br>"),
 		"",
 		descendInDungeon, "Descend",
 		displayDialog, "Exit"
@@ -33,6 +38,9 @@ function displayDungeon() {
 }
 
 function descendInDungeon() {
+	//tween.transitionZ = boardScale;
+	//TweenFX.to(tween, 9, {transitionZ: 4}, e => doFrameAnimationMove(0, 1), e => { }, 1);
+
 	dungeonFloor = -1;
 	dungeon.forEach((_dungeon, _index) => {
 		if (_dungeon.length && dungeonFloor < 0) {
@@ -53,22 +61,34 @@ function descendInDungeon() {
 }
 
 function dungeonBattle() {
-	inBattle = true;
 	if (inDialog) displayDialog();// hide dialog screen
 
 	prepareBattleScreen(
 		"<br>",
-		"<br>Slime hits Corsair for 2dmg<br>",
-		dungeonBattle, "Attack",
-		displayDialog, "Flee"
+		"<br>Enemies prepared for fight!<br><br>",
+		battleItem, "Item",
+		tryToFleeBattle, "Flee"
 	);
 
 	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[36 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
-	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
-	addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	//addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[37 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
+	//addBitmapToDialog(battleScreen.firstChild, offscreenBitmaps[38 + dungeonEnemy], getEnemyName(dungeonEnemy), addHealthbar(10, 10), "scale(1.5)");
 
 	resizeUI();
 	updateInfoTab();
+	updateActionButton();
+}
+
+function battleAttack() {
+	
+}
+
+function battleItem() {
+	
+}
+
+function tryToFleeBattle() {
+	
 }
 
 function enemyTurn() {

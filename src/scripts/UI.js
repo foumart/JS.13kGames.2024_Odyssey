@@ -1,4 +1,4 @@
-const goldIcon = "&#10022;";
+const goldIcon = "&#10022;";//&#10022;
 
 function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
@@ -53,12 +53,16 @@ function createUI() {
 		() => {
 			prepareDialog(
 				state ? "Day: " + timePassed : "",
-				state ? getSpan("<br>&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}<br>`)
-					: "<br><br>Game by Noncho Savov<br>",
+				"<br>" + (
+					state
+					? inBattle
+						? getDungeonStagesString()
+						: getSpan("&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
+					: "<br>Game by Noncho Savov") + "<br>",
 				displayDialog
 			);
 			if (!state) {
-				let bitmap = offscreenBitmaps[islandGenerator.rand(36,45)];
+				let bitmap = offscreenBitmaps[37];
 				dialog.firstChild.prepend(bitmap);
 				bitmap.style.marginTop = "4vmin";
 			}
@@ -127,7 +131,7 @@ function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 	if (_name) bitmapContainer.innerHTML = `<div style="margin-top:5vmin;font-size:3em;position:relative">${_name}</div>`;
 	_dialog.prepend(bitmapContainer);
 	_dialog.style.display = "inline-flex";
-	_bitmap.style.margin = _healthBar ? '8vmin' : '13vmin 0 0';
+	_bitmap.style.margin = _healthBar ? '7vmin' : '13vmin 0 0';
 	bitmapContainer.append(_bitmap);
 
 	if (_healthBar) {
@@ -173,9 +177,10 @@ function displayDialog() {
 
 function displayBattleScreen() {
 	inBattle = !inBattle;
-	battleScreen.style.display = inDialog ? 'block' : 'none';
-	gameContainer.style.display = inDialog ? 'none' : 'block';
-	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
+	battleScreen.style.display = inBattle ? 'block' : 'none';
+	gameContainer.style.display = inBattle ? 'none' : 'block';
+	uiDiv.style.pointerEvents = inBattle ? 'auto' : 'none';
+	uiDiv.style.background = inBattle ? "#222b" : "0";
 }
 
 function displayRumors(_rumors, _amount) {
@@ -216,16 +221,15 @@ function updateActionButton(e) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
 
-	} else if (gamePlayer.overlay == UnitType.WRECK || gamePlayer.overlay == UnitType.GOLD) {//GOLD WRECK
+	} else if (gamePlayer.overlay == UnitType.WRECK || gamePlayer.overlay == UnitType.GOLD) {
 		gamePlayer.overlay = 0;
 		removeUnit(playerX, playerY);
-		
+
 		gold += 50;
-		//updateActionButton();
-		//action(6);
 		backFromDialog();
 	} else {
-		actButton.innerHTML = hasTutorial ? "?" :
+		actButton.innerHTML = inBattle ? "&#9876<br>" + getSpan("ATTACK", 0, "5vmin") : hasTutorial ? "?" :
+			
 			//hasEvent ? 'E' :
 			onFoot ? '&#10003' : 'S';
 

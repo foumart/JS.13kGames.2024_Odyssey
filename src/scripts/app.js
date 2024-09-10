@@ -159,20 +159,20 @@ function resizeUI(e) {
 
 	// Resize the Dialog Menu
 	updateStyleUI(battleScreen,
-		(inBattle ? '' : 'display:none;') +
+		(inBattle ? inDialog ? 'opacity:.5;' : '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.9 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			portrait ? 80 : 50
+			portrait ? 60 : 44
 		}%) translateX(-${
-			50
+			portrait ? 50 : 42
 		}%)`, 60, 60
 	);
 
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
-		updateStyleUI(actButton, `bottom:3vmin;right:3vmin;width:auto;padding:2vmin 3vmin;min-width:16vmin;min-height:12vmin`, 99, -1);
+		updateStyleUI(actButton, `bottom:3vmin;right:3vmin;width:auto;padding:2vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -197,12 +197,12 @@ function resizeUI(e) {
 			offscreenBitmaps[8].style.width = "18vmin";
 		}
 		e = inBattle
-			? `padding:3vmin;position:absolute;margin:6vmin;border-radius:3vmin;`
+			? `padding:3vmin;position:absolute;margin:9vmin;border-radius:3vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:1% 0 0 1%;border-radius:2vmin`;
 
 		updateStyleUI(
 			playerButton,
-			e + (inBattle?portrait?'bottom:16%;left:45%;transform:translateX(-100%)':`top:10%`:''),
+			e + (inBattle?portrait?`bottom:5%;left:45%;margin-left:-${playerButton.offsetWidth}px`:`top:12%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
@@ -212,7 +212,7 @@ function resizeUI(e) {
 		);
 		updateStyleUI(
 			crewButton,
-			e + (inBattle?portrait?'bottom:16%;left:50%':`top:45%`:''),
+			e + (inBattle?portrait?'bottom:5%;left:48%':`top:48%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		shipButton.style.display = inBattle ? "none" : "block";
@@ -232,7 +232,7 @@ function resizeUI(e) {
 	if (playButton) {
 		//if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
 		//updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
-		updateStyleUI(playButton, `top:${(portrait?75:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
+		updateStyleUI(playButton, `top:74%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
 		titlePng.innerHTML = getIcon(portrait ? 80*getSize() : 80*getSize());
 		updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #1267);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
