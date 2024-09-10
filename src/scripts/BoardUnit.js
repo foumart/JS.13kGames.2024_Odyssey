@@ -45,6 +45,9 @@ class BoardUnit extends BoardTile {
 			let _offsetY = this == boardPlayer && !this.overlay
 				|| this == boardShip ? 3 : 4;
 
+			if (this.type < 6) {
+				debugger;
+			}
 			// draw the object beneath this unit
 			if (this.overlay) {
 				this.drawImage(this.overlay, true);
@@ -59,7 +62,12 @@ class BoardUnit extends BoardTile {
 			}
 
 			// draw animated colored flag
-			if (this.origin && (this.type > UnitType.PLAYERRIGHT && this.type < UnitType.ENEMY1) || this.type == UnitType.CASTLE || this.overlay == UnitType.CASTLE) {
+			if (this.origin && (
+					this.type == UnitType.SHRINE ||
+					this.type > UnitType.PLAYERRIGHT &&
+					this.type < UnitType.ENEMY1
+				) || this.type == UnitType.CASTLE || this.overlay == UnitType.CASTLE
+			) {
 				// draw flag base
 				gameContext.fillStyle = "#840";
 				this.fillRect(_offsetX, _offsetY, 1, 2);

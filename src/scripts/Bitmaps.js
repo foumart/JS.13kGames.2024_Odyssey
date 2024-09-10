@@ -138,7 +138,7 @@ for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
 		for(i = 0; i < l; i++){
 			if(offscreenpx[j*l+i]) {
 				// make the cloud (k==15) sprite semi-transparent
-				offscreenCtx.fillStyle = "#"+offscreenC.substr(6*(offscreenpx[j*l+i]-1), 6) + (k==15?["66","dd","bb","cc","ee","ff"][offscreenpx[j*l+i]-1]:"ff");
+				offscreenCtx.fillStyle = `#${offscreenC.substr(6*(offscreenpx[j*l+i]-1), 6)}${k==15 ? ["66","dd","bb","cc","ee","ff"][offscreenpx[j*l+i]-1] : "ff"}`;
 				offscreenCtx.fillRect(i, j, 1, 1);
 			}
 		}

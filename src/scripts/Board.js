@@ -123,6 +123,7 @@ function initBoard() {
 								//console.log(index-colors.length, i, arr);
 								unit.dungeon.push(arr);
 							}
+							//if (unit.dungeon.length == 3) unit.origin = 2;
 						}
 					}
 				});
@@ -508,45 +509,41 @@ function drawBoard() {
 						} else if (_x == shipX && _y == shipY) {
 							boardShip = unitScreen[y][x];
 							boardShip.origin = gameShip.origin;
-						}
-
-						_unit = getUnit(_x, _y);
-						if (_unit) {
-							unitScreen[y][x].overlay = _unit.overlay;
-							unitScreen[y][x].movingX = _unit.movingX;
-							unitScreen[y][x].movingY = _unit.movingY;
-							unitScreen[y][x].origin = _unit.origin;
-							unitScreen[y][x].apple = _unit.apple;
-							unitScreen[y][x].dungeon = _unit.dungeon;
-							unitScreen[y][x].enemy = _unit.enemy;
-							// some units are visible in the fog, others not
-							shouldSkipDrawingUnit = visitedData[_y][_x] < (
-								_unit.type > UnitType.ENEMY2 &&
-								_unit.type < UnitType.WRECK ? 1 : 2
-							);
+						} else {
+							_unit = getUnit(_x, _y);
+							if (_unit) {
+								unitScreen[y][x].overlay = _unit.overlay;
+								unitScreen[y][x].movingX = _unit.movingX;
+								unitScreen[y][x].movingY = _unit.movingY;
+								unitScreen[y][x].origin = _unit.origin;
+								unitScreen[y][x].apple = _unit.apple;
+								unitScreen[y][x].dungeon = _unit.dungeon;
+								unitScreen[y][x].enemy = _unit.enemy;
+								// some units are visible in the fog, others not
+								shouldSkipDrawingUnit = visitedData[_y][_x] < (
+									_unit.type > UnitType.ENEMY1 &&
+									_unit.type < UnitType.WRECK ? 1 : 2
+								);
+							}
 						}
 					}
-	
-					if (state && !shouldSkipDrawingUnit) unitScreen[y][x].update(_z);
+
+					// update units
+					if (state && !shouldSkipDrawingUnit || _player) {
+						unitScreen[y][x].update(_z);
+					}
 
 					// draw tile clouds
 					tileScreen[y][x].drawOverlay();
 				}
 			}
 		}
-		if (_player) {
-			boardPlayer.update(_player);
-		}
 	}
 
 	if (gameDirty) {
 		gameDirty = 0;
 		if (buttonScreen && !paused) {
-			for (_y = 0; _y < buttonScreen.length; _y ++) {
-				for (_x = 0; _x < buttonScreen[_y].length; _x ++) {
-					buttonScreen[_y][_x].update(1, playerX - _ox, playerY - _oy);
-				}
-			}
+			buttonScreen.forEach(row => row.forEach(button => button.update(1, playerX - _ox, playerY - _oy)));
 		}
 	}
 }
@@ -560,12 +557,5 @@ function getUnit(x, y) {
 }
 
 function getUnitId(x, y) {
-	let id = -1;
-	unitsList.forEach((unit, index) => {
-		if (unit.x == x && unit.y == y && unit != gamePlayer && unit != gameShip) {
-			id = index;
-		}
-	});
-
-	return id;
+	return unitsList.reduce((id, u, i) => u.x == x && u.y == y && u != gamePlayer && u != gameShip ? i : id, -1);
 }

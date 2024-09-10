@@ -11,7 +11,7 @@ let unit,
 	hasTutorial;
 
 const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta"];
-const shipPrices = [250,500,999];
+const shipPrices = [250,500,1e3];
 
 let stage, turn, gold,
 	moveLeft, moveLimit, timePassed,
@@ -45,6 +45,11 @@ function createUnit(x, y, z) {
 
 function action(direction, additionalParam) {
 	if (paused) return;
+	if (inBattle && direction == 6) {
+		// Attack button clicked
+		beginNewRound();
+		return;
+	}
 	let _unit;
 	switch (direction) {
 		case 1: // Up
@@ -152,10 +157,6 @@ function action(direction, additionalParam) {
 			break;
 		case 6: // Action
 			_unit = getUnit(playerX, playerY);
-			if (inBattle) {
-				// Attack button clicked
-				beginNewRound();
-			} else
 			if (hasTutorial) {
 				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Castles ';
 				for (_unit = 2; _unit < colors.length; _unit++) {
@@ -403,8 +404,8 @@ function closeButtonClick(e) {
 }
 
 function getAttackDamage(id) {
-	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel*3 : !id
-		? playerLevel + 10
+	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel : !id
+		? playerLevel + 1
 		: getEnemyAttack(id - 3)
 	);
 }

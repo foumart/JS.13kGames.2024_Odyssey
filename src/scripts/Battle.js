@@ -63,10 +63,6 @@ function displayDungeon(_dungeon) {
 	);
 }
 
-function nextRoomInDungeon() {
-
-}
-
 function descendInDungeon(_skip) {
 	//tween.transitionZ = boardScale;
 	//TweenFX.to(tween, 9, {transitionZ: 4}, e => doFrameAnimationMove(0, 1), e => { }, 1);
@@ -88,6 +84,7 @@ function descendInDungeon(_skip) {
 		dungeonBattle();
 	} else {
 		updateInfoTab();
+		updateActionButton();// TODO: fix
 		prepareDialog(
 			`<br>`,//Stage ${dungeonStage}, Room ${dungeonRoom}
 			`<br>Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
@@ -105,7 +102,7 @@ function dungeonBattle() {
 
 	prepareBattleScreen(
 		"<br>",
-		"<br>Enemy is prepared for a fight!<br>",
+		getEnemyStatsString(),
 		beginNewRound, "Attack",
 		tryToFleeBattle, "Flee"
 	);
@@ -128,6 +125,10 @@ function dungeonBattle() {
 	resizeUI();
 	updateInfoTab();
 	updateActionButton();
+}
+
+function getEnemyStatsString() {
+	return `<br>Enemy HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}<br>`;
 }
 
 function getEnemyHealthBar() {
@@ -186,6 +187,7 @@ function animateUnitHit(_id, _callback) {
 						if (Math.random() < .5) {
 							// atacks the hero
 							playerHealth -= dungeonEnemyAttack;
+							if (playerHealth < 1) prepareDialog("Hero fell!", "Game Over", quitGame);
 						} else {
 							// atacks the crew
 							crewHealth -= dungeonEnemyAttack;
@@ -193,6 +195,8 @@ function animateUnitHit(_id, _callback) {
 					} else {
 						dungeonEnemyHealth -= getAttackDamage(_id);
 						dungeonEnemyHealthBar.innerHTML = getEnemyHealthBar();
+						//dialog
+						battleScreen.children[2].innerHTML = getEnemyStatsString();
 					}
 
 					resizeUI();

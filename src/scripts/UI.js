@@ -1,4 +1,4 @@
-const goldIcon = "&#164;";//"₪";//"ϵ";// + getSpan(":", 0, "11vmin") + "&#183;";//"&#10022;"
+const goldIcon = "&#164;";// currency sign
 
 function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
@@ -206,16 +206,19 @@ function updateActionButton(event) {
 	// ⌢ &#8994 | ᵔ &#7508 | ⤼ &#10556 | ට | 𝓠 &#120032 | 𝓞 | ⌓ ᗝ ◑ ❍ | Ѻ &#1146 | ▢ ⬯ | 𝕆 &Oopf; |
 	// ⫝ &#10973 | ⥀ &#10560 | ⛀ ⛃ | ⬭ &#11053; | ⬬ &#11052 | ⤽ | ⤸ | ⤺ &#10554 | 🜿 &#128831 | 𝅏▼▾ | ❫ &#10091 |
 	// ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈  ✠  ✡  ✢  ✣  ✤  ✥  ✦&#10022  ✧  ✰  ✱  ✲  ✳  ✴  ✵  ✶  ✷  ✸
-	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | 
+	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | "₪" "ϵ"
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
 
 	//unit = getUnit(playerX, playerY);
-
+	if (dungeon || inBattle) {
+		actButton.innerHTML = "&#9876<br>" + getSpan("ATTACK", 0, "5vmin");
+	} else
 	if (
 		gamePlayer.overlay == UnitType.CASTLE ||
 		gamePlayer.overlay == UnitType.SHRINE ||
 		gamePlayer.overlay == UnitType.TREE
 	) {
+
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
 		actButton.innerHTML = `${
 			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
@@ -231,8 +234,7 @@ function updateActionButton(event) {
 		gold += 50;
 		backFromDialog();
 	} else {
-		actButton.innerHTML = inBattle ? "&#9876<br>" + getSpan("ATTACK", 0, "5vmin") : hasTutorial ? "?" :
-			onFoot ? '&#10003' : 'S';
+		actButton.innerHTML = hasTutorial ? "?" : onFoot ? '&#10003' : 'S';
 
 		//actButton.style.opacity = hasEvent ? 1 : .5;
 	}
