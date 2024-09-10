@@ -7,7 +7,7 @@ let unit,
 	holding,// is player holding a direction button for constant moving
 	inDialog,// is a dialog on screen
 	inBattle,// is player in battle
-	hardChoice,//TODO: make some dialogs permanent
+	hardChoice,//TODO: make some dialogs permanent (do we need it?)
 	hasTutorial;
 
 const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta"];
@@ -17,7 +17,10 @@ let stage, turn, gold,
 	moveLeft, moveLimit, timePassed,
 	crewHealth, crewHealthMax, crewLevel, crewPaid,
 	playerHealth, playerHealthMax, playerLevel,
-	shipHealth, shipHealthMax, shipLevel;
+	shipHealth, shipHealthMax, shipLevel,
+	playerBitmap, shipBitmap, crewBitmap;
+
+let enemiesKilled;
 
 // initialize vars for new game
 function initVars() {
@@ -31,6 +34,8 @@ function initVars() {
 	playerHealth = 10; playerHealthMax = 20; playerLevel = 1;
 	shipHealth = 30; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
 	crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
+
+	enemiesKilled = [];
 }
 
 function createUnit(x, y, z) {
@@ -59,7 +64,7 @@ function action(direction, additionalParam) {
 				playerY --;
 				gamePlayer.y --;
 				if (!onFoot && !landing) gameShip.y --;
-				if (playerY < jump) {// TODO: fix wrapping
+				if (playerY < jump) {// TODO: fix wrapping or make the map constrained
 					playerY = boardWidth-1;
 					gamePlayer.y += boardWidth-jump;
 				}
@@ -149,7 +154,7 @@ function action(direction, additionalParam) {
 			_unit = getUnit(playerX, playerY);
 			if (inBattle) {
 				// Attack button clicked
-
+				beginNewRound();
 			} else
 			if (hasTutorial) {
 				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Castles ';
@@ -367,7 +372,7 @@ function healPlayer(_hp = 9) {
 
 function backFromDialog() {
 	if (inDialog) displayDialog();
-	gameContainer.style.display = "block";//TODO: fix lag
+	gameContainer.style.display = "block";//TODO: fix lag (low priority)
 	updateActionButton();
 	updateInfoTab();
 }

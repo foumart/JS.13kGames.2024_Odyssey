@@ -28,6 +28,7 @@ function generateUIButton(div, code, handler, className = "css_icon css_space") 
 
 function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 	let str = '<br><br><br>';
+	if (_max < _num) _num = _max;
 	const _step = _max / _num;
 	for (let i = 0; i < _num; i++) {
 		if (i * _step < _health) {
@@ -52,7 +53,7 @@ function createUI() {
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
 			prepareDialog(
-				state ? inBattle ? "<br>Dungeon floor " + dungeonFloor : "Day: " + timePassed : "",
+				state ? inBattle ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
 				"<br>" + (
 					state
 					? inBattle
@@ -123,7 +124,7 @@ function createUI() {
 	resizeUI();
 }
 
-function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "scale(1.5) translateY(-30%)", _callback = 0) {
+function addBitmapToScreen(_dialog, _bitmap, _name, _healthBar, _transform = "scale(1.5) translateY(-30%)", _callback = 0) {
 	let bitmapContainer = document.createElement("div");
 	bitmapContainer.style.position = "relative";
 	bitmapContainer.style.fontSize = "2vmin";
@@ -144,10 +145,6 @@ function addBitmapToDialog(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 	if (_transform) _bitmap.style.transform = _transform;
 	return bitmapContainer;
 }
-
-/*function enemyClicked(e) {
-	console.log(e, dungeonEnemy);
-}*/
 
 function addLabelToDialog(_dialog, _label, _label2) {
 	_dialog.innerHTML = `${_label?'<span style="font-size:6vmin;line-height:9vmin">'+_label+'</span><br>':''}<b>${_label2}</b><br>`;
@@ -246,7 +243,7 @@ function updateActionButton(event) {
 function updateInfoTab() {
 	let _char = "&#9608";
 	if (inBattle) {
-		infoTab.innerHTML = getSpan("Dungeon Floor 1 Battle!", 0, '3em', 'line-height:2vmin');
+		infoTab.innerHTML = getSpan(`Dungeon Stage ${dungeonStage}, Room ${dungeonRoom}`, 0, '3em', 'line-height:2vmin');
 	} else {
 		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
 			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')

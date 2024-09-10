@@ -151,9 +151,9 @@ function resizeUI(event) {
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			!state ? portrait ? 88 : 80 : portrait ? 60 : 40
+			!state ? portrait ? 88 : 80 : portrait ? 60 : inBattle ? 44 : 38
 		}%) translateX(-${
-			portrait || !state ? 50 : inBattle ? 47 : 42
+			portrait || !state ? 50 : inBattle ? 47 : 44
 		}%)`, 60, 60
 	);
 
@@ -177,25 +177,31 @@ function resizeUI(event) {
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
-		if (gamePlayer.overlay) offscreenBitmaps[gamePlayer.overlay-1].style = `margin:2vmin 0;border:2vmin solid #0000;border-radius:2vmin;background:#2266;position:relative;width:16vmin`;
+		if (gamePlayer.overlay) {
+			offscreenBitmaps[gamePlayer.overlay-1].style =
+				`margin:2vmin 0;border:2vmin solid #0000;border-radius:2vmin;background:#2266;position:relative;width:16vmin`;
+		}
 	}
 
 	gameContext.imageSmoothingEnabled = bgrContext.imageSmoothingEnabled = false;
 
-	if (closeButton) updateStyleUI(closeButton, `position:relative;float:right;margin:2vmin;margin-left:0;background:#faac`, 68, 72);
+	if (closeButton) {
+		updateStyleUI(closeButton, `position:relative;float:right;margin:2vmin;margin-left:0;background:#faac`, 68, 72);
+	}
 
 	if (playerButton) {
 		playerButton.innerHTML = addHealthbar(playerHealth, playerHealthMax);
 		shipButton.innerHTML = addHealthbar(shipHealth, shipHealthMax);
 		crewButton.innerHTML = addHealthbar(crewHealth, crewHealthMax);
-		playerButton.prepend(offscreenBitmapsFlipped[0]);
-		shipButton.prepend(offscreenBitmapsFlipped[4]);
-		crewButton.prepend(offscreenBitmaps[8]);
-		if (inBattle) {
-			offscreenBitmapsFlipped[0].style.width = "18vmin";
-			offscreenBitmapsFlipped[4].style.width = "18vmin";
-			offscreenBitmaps[8].style.width = "18vmin";
-		}
+		playerBitmap = offscreenBitmapsFlipped[0];
+		shipBitmap = offscreenBitmapsFlipped[4];
+		crewBitmap = offscreenBitmaps[8];
+
+		playerButton.prepend(playerBitmap);
+		shipButton.prepend(shipBitmap);
+		crewButton.prepend(crewBitmap);
+		playerBitmap.style.width = shipBitmap.style.width = crewBitmap.style.width = `${inBattle?18:12}vmin`;
+
 		e = inBattle
 			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;

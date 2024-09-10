@@ -299,7 +299,6 @@ function initBoard() {
 
 	// data initialization completed
 
-	// TODO: should be optimized, fix lag
 	gameContainer.innerHTML = "";
 
 	// now preparing board elements to render only what is visible inside the game window
