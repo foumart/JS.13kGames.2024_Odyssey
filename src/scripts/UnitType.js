@@ -23,16 +23,16 @@ class UnitType {
 		return 6;
 	}
 
-	static get ENEMY1() {
+	static get SQUID() {
 		return 7;
 	}
-	static get ENEMY2() {
+	static get SERPENT() {
 		return 8;
 	}
-	static get ENEMY3() {
+	static get KNIGHT() {
 		return 9;
 	}
-	static get ENEMY4() {
+	static get CRAB() {
 		return 10;
 	}
 
@@ -54,54 +54,51 @@ class UnitType {
 	}
 
 	// Surface Creatures
-	static get SQUID() {
+	/*static get SQUID1() {
 		return 16;
 	}
-	static get SERPENT() {
+	static get SERPENT1() {
 		return 17;
 	}
-	static get KNIGHT() {
+	static get KNIGHT1() {
 		return 18;
 	}
-	static get CRAB() {
+	static get CRAB1() {
 		return 19;
-	}
+	}*/
 
 	// Dungeon Creatures
-	static get BAT() {//
+	static get BAT() {
 		return 20;
 	}
 	static get SLIME() {
 		return 21;
 	}
-	static get WOLF() {//
+	static get WOLF() {
 		return 22;
 	}
-	static get GOBLIN() {
+	static get IMP() {
 		return 23;
 	}
-	static get IMP() {
+	static get ORC() {
 		return 24;
 	}
 
-	static get ORC() {
+	static get WIZARD() {
 		return 25;
 	}
 	static get TROLL() {
 		return 26;
 	}
-	static get WIZARD() {
+	static get LICH() {
 		return 27;
 	}
-	static get LICH() {
-		return 28;
-	}
 	static get DRAGON() {
-		return 29;
+		return 28;
 	}
 
 	static get BALROG() {
-		return 30;
+		return 29;
 	}
 
 }

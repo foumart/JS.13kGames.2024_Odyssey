@@ -1,9 +1,9 @@
 
 let audioContext;
 const SoundFXoscTypes = ["sawtooth", "square", "sine"];//"triangle", "sine"
-let SoundFXvolume = 1;
+let SoundFXvolume = 0;// have it turned off initially until user interaction
 
-function SoundFXplayTune(tone, len = 9, vol = 5, type = 1) {
+function SoundFXplayTune(tone, len = 3, vol = 1, type = 1) {
 	if (!tone || !audioContext) return;
 	else playTune(tone, len / 99, len, vol / 9);
 	function playTune(_tone, _len, _dur, _vol) {
@@ -32,12 +32,12 @@ function SoundFXplayTune(tone, len = 9, vol = 5, type = 1) {
 	}
 }
 
-function SoundFXplaySequence(start, incr, len = 6, j = '') {
+/*function SoundFXplaySequence(start, incr, len = 6, j = '') {
 	for (let i = 0; i < len; i++) {
 		j += String.fromCharCode(start + i * incr);
 	}
 	return j;
-}
+}*/
 
 // !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~
 
@@ -45,12 +45,24 @@ function SoundFXstart() {
 	audioContext = new AudioContext();
 }
 
+function SoundFXui() {
+	SoundFXplayTune("U;", 2, 1, 2);
+}
+
 function SoundFXmute() {
 	SoundFXplayTune("9NA", 3, 1, 2);
 }
 
+function SoundFXgetGold() {
+	SoundFXplayTune(`X_a`, 6, 1);
+}
+
 function SoundFXmoveStep() {
-	SoundFXplayTune(`' *`, 4, 1);
+	SoundFXplayTune(`' *`, 4, .5);
+}
+
+function SoundFXmoveSail() {
+	SoundFXplayTune(`2 4`, 2, 1, 2);
 }
 
 function SoundFXdisabled() {
@@ -62,14 +74,3 @@ function SoundFXhilight() {
 	SoundFXplayTune(" AA  C", 3, 1, 2);
 }
 
-function SoundFXremoveHilight() {
-	SoundFXplayTune("  DD  B", 3, 1, 2);
-}
-
-function soundFXdecline() {
-	SoundFXplayTune("  CC B A", 3, 2, 2);
-}
-
-function soundFXraise() {
-	SoundFXplayTune("  AA B C", 3, 2, 2);
-}

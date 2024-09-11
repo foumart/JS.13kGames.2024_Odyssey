@@ -2,25 +2,29 @@ const keysHeld = [];
 function onKeyDown(event) {
 	//console.log(event.keyCode);
 
-	/*if (event.keyCode == 49) {// M change Sound
+	if (event.keyCode == 49) {
+		SoundFXui();
+	} else
+	if (event.keyCode == 50) {
+		SoundFXgetGold();
+	} else
+	if (event.keyCode == 51) {
 		SoundFXmoveStep();
 	} else
-	if (event.keyCode == 50) {// M change Sound
+	if (event.keyCode == 52) {
+		SoundFXmoveSail();
+	} else
+	if (event.keyCode == 53) {
 		SoundFXdisabled();
 	} else
-	if (event.keyCode == 51) {// M change Sound
+	if (event.keyCode == 54) {
 		SoundFXhilight();
 	} else
-	if (event.keyCode == 52) {// M change Sound
-		soundFXdecline();
+	if (event.keyCode == 55) {
+		debugBoard();
 	} else
-	if (event.keyCode == 53) {// M change Sound
-		SoundFXremoveHilight();
-	} else
-	if (event.keyCode == 54) {// M change Sound
-		soundFXraise();
-	} else*/
-	if (event.keyCode == 55) {// M change Sound
+
+	/*if (event.keyCode == 55) {// summon dungeon
 		unitsList.forEach(_unit => {
 			if (_unit.dungeon && !dungeon) {
 				dungeon = _unit.dungeon
@@ -28,7 +32,7 @@ function onKeyDown(event) {
 		})
 		
 		displayDungeon();
-	}
+	}*/
 
 
 	
@@ -49,35 +53,19 @@ function onKeyDown(event) {
 	} else
 
 	if (event.keyCode == 38 || event.keyCode == 87) { // up
-		/*if (!state) {
-			console.log("Menu up");
-		} else {*/
-			action(1);
-		//}
+		action(1);
 	} else
 
 	if (event.keyCode == 40 || event.keyCode == 83) { // down
-		/*if (!state) {
-			console.log("Menu down");
-		} else {*/
-			action(3);
-		//}
+		action(3);
 	} else
 
 	if (event.keyCode == 37 || event.keyCode == 65) { // left
-		/*if (!state) {
-			console.log("Menu left");
-		} else {*/
-			action(4);
-		//}
+		action(4);
 	} else
 
 	if (event.keyCode == 39 || event.keyCode == 68) { // right
-		/*if (!state) {
-			console.log("Menu right");
-		} else {*/
-			action(2);
-		//}
+		action(2);
 	}
 
 	holding = false;

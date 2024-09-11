@@ -32,8 +32,8 @@ class BoardTile extends BoardElement {
 	}
 
 	reset() {
-		// reflected variables from the corresponding game unit
-		// When performing a move all board elements are reset and new data is assigned
+		// Variables assigned from the corresponding game unit on previous move.
+		// When performing next move all board elements are reset and new data is assigned.
 		this.overlay = 0;
 		this.origin = 0;
 		this.selection = 0;
@@ -46,19 +46,17 @@ class BoardTile extends BoardElement {
 	}
 
 	draw() {
-		//if (this.visited) {
-			let mirrored = [7,11,12,16].indexOf(this.type) > -1;
-			bgrContext.drawImage(
-				(mirrored ? offscreenBitmapsFlipped : offscreenBitmaps)[
-					!state || this.visited ? (this.type || 0) + (mirrored ? 14 : 16) : 15
-				],
-				0, 0, tileWidth, tileWidth,
-				this.getX(),
-				this.getY(),
-				this.width,
-				this.width
-			);
-		//}
+		let mirrored = [7,11,12,16].indexOf(this.type) > -1;
+		bgrContext.drawImage(
+			(mirrored ? offscreenBitmapsFlipped : offscreenBitmaps)[
+				!state || this.visited ? (this.type || 0) + (mirrored ? 14 : 16) : 15
+			],
+			0, 0, tileWidth, tileWidth,
+			this.getX(),
+			this.getY(),
+			this.width,
+			this.width
+		);
 	}
 
 	drawOverlay() {

@@ -243,7 +243,7 @@ function resizeUI(event) {
 		updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #1267);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
 			}px;font-size:${45*scale}px;color:#ff9"><i>The</i></div><div style="filter:drop-shadow(.15em .1em 0 #1267);text-shadow:#f74 .07em .03em;margin-top:-${95*scale}px;margin-left:${325*scale
-			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div><span style="filter:drop-shadow(.1em .05em 0 #1267);color:#efe;text-shadow:#1bc .06em .03em">O<b>dyssey</b></span>`;
+			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div>${getSpan("O<b>dyssey</b>", "#efe", 0, "filter:drop-shadow(.1em .05em 0 #1267);text-shadow:#1bc .06em .03em")}`;
 		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?340:260}%) translateX(-50%) scale(${getSize(500)})`, 220);
 	}
 }

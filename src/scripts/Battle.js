@@ -11,27 +11,26 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 
 function getEnemyName(_id) {
 	return [
-		"Bat", "Slime", "Wolf", "Goblin", "Imp",
-		"Orc", "Wizard", "Troll", "Lich", "Dragon", "Balrog"
+		"Bat", "Slime", "Wolf", "Imp", "Orc",
+		"Wizard", "Troll", "Lich", "Dragon", "Balrog",
+		"Squid", "Serpent", "Knight", "Crab"
 	][_id > 9 ? _id - 20 : _id];
 }
 
 function getEnemyAttack(_id) {
 	return [
-		1, 2, 2, 2, 1,
-		3, 3, 6, 5, 12, 16
+		1, 2, 2, 1, 3,
+		3, 6, 5, 12, 16,
+		2, 5, 4, 3
 	][_id > 9 ? _id - 20 : _id];
 }
 
 function getEnemyHP(_id) {
 	return [
-		6, 10, 12, 16, 16,
-		24, 20, 42, 32, 60, 90
+		6, 10, 12, 16, 24,
+		20, 42, 32, 60, 90,
+		24, 50, 32, 24
 	][_id > 9 ? _id - 20 : _id];
-}
-
-function getSurfaceEnemyName(_id) {
-	return ["Squid", "Serpent", "Knight", "Crab"][_id];
 }
 
 function getDungeonStagesString(label = "") {
@@ -87,7 +86,7 @@ function descendInDungeon(_skip) {
 		updateActionButton();// TODO: fix
 		prepareDialog(
 			`<br>`,//Stage ${dungeonStage}, Room ${dungeonRoom}
-			`<br>Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
+			`Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
@@ -270,11 +269,46 @@ function completeDungeon() {
 	closeAllScreens();
 }
 
-/*function clearDungeonStage() {
+function prepareCastleSiegeDialog(_unit) {
+
+	//dungeonStage = -1;
+	//dungeonRoom = _nextStage.findIndex(e => e > -1) + 1;
+	//dungeonEnemy = _nextStage[dungeonRoom-1];
+	//dungeonEnemy = _unit.type;
+	//dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
+	//dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
+	
+	//prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", dungeonBattle, "Attack", displayDialog, "Retreat");
+
+	updateInfoTab();
+	updateActionButton();// TODO: fix
 	prepareDialog(
-		`Stage ${dungeonStage} cleared!`,
-		"",
-		descendInDungeon, "Descend",
+		`<br>CASTLE ${_unit.type}`,
+		`<br>You approached a ${_unit.origin}<br>`,
+		dungeonBattle, "Fight",
+		closeAllScreens, "Exit"
+	);
+}
+
+function prepareSurfaceBattle(_unit) {
+	updateInfoTab();
+	updateActionButton();// TODO: fix
+	prepareDialog(
+		`<br>SFC BATTLE ${_unit.type}`,
+		`<br>You approached a ${_unit.origin}<br>`,
+		dungeonBattle, "Fight",
+		closeAllScreens, "Exit"
+	);
+}
+
+
+/*function prepareMarineBattle(_unit) {
+	updateInfoTab();
+	updateActionButton();// TODO: fix
+	prepareDialog(
+		`<br>SFC ${_unit.type}`,//Stage ${dungeonStage}, Room ${dungeonRoom}
+		`<br>You approached a ${_unit.origin}<br>`,
+		dungeonBattle, "Fight",
 		closeAllScreens, "Exit"
 	);
 }*/

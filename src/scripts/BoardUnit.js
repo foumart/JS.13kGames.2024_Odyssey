@@ -6,15 +6,15 @@ class BoardUnit extends BoardTile {
 
 	shouldAnimate() {
 		return this.type < UnitType.SHIPUP && onFoot ||
-			this.type > UnitType.PLAYER && this.type < UnitType.ENEMY1 && !onFoot;
+			this.type > UnitType.PLAYER && this.type < UnitType.SQUID && !onFoot;
 	}
 
 	isEnemyMovingX() {
-		return this.type > UnitType.ENEMY1 && this.type < UnitType.CASTLE ? this.movingX : 0;
+		return this.type > UnitType.SQUID && this.type < UnitType.CASTLE ? this.movingX : 0;
 	}
 
 	isEnemyMovingY() {
-		return this.type > UnitType.ENEMY2 && this.type < UnitType.CASTLE ? this.movingY : 0;
+		return this.type > UnitType.SERPENT && this.type < UnitType.CASTLE ? this.movingY : 0;
 	}
 
 	getX(reverse) {
@@ -47,7 +47,7 @@ class BoardUnit extends BoardTile {
 
 			// draw the object beneath this unit
 			if (this.overlay) {
-				this.drawImage(this.overlay, true);
+				this.drawImage(this.overlay, true, true);
 				_offsetX += tileWidth * tween.transitionX;
 				_offsetY -= tileWidth * tween.transitionY;
 			}
@@ -62,7 +62,7 @@ class BoardUnit extends BoardTile {
 			if (this.origin && (
 					this.type == UnitType.SHRINE ||
 					this.type > UnitType.PLAYERRIGHT &&
-					this.type < UnitType.ENEMY1
+					this.type < UnitType.SQUID
 				) || this.type == UnitType.CASTLE || this.overlay == UnitType.CASTLE
 			) {
 				// draw flag base
@@ -105,14 +105,24 @@ class BoardUnit extends BoardTile {
 		);
 	}
 
-	drawImage(_type, reverse) {
+	drawImage(_type, reverse, underlay) {
 		gameContext.drawImage(
-			this.type == UnitType.PLAYERRIGHT ||
-			this.type == UnitType.SHIPRIGHT ||
-			this.type == UnitType.SHIPDOWN ? offscreenBitmapsFlipped[_type-2] : offscreenBitmaps[_type-1], 
+			(
+				this.type == UnitType.PLAYERRIGHT ||
+				this.type == UnitType.SHIPRIGHT ||
+				this.type == UnitType.SHIPDOWN
+			) && !underlay ? offscreenBitmapsFlipped[_type-2] : offscreenBitmaps[_type-1],
+
 			0, 0, unitWidth, unitWidth,
-			this.getX(reverse) - this.width/2 - this.width/tileWidth * ((_type == UnitType.ENEMY2 || _type == UnitType.ENEMY4) && ((step+this.y*9)/50|0)%2 ? 2 : 1),
-			this.getY(reverse) - this.height - this.width/tileWidth * (_type==UnitType.ENEMY1 || _type==UnitType.WRECK ? ((step+this.y*9)/70|0)%2 ? 0 : -1 : _type > UnitType.SHIPRIGHT ? 2 : 1),
+			this.getX(reverse) - this.width/2 - this.width/tileWidth * (
+				(_type == UnitType.SERPENT || _type == UnitType.CRAB) && ((step + this.y * 9) / 50 | 0) % 2
+					? 2 : 1
+			),
+			this.getY(reverse) - this.height - this.width/tileWidth * (
+				_type == UnitType.SQUID || _type == UnitType.WRECK
+					? ((step + this.y * 9) / 70 | 0) % 2 ? 0 : -1
+					: _type > UnitType.SHIPRIGHT ? 2 : 1
+			),
 			this.width/tileWidth*unitWidth,
 			this.width/tileWidth*unitWidth
 		);

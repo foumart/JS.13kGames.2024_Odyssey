@@ -22,7 +22,7 @@ class IslandGenerator {
 		this.destroyed = true;
 	}
 
-	regenerate(_startX, _startY, _endX, _endY) {
+	/*regenerate(_startX, _startY, _endX, _endY) {
 		let islesToNotRegen = [];
 		// get the islands that fall in the protected area
 		for (let y = _startY; y < (_endY < this.height ? _endY : this.height); y++) {
@@ -54,7 +54,7 @@ class IslandGenerator {
 		this.id --;
 
 		this.generateNextIsland(true);
-	}
+	}*/
 
 	generateIslands(width, height) {
 		this.width = width;
