@@ -97,8 +97,12 @@ function action(direction, additionalParam) {
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				_unit = getUnit(playerX-1, playerY);
-				if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
+				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareCastleSiegeDialog(_unit);
+					return;
+				}
+                if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
+					prepareSurfaceBattle(_unit);
 					return;
 				}
 				unitsData[playerY][playerX] = landing ? UnitType.SHIPDOWN : gamePlayer.overlay;
@@ -116,7 +120,7 @@ function action(direction, additionalParam) {
 
 			break;
 		case 5: // Center
-			gamePlayer.selection = gamePlayer.selection ? 0 : 1;
+			action(6);
 
 			break;
 		case 6: // Action

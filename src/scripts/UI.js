@@ -57,7 +57,7 @@ function createUI() {
 				"<br>" + (
 					state
 					? inBattle
-						? getDungeonStagesString()
+						? getDungeonStagesString()[0]
 						: getSpan("&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
 					: "<br>Game by Noncho Savov") + "<br>",
 				displayDialog
@@ -152,7 +152,7 @@ function addLabelToDialog(_dialog, _label, _label2) {
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {//hardChoice
-	if (inDialog) return;
+	//if (inDialog) return;
 	addLabelToDialog(dialog, _label, _label2);
 	prepareDialogButtons(dialog, displayDialog, _callback1, _btn1, _callback2, _btn2);
 	if (!inDialog) displayDialog();
@@ -235,9 +235,7 @@ function updateActionButton(event) {
 		gold += 50;
 		backFromDialog();
 	} else {
-		actButton.innerHTML = hasTutorial ? "?" : onFoot ? '&#10003' : 'S';
-
-		//actButton.style.opacity = hasEvent ? 1 : .5;
+		actButton.innerHTML = hasTutorial ? "?" : '&#187';
 	}
 
 	resizeUI(event);
@@ -262,7 +260,7 @@ function updateInfoTab() {
 
 function backFromDialog() {
 	if (inDialog) displayDialog();
-	gameContainer.style.display = "block";//TODO: fix lag (low priority)
+	gameContainer.style.display = "block";
 	updateActionButton();
 	updateInfoTab();
 }

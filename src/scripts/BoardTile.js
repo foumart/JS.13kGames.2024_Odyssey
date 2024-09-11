@@ -36,7 +36,6 @@ class BoardTile extends BoardElement {
 		// When performing next move all board elements are reset and new data is assigned.
 		this.overlay = 0;
 		this.origin = 0;
-		this.selection = 0;
 		this.visited = 0;
 	}
 

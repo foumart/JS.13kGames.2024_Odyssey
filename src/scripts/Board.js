@@ -52,12 +52,11 @@ function initBoard() {
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
 	let t=0,
-		//c=0,
 		e1=0,
 		e2=0,
-		//e3=0,
-		//g1=0,
-		//g2=0,
+		e3=0,
+		g1=0,
+		g2=0,
 		treasures = [];
 	oddDirectionalArray = generateOddArray(renderedScreenSize);
 
@@ -88,7 +87,6 @@ function initBoard() {
 				// walk through all islands to place castles and shrines
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
-						//c ++;
 						// there are colors.length-2 castles available
 						unit = createUnit(x, y, index < colors.length ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
@@ -202,72 +200,73 @@ function initBoard() {
 				}
 				//if (idsData[y-1][x-1] > 1 && stage>1) visitedData[y-1][x-1] = 0;
 			}
+		}
+	}
 
-			if (
-				Math.random()<.2 && getUnitId(x, y)==-1 &&
-				getUnitId(x-1, y)==-1 && getUnitId(x+1, y)==-1 &&
-				getUnitId(x, y-1)==-1 && getUnitId(x, y+1)==-1 &&
-				getUnitId(x-1, y-1)==-1 && getUnitId(x+1, y+1)==-1 &&
-				getUnitId(x+1, y-1)==-1 && getUnitId(x-1, y+1)==-1
-			) {
+	for(y = 0; y < boardWidth; y++) {
+		for(x = 0; x < boardWidth; x++) {
+			// generate enemies and items
+			if (!unitsData[y][x]) {
 				if (isWalkable(x, y)) {
-					let dungeonId = colors.length-1;// 5
-					if (idsData[y][x] > dungeonId && treasures.indexOf(idsData[y][x]) == -1) {
+					if (idsData[y][x] >= colors.length && treasures.indexOf(-idsData[y][x]) == -1) {
 						// place gold piles on isles 7-13
-						treasures.push(idsData[y][x]);
+						treasures.push(-idsData[y][x]);
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
-						console.log("GOLD", unitsList.length+"("+treasures.length+")", idsData[y][x], x+"x"+y);
-						//g1 ++;
+						//if (state) console.log("GOLD", x+"x"+y);
+						g1 ++;
 					}
-					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && treasures.indexOf(-idsData[y][x]) == -1) {
+					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && treasures.indexOf(idsData[y][x]) == -1) {
 						// place knight (isles 2-6) or crab (isles 7-13)
-						unit = createUnit(x, y, idsData[y][x] > dungeonId ? UnitType.CRAB : UnitType.KNIGHT);
+						unit = createUnit(x, y, idsData[y][x] >= colors.length ? UnitType.CRAB : UnitType.KNIGHT);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
-						treasures.push(-idsData[y][x]);
+						treasures.push(idsData[y][x]);
 						unitsList.push(unit);
-						unitsData[y][x] = idsData[y][x] > dungeonId ? UnitType.CRAB : UnitType.KNIGHT;
-						console.log(dungeonId ? "CRAB" : "KNIGHT", unitsList.length+"("+treasures.length+")", -idsData[y][x], x+"x"+y);
-						//e3 ++;
-					}
-				} else if (isSailable(x, y)) {
-					if (isSailable(x, y, TileType.RIFF2) && x > 9 && y > 13 && treasures.indexOf(y) == -1) {
-						// place gold wreckage
-						treasures.push(y);
-						unitsList.push(createUnit(x, y, UnitType.WRECK));
-						unitsData[y][x] = UnitType.WRECK;
-						console.log("WRECK", unitsList.length+"("+treasures.length+")", y, x+"x"+y);
-						//g2 ++;
-					}
-					if (treasures.indexOf(-y) == -1 && x > 9 && y > 13 && e2 < 9) {//mapData[y][x] && 
-						// place water enemies
-						let enemySerpent = isSailable(x, y, TileType.RIFF1) && e1 > 9;
-						unit = createUnit(x, y, enemySerpent ? UnitType.SERPENT : UnitType.SQUID)
-						enemies.push(unit);
-						treasures.push(-y);
-						unitsList.push(unit);
-						unitsData[y][x] = enemySerpent ? UnitType.SERPENT : UnitType.SQUID;
-						console.log(enemySerpent ? "SERPENT" : "SQUID", unitsList.length+"("+treasures.length+")", -y, x+"x"+y);
-						if (enemySerpent) e2 ++; else e1 ++;
+						unitsData[y][x] = idsData[y][x] >= colors.length ? UnitType.CRAB : UnitType.KNIGHT;
+						//if (state) console.log(idsData[y][x] >= colors.length ? "CRAB" : "KNIGHT", x+"x"+y);
+						e3 ++;
 					}
 				}
+			}
+
+			if (y > 13 && treasures.indexOf(-y) == -1) {
+				let _x = 9;
+				let _y = 9;
+				while (
+					mapData[_y][_x] > 2 ||
+					unitsData[_y][_x] ||
+					unitsData[_y][_x+1] || unitsData[_y][_x-1] ||
+					unitsData[_y+1][_x] || unitsData[_y-1][_x] ||
+					unitsData[_y+1][_x+1] || unitsData[_y-1][_x-1] ||
+					unitsData[_y+1][_x-1] || unitsData[_y-1][_x+1] ||
+					!isSailable(_x, _y, g2 < 9 || e2 < 9 ? TileType.RIFF2 : TileType.RIFF1)
+				) {
+					_x = islandGenerator.rand(9, 35);
+					_y = islandGenerator.rand(9, 35);
+				}
+
+				unit = createUnit(_x, _y, g2 < 9 ? UnitType.WRECK : e1 < 9 ? UnitType.SERPENT : UnitType.SQUID)
+				enemies.push(unit);
+				treasures.push(-y);
+				unitsList.push(unit);
+				unitsData[_y][_x] = unit.type;
+				//if (state) console.log(g2 < 9 ? "WRECK" : e1 < 9 ? "SERPENT" : "SQUID", _x+"x"+_y);
+				if (g2 < 9) g2 ++; else if (e1 < 9) e1 ++; else e2 ++;
 			}
 		}
 	}
 
-	console.log(treasures)
-
-	if (_debug) console.log(
+	/*if (_debug) console.log(
 		unitsList.length,
 		"trees:"+t,
-		//"castles:"+c,
-		//"g1:"+g1,
-		//"g2:"+g2,
+		"g1:"+g1,
+		"g2:"+g2,
 		"e1:"+e1,
-		"e2:"+e2
-		//"e3:"+e3
-	);
+		"e2:"+e2,
+		"e3:"+e3
+		//treasures
+	);*/
 
 	// starting town position
 	townX = playerX = shipX = stageData.x;
@@ -502,7 +501,6 @@ function drawBoard() {
 								_player = _data;
 							}
 							boardPlayer.overlay = gamePlayer.overlay;
-							boardPlayer.selection = gamePlayer.selection;
 							boardPlayer.origin = UnitType.PLAYER;
 						} else if (_x == shipX && _y == shipY) {
 							boardShip = unitScreen[y][x];

@@ -21,10 +21,6 @@ async function gameInit() {
 function gameStart() {
 	gameStop();
 	doAnimationFrame();
-
-	if (_debug) {
-		if (state) debugBoard();
-	}
 }
 
 function gameStop() {

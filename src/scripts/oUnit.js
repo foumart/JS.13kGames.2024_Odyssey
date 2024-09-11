@@ -9,7 +9,6 @@ class Unit {
 		this.origin = 0;// flag color
 		this.transitionX = 0;
 		this.transitionY = 0;
-		this.selection = 0;// only for player (player marked with green contour)
 		//this.apple = 0;
 		//this.enemy = 0;
 		//this.dungeon = 0;

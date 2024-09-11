@@ -57,18 +57,16 @@ function displayDungeon(_dungeon) {
 	prepareDialog(
 		_dungeon[0],
 		"",
-		_dungeon[1] ? descendInDungeon : displayDialog, _dungeon[1] ? "Descend" : "Exit",
+		_dungeon[1] ? descendInDungeon : displayDialog, _dungeon[1] ? "Enter" : "Exit",
 		_dungeon[1] ? displayDialog : 0, _dungeon[1] ? "Exit" : 0
 	);
 }
 
-function descendInDungeon(_skip) {
-	//tween.transitionZ = boardScale;
-	//TweenFX.to(tween, 9, {transitionZ: 4}, e => doFrameAnimationMove(0, 1), e => { }, 1);
+function descendInDungeon(event, _skip) {
 	dungeonFlee = 0;
 	dungeonStage = -1;
 	dungeonRoom = -1;
-	dungeon.forEach((_nextStage, _index) => {// TODO: fix dungeon stage advancing
+	dungeon.forEach((_nextStage, _index) => {
 		let haveEnemies = !_nextStage.every(x => x == -1);
 		if (haveEnemies && dungeonStage < 0) {
 			dungeonStage = _index + 1;
@@ -85,7 +83,7 @@ function descendInDungeon(_skip) {
 		updateInfoTab();
 		updateActionButton();// TODO: fix
 		prepareDialog(
-			`<br>`,//Stage ${dungeonStage}, Room ${dungeonRoom}
+			`<br>`,
 			`Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
@@ -151,7 +149,7 @@ function tryToFleeBattle() {
 		//console.log(1, Math.random() * _level , dungeonEnemy)
 		if (Math.random() * _level < dungeonEnemy) {
 			// player will however suffer a hit
-			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Fled", "<br>Not after an enemy hit.<br>", closeAllScreens));
+			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
 		} else {
 			prepareDialog("<br>Fled", "<br>", closeAllScreens);
 		}
@@ -255,7 +253,7 @@ function battleVictory() {
 			prepareBattleScreen(
 				getSpan(stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
 				`<br>Found ${bonus} gold.<br>` + (lastStage ? "<br>Found Healing Potion.<br>" : ""),
-				lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(1),
+				lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(0, 1),
 				lastStage ? "Complete" : stageCleared ? "Descend" : "Advance",
 				lastStage ? 0 : closeAllScreens, "Exit"
 			);
