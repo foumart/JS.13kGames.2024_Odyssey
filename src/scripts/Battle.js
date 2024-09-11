@@ -6,6 +6,7 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 	dungeonEnemyAttack,
 	dungeonEnemyBitmap,
 	dungeonEnemyHealthBar,// the enemy element span holding enemy health bar symbols
+	dungeonEnemyUnit,// only for surface battles (yeah, we use dungeon battle screen for that too)
 	dungeonFlee,// increases on unsuccessfull flee attempts to increase the chance to escape battle
 	dungeonFighting;// bool if we are currently animating a fight
 
@@ -14,7 +15,7 @@ function getEnemyName(_id) {
 		"Bat", "Slime", "Wolf", "Imp", "Orc",
 		"Wizard", "Troll", "Lich", "Dragon", "Balrog",
 		"Squid", "Serpent", "Knight", "Crab"
-	][_id > 9 ? _id - 20 : _id];
+	][_id > 13 ? _id - 20 : _id];
 }
 
 function getEnemyAttack(_id) {
@@ -22,7 +23,7 @@ function getEnemyAttack(_id) {
 		1, 2, 2, 1, 3,
 		3, 6, 5, 12, 16,
 		2, 5, 4, 3
-	][_id > 9 ? _id - 20 : _id];
+	][_id > 13 ? _id - 20 : _id];
 }
 
 function getEnemyHP(_id) {
@@ -30,7 +31,7 @@ function getEnemyHP(_id) {
 		6, 10, 12, 16, 24,
 		20, 42, 32, 60, 90,
 		24, 50, 32, 24
-	][_id > 9 ? _id - 20 : _id];
+	][_id > 13 ? _id - 20 : _id];
 }
 
 function getDungeonStagesString(label = "") {
@@ -106,7 +107,7 @@ function dungeonBattle() {
 
 	dungeonEnemyBitmap = addBitmapToScreen(
 		battleScreen.firstChild,
-		offscreenBitmapsFlipped[36 + dungeonEnemy],
+		offscreenBitmapsFlipped[dungeonEnemy > 9 ? dungeonEnemy - 4 : 36 + dungeonEnemy],
 		getEnemyName(dungeonEnemy),
 		getEnemyHealthBar(),
 		"scale(1.5)",
@@ -125,7 +126,7 @@ function dungeonBattle() {
 }
 
 function getEnemyStatsString() {
-	return `<br>Enemy HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}<br>`;
+	return `<br>HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}<br>`;
 }
 
 function getEnemyHealthBar() {
@@ -138,6 +139,7 @@ function closeAllScreens() {
 	if (inDialog) displayDialog();// close any visible dialogs
 	resizeUI();
 	updateInfoTab();
+	dungeon = 0;
 	updateActionButton();
 }
 
@@ -159,7 +161,7 @@ function tryToFleeBattle() {
 		if (Math.random() * _level < dungeonEnemy && dungeonFlee < _level) {
 			// player will receive a hit on top of that
 			dungeonFlee ++;
-			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Escaping...", "<br>The enemy hits you while trying.<br>", displayDialog));
+			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Escaping...", "<br>Got hit trying.<br>", displayDialog));
 		} else {
 			dungeonFlee = -1;
 			prepareDialog("<br>Cannot flee battle!", "<br>", displayDialog);
@@ -181,12 +183,16 @@ function animateUnitHit(_id, _callback) {
 				},
 				e => {
 					if (_id > 2) {
-						if (Math.random() < .5) {
-							// atacks the hero
+						if (inBattle == 3) {
+							// attacks the ship
+							shipHealth -= dungeonEnemyAttack;
+							if (shipHealth < 1) prepareDialog("Ship sunk!", "Game Over", quitGame);
+						} else if (Math.random() < .5 || crewHealth < dungeonEnemyAttack) {
+							// attacks the hero
 							playerHealth -= dungeonEnemyAttack;
 							if (playerHealth < 1) prepareDialog("Hero fell!", "Game Over", quitGame);
 						} else {
-							// atacks the crew
+							// attacks the crew
 							crewHealth -= dungeonEnemyAttack;
 						}
 					} else {
@@ -218,21 +224,27 @@ function disableBattleInteractions() {
 function beginNewRound() {
 	if (dungeonFighting) return;
 	disableBattleInteractions();
-	// hero attacks
-	animateUnitHit(0, e => {
-		// crew attacks
-		if (dungeonEnemyHealth > 0) animateUnitHit(2, e => {
+	if (inBattle == 3) {
+		// ship attacks
+		animateUnitHit(1, e => {
 			// enemy fight back
 			if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
-			
-				
 				enableBattleInteractions();
-
 			}); else battleVictory();
-		}); else battleVictory();
-	});
+		});
+	} else {
+		// hero attacks
+		animateUnitHit(0, e => {
+			// crew attacks
+			if (dungeonEnemyHealth > 0) animateUnitHit(2, e => {
+				// enemy fight back
+				if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
+					enableBattleInteractions();
+				}); else battleVictory();
+			}); else battleVictory();
+		});
+	}
 }
-
 
 function battleVictory() {
 	TweenFX.to(tween, 9, {transitionZ: 2},
@@ -242,71 +254,70 @@ function battleVictory() {
 		},
 		e => {
 			enableBattleInteractions();
+			enemiesKilled.push(dungeonEnemy);
+			SoundFXgetGold();
+			if (inBattle==1) {
+				dungeon[dungeonStage - 1][dungeonRoom - 1] = -1;// mark the enemy as destroyed
+				let stageCleared = dungeonRoom == dungeon[dungeonStage - 1].length;
+				let bonus = islandGenerator.rand(dungeonStage, getEnemyHP(dungeonEnemy)/2) * (stageCleared ? 2 : 1) + (stageCleared ? dungeonStage*9 : 0);
+				gold += bonus;
+				let lastStage = dungeonStage == dungeon.length && stageCleared;
 
-			enemiesKilled.push(dungeonEnemy)
-			dungeon[dungeonStage - 1][dungeonRoom - 1] = -1;// mark the enemy as destroyed
-			let stageCleared = dungeonRoom == dungeon[dungeonStage - 1].length;
-			let bonus = islandGenerator.rand(dungeonStage, getEnemyHP(dungeonEnemy)/2) * (stageCleared ? 2 : 1) + (stageCleared ? dungeonStage*9 : 0);
-			gold += bonus;
-			let lastStage = dungeonStage == dungeon.length && stageCleared;
-
-			prepareBattleScreen(
-				getSpan(stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
-				`<br>Found ${bonus} gold.<br>` + (lastStage ? "<br>Found Healing Potion.<br>" : ""),
-				lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(0, 1),
-				lastStage ? "Complete" : stageCleared ? "Descend" : "Advance",
-				lastStage ? 0 : closeAllScreens, "Exit"
-			);
+				prepareBattleScreen(
+					getSpan(stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
+					`<br>Found ${bonus} gold.<br>` + (lastStage ? "<br>Found Healing Potion.<br>" : ""),
+					lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(0, 1),
+					lastStage ? "Complete" : stageCleared ? "Descend" : "Advance",
+					lastStage ? 0 : closeAllScreens, "Exit"
+				);
+			} else {
+				let bonus = islandGenerator.rand(9, getEnemyHP(dungeonEnemy));
+				gold += bonus;
+				removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
+				unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
+				console.log(enemies.indexOf(dungeonEnemyUnit));
+				enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
+				prepareBattleScreen(
+					getSpan("<br>Victory!", "#fe8", "9vmin"),
+					`<br>Found ${bonus} gold.<br>`,
+					closeAllScreens
+				);
+			}
 		}
 	);
 }
 
 function completeDungeon() {
-	console.log(getUnit(playerX, playerY));
 	getUnit(playerX, playerY).origin = 1;
 	closeAllScreens();
 }
 
 function prepareCastleSiegeDialog(_unit) {
-
-	//dungeonStage = -1;
-	//dungeonRoom = _nextStage.findIndex(e => e > -1) + 1;
-	//dungeonEnemy = _nextStage[dungeonRoom-1];
-	//dungeonEnemy = _unit.type;
-	//dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
-	//dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
-	
-	//prepareDialog(`<br>Opponent "${colors[_unit.origin-2]}"'s Castle`, "will you", dungeonBattle, "Attack", displayDialog, "Retreat");
-
-	updateInfoTab();
+	/*updateInfoTab();
 	updateActionButton();// TODO: fix
 	prepareDialog(
 		`<br>CASTLE ${_unit.type}`,
 		`<br>You approached a ${_unit.origin}<br>`,
 		dungeonBattle, "Fight",
 		closeAllScreens, "Exit"
-	);
+	);*/
 }
 
 function prepareSurfaceBattle(_unit) {
+	dungeonEnemyUnit = _unit;
+	dungeonEnemy = _unit.type + 3;
+	dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
+	dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
+
 	updateInfoTab();
 	updateActionButton();// TODO: fix
 	prepareDialog(
-		`<br>SFC BATTLE ${_unit.type}`,
-		`<br>You approached a ${_unit.origin}<br>`,
+		`<br>`,
+		`<br>You see a ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, "Fight",
-		closeAllScreens, "Exit"
+		closeAllScreens, "Run"
 	);
+
+	dialog.firstChild.append(offscreenBitmaps[_unit.type-1]);
+	uiDiv.style.background = "#2228";
 }
-
-
-/*function prepareMarineBattle(_unit) {
-	updateInfoTab();
-	updateActionButton();// TODO: fix
-	prepareDialog(
-		`<br>SFC ${_unit.type}`,//Stage ${dungeonStage}, Room ${dungeonRoom}
-		`<br>You approached a ${_unit.origin}<br>`,
-		dungeonBattle, "Fight",
-		closeAllScreens, "Exit"
-	);
-}*/

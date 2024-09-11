@@ -6,7 +6,7 @@ let unit,
 	onFoot = true,// player starts on foot
 	holding,// is player holding a direction button for constant moving
 	inDialog,// is a dialog on screen
-	inBattle,// is player in battle
+	inBattle,// is player in battle, battle types: 1:dungeon, 2:land, 3:sea
 	hardChoice,// make a dialog permanent non skippable
 	hasTutorial;
 
@@ -44,7 +44,7 @@ function createUnit(x, y, z) {
 }
 
 function prepareToMove(dir) {
-	if (inDialog) displayDialog();// hide the dialog
+	//if (inDialog) displayDialog();// hide the dialog
 	hasTutorial = 0;// disable tutorial presented as "?" at the beginning
 	gameDirty = 2;
 	gamePlayer.overlay = unitsData[playerY][playerX];
@@ -131,12 +131,12 @@ function performEnemyMoves() {
 	enemies.forEach(enemy => { // RIGHT
 		if (islandGenerator.rand(0,1)) {
 			if (((enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x + 1, enemy.y, 1) ||
-					enemy.type == UnitType.SERPENT && isSailable(enemy.x + 1, enemy.y, TileType.WATER, 1)
+					enemy.type == UnitType.SERPENT && isSailable(enemy.x + 1, enemy.y, TileType.RIFF1, 1)
 				) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
 					enemy.movingX = 1; enemy.movingY = 0;
 			} else if (( // LEFT
 					(enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x - 1, enemy.y, 1) ||
-					enemy.type == UnitType.SERPENT && isSailable(enemy.x - 1, enemy.y, TileType.WATER, 1)
+					enemy.type == UnitType.SERPENT && isSailable(enemy.x - 1, enemy.y, TileType.RIFF1, 1)
 				) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
 					enemy.movingX = -1; enemy.movingY = 0;
 			} else if (( // DOWN
@@ -225,12 +225,11 @@ function isWalkable(x, y, enemy) {
 }
 
 function isSailable(x, y, tileId = TileType.RIFF2, enemy = false) {
-	// check if current unit tile is player or empty, or walkable item as gold wreck.
-	// also check if current map tile is at least water tileId (depth)
+	// check if current unit tile is player or empty, or takable item as gold wreck.
+	// also check if current map tile is water (tileId)
 	return (
-		unitsData[y][x] && enemy ||
-		unitsData[y][x] < UnitType.SHIPUP ||
-		unitsData[y][x] == UnitType.WRECK
+		!(unitsData[y][x] && enemy) ||
+		(unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] == UnitType.WRECK) && !enemy
 	) && mapData[y][x] < tileId;
 }
 

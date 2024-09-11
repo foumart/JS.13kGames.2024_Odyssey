@@ -1,6 +1,7 @@
 function action(direction, additionalParam) {
-	if (paused) return;//hardChoice
-	if (inBattle && direction == 6) {
+	if (paused || inDialog) return;//hardChoice
+	if (!direction && !additionalParam) additionalParam = isPlayerDamaged;
+	if (inBattle && !direction) {
 		// Attack button clicked
 		beginNewRound();
 		return;
@@ -119,11 +120,8 @@ function action(direction, additionalParam) {
 			}
 
 			break;
-		case 5: // Center
-			action(6);
 
-			break;
-		case 6: // Action
+		default: // Action
 			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
 				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Castles ';
@@ -147,13 +145,13 @@ function action(direction, additionalParam) {
 						if (spendGold(_amount)) return;
 						healPlayer(_amount);
 						backFromDialog();
-						action(6, isPlayerDamaged());
+						action();
 					} : shipLevel < 4 ? upgradeShip : displayDialog,
 					_hp ? "Rest " + goldIcon + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
 						"Repair " + goldIcon + (shipHealthMax - shipHealth) * 2 :
 						"Deal " + goldIcon + shipPrices[shipLevel-1] : 0,
 
-					_unit.rumors && !additionalParam ? () => action(6, 1) : secondMenu ? e => {
+					_unit.rumors && !additionalParam ? () => action(0, 1) : secondMenu ? e => {
 						_hp = (_unit.origin)*(crewHealthMax / 5 | 0);
 						prepareDialog(
 							"Tavern",
@@ -178,19 +176,15 @@ function action(direction, additionalParam) {
 				updateActionButton();
 			} else
 			if (gamePlayer.overlay == UnitType.GOLD) {
-				prepareDialog("Gold Ore", "Will you ?", quitGame, "Mine", displayDialog, "Exit");
+				prepareDialog("Gold Ore", "Will you ?", quitGame, "Mine", closeAllScreens, "Exit");
 			} else {
 				// PASS
 				if (inDialog) displayDialog();// hide the dialog
-				//infoTab.innerHTML = `<br>${onFoot ? 'Dug, nothing? pass' : 'Fish, nothing? pass'}`;
 				tween.transitionZ = 1;
 				TweenFX.to(tween, 6, {transitionZ: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
 				performEnemyMoves();
 			}
 
-			break;
-		default: // Corners
-			console.log("Default action:", direction);
 			break;
 	}
 }

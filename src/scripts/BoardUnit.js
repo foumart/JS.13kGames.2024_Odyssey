@@ -42,8 +42,7 @@ class BoardUnit extends BoardTile {
 				? _offsets[unitsData[playerY][playerX]-1]
 				: this == boardShip ? _offsets[unitsData[shipY][shipX]-1] : 1;
 
-			let _offsetY = this == boardPlayer && !this.overlay
-				|| this == boardShip ? 3 : 4;
+			let _offsetY = this == boardPlayer && !this.overlay || this == boardShip ? 3 : 4;
 
 			// draw the object beneath this unit
 			if (this.overlay) {

@@ -206,6 +206,7 @@ function resizeUI(event) {
 			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;
 
+		let landBattle = inBattle && inBattle < 3;
 		updateStyleUI(
 			playerButton,
 			event + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
@@ -221,7 +222,9 @@ function resizeUI(event) {
 			event + (inBattle?portrait?`bottom:0;left:0;margin-left:${playerButton.offsetWidth*1.32}px`:`top:50%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
-		shipButton.style.display = inBattle ? "none" : "block";
+		shipButton.style.display = landBattle ? "none" : "block";
+		playerButton.style.display = !landBattle && inBattle ? "none" : "block";
+		crewButton.style.display = !landBattle && inBattle ? "none" : "block";
 	}
 
 	// Fullscreen button

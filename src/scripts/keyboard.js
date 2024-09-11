@@ -48,7 +48,7 @@ function onKeyDown(event) {
 		if (!state) {
 			switchState();
 		} else {
-			action(6, isPlayerDamaged());
+			action();
 		}
 	} else
 

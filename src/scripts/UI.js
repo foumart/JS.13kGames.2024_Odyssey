@@ -53,10 +53,10 @@ function createUI() {
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
 			prepareDialog(
-				state ? inBattle ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
+				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
 				"<br>" + (
 					state
-					? inBattle
+					? inBattle==1
 						? getDungeonStagesString()[0]
 						: getSpan("&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
 					: "<br>Game by Noncho Savov") + "<br>",
@@ -84,7 +84,7 @@ function createUI() {
 		bgrCanvas.style.opacity = .6;
 	} else {
 		hasTutorial = 1;
-		actButton = generateUIButton(uiDiv, '', e => action(6, isPlayerDamaged()), "css_icon css_controls");
+		actButton = generateUIButton(uiDiv, '', e => action(), "css_icon css_controls");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
@@ -161,7 +161,9 @@ function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {/
 function prepareBattleScreen(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
 	addLabelToDialog(battleScreen, _label, _label2);
 	prepareDialogButtons(battleScreen, displayBattleScreen, _callback1, _btn1, _callback2, _btn2);
-	if (!inBattle) displayBattleScreen();
+	if (!inBattle) {
+		displayBattleScreen(dungeonEnemy == 10 || dungeonEnemy == 11 ? 3 : dungeonEnemy == 12 || dungeonEnemy == 13 ? 2 : 1);
+	}
 }
 
 function prepareDialogButtons(_dialog, _close, _callback1, _btn1, _callback2, _btn2) {
@@ -179,8 +181,8 @@ function displayDialog() {
 	battleScreen.style.opacity = inDialog ? 0.5 : 1;
 }
 
-function displayBattleScreen() {
-	inBattle = !inBattle;
+function displayBattleScreen(battleType) {console.log("displayBattleScreen", battleType);
+	inBattle = battleType || !inBattle;
 	battleScreen.style.display = inBattle ? 'block' : 'none';
 	gameContainer.style.display = inBattle ? 'none' : 'block';
 	uiDiv.style.pointerEvents = inBattle ? 'auto' : 'none';
@@ -195,7 +197,7 @@ function displayRumors(_rumors, _amount) {
 
 function displayNoFunds() {
 	backFromDialog();
-	prepareDialog(0, "<br>Not enough gold<br><br>", () => action(6));
+	prepareDialog(0, "<br>Not enough gold<br><br>", () => action());
 }
 
 function updateActionButton(event) {
@@ -243,7 +245,7 @@ function updateActionButton(event) {
 
 function updateInfoTab() {
 	let _char = "&#9608";
-	if (inBattle) {
+	if (inBattle == 1) {// dungeon
 		infoTab.innerHTML = getSpan(`Stage ${dungeonStage}, Room ${dungeonRoom}`, 0, '3em', 'line-height:2vmin');
 	} else {
 		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
@@ -275,7 +277,7 @@ function infoButtonClick(id, _hp, _att) {
 			(id < 3 ? " <b>(lvl: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') + "<br>",
 		"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
-			" &nbsp Attack: " + getAttackDamage() + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
+			" &nbsp Attack: " + getAttackDamage(id) + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
 		displayDialog
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
