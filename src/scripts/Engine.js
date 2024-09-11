@@ -22,7 +22,9 @@ function gameStart() {
 	gameStop();
 	doAnimationFrame();
 
-	if (state) debugBoard();
+	if (_debug) {
+		if (state) debugBoard();
+	}
 }
 
 function gameStop() {
@@ -40,18 +42,9 @@ function doAnimationFrame(timeStamp) {
 			// initial level zoom in (level zoom is hooked to tween.transitionZ)
 			tween.transitionZ = .3;
 			TweenFX.to(tween, 6, {transitionZ: 0.5}, e => doFrameAnimationMove(1), e => {
-				//finalizeMove();
 				tween.transitionZ = 1;
 				TweenFX.to(tween, 6, {transitionZ: 1.2}, e => doFrameAnimationMove(0, 1), e => {
 					finalizeMove();
-					// TODO: to be removed after dungeon battles completion
-					/*unitsList.forEach(_unit => {
-						if (_unit.dungeon && !dungeon) {
-							dungeon = _unit.dungeon
-						}
-					});
-					//descendInDungeon();
-					displayDungeon();*/
 				}, 1);
 			});
 		} else if (step % 7 == 0) {
@@ -62,6 +55,7 @@ function doAnimationFrame(timeStamp) {
 		if (state > 1) {
 			gameStop();
 			console.log("stage complete");
+			return;
 		}
 
 		if (_debug) {
@@ -115,7 +109,7 @@ function populateStageData(data) {
 }
 
 function getStageData(_size, _offset) {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve) => {
 		islandGenerator.resolve = resolve;
 		islandGenerator.initialize(_size, _size, {
 			type: 1,
@@ -126,7 +120,7 @@ function getStageData(_size, _offset) {
 }
 
 function updateStageData() {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve) => {
 		islandGenerator.resolve = resolve;
 		islandGenerator.regenerate(
 			playerX - screenSide - (portrait ? 0 : screenOut/2),

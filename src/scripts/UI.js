@@ -34,7 +34,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 		if (i * _step < _health) {
 			str += _char;
 		} else {
-			str += `<span style="color:red">${_char}</span>`;
+			str += getSpan(_char, "red");
 		}
 		if ((i+1) % (8-_step|0) == 0) str += _max > 19 ? " " : "";
 	}
@@ -148,11 +148,11 @@ function addBitmapToScreen(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 }
 
 function addLabelToDialog(_dialog, _label, _label2) {
-	_dialog.innerHTML = `${_label?'<span style="font-size:6vmin;line-height:9vmin">'+_label+'</span><br>':''}<b>${_label2}</b><br>`;
+	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") + '<br>' : ''}<b>${_label2}</b><br>`;
 }
 
-function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
-	if (inDialog && hardChoice) return;
+function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {//hardChoice
+	if (inDialog) return;
 	addLabelToDialog(dialog, _label, _label2);
 	prepareDialogButtons(dialog, displayDialog, _callback1, _btn1, _callback2, _btn2);
 	if (!inDialog) displayDialog();
@@ -231,7 +231,7 @@ function updateActionButton(event) {
 	} else if (gamePlayer.overlay == UnitType.WRECK || gamePlayer.overlay == UnitType.GOLD) {
 		gamePlayer.overlay = 0;
 		removeUnit(playerX, playerY);
-
+		SoundFXgetGold();
 		gold += 50;
 		backFromDialog();
 	} else {
@@ -260,10 +260,56 @@ function updateInfoTab() {
 	}
 }
 
+function backFromDialog() {
+	if (inDialog) displayDialog();
+	gameContainer.style.display = "block";//TODO: fix lag (low priority)
+	updateActionButton();
+	updateInfoTab();
+}
+
+function closeButtonClick(e) {
+	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
+}
+
+function infoButtonClick(id, _hp, _att) {
+	prepareDialog(
+		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) +
+			(id < 3 ? " <b>(lvl: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') + "<br>",
+		"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
+			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
+			" &nbsp Attack: " + getAttackDamage() + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
+		displayDialog
+	);
+	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
+		: offscreenBitmapsFlipped[33 + id];
+
+	bmp.style.marginBottom = "1vmin";
+	dialog.firstChild.append(bmp)
+}
+
+function checkCrewSailing() {
+	if (crewHealth < 1) {
+		resizeUI();
+		hardChoice = true;
+		if (gold < crewHealthMax * crewPaid) {
+			prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
+		} else {
+			prepareDialog("Revolt!", "Crew demands:", () => {
+				spendGold(crewHealthMax * crewPaid);
+				crewPaid ++;
+				crewHealth = crewHealthMax;
+				hardChoice = false;
+				backFromDialog();
+			}, "Pay " + goldIcon + crewHealthMax * crewPaid);
+		}
+	}
+}
+
+
 function debugBoard() {
-	/*if (_debug) console.log(
+	if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
-	);*/
+	);
 }
 
 // debug visitedData

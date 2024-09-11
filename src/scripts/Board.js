@@ -1,6 +1,6 @@
 const
 	screenWidth = 7,// must be odd number, so there will be a central tile where player will reside
-	screenSide = 3,// must be even, screenWidth / 2 | 0
+	screenSide = 3,// must be screenWidth / 2 | 0
 	screenOut = 14,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
 	tilt = 1,
 	jump = 3;// how many tiles to jump when wrapping from map sides
@@ -47,7 +47,7 @@ function onBoardZoom(event) {
 function initBoard() {
 	boardWidth = stageData.size;//defined in Game.js getStageData
 
-	boardScale = 1;//mobile ? state ? 1 : 0.91 : state ? 0.7 : 0.84;
+	boardScale = 1;
 	boardZoom = state ? 0 : 0.7;
 
 	let x, y, unit, renderedScreenSize = screenWidth + screenOut;
@@ -61,11 +61,11 @@ function initBoard() {
 		treasures = [];
 	oddDirectionalArray = generateOddArray(renderedScreenSize);
 
-	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied)
+	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied) - will be mutated
 	mapData = visitedData.map(row => [...row]);// 2d array of concrete map data (TileType + coastal edges 11-25)
 	idsData = stageData.ids.map(row => [...row]);// 2d array of 0 (water) 1-13 (isle ids)
 	unitsData = islandGenerator.initArray();// 2d array of 0 (empty) - 1,2,3.. (unit ids)
-	islesData = stageData.islands.splice(0);// start location and directions of consecutive generation
+	islesData = stageData.islands.splice(0);// start location and directions of consecutive generation (-1,0) left, (0,-1) up, etc.
 	unitsList = [];
 	enemies = [];
 
@@ -82,9 +82,7 @@ function initBoard() {
 					unit.apple = 1;
 					unitsList.push(unit);
 					unitsData[y][x] = UnitType.TREE;
-					//revealClouds(x, y);
-					// if (stageData.relief[y][x] > 2)
-					// TODO: place treasures buried on land
+					// if (stageData.relief[y][x] > 2) // can be used to place something special
 				}
 
 				// walk through all islands to place castles and shrines
@@ -98,8 +96,9 @@ function initBoard() {
 						// set castle origin color flag
 						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
 						unit.rumors = 1;
+
 						// Add enemies to dungeons
-						if (index >= colors.length) {// colors.length = 6
+						if (index >= colors.length) {// colors.length is 6
 							unit.dungeon = [];
 							// generate at least 3 floors per dungeon up to 9 floors for the last 7th dungeon
 							for (let i = 0; i < index-3; i++) {
@@ -119,11 +118,10 @@ function initBoard() {
 								// generate pre-final boss
 								if (i == index-5 && arr[arr.length-1] < index-3) arr.push(index-3);
 								// generate final floor boss
-								if (i == index-4) arr.push(index-1);//&& index != 12
+								if (i == index-4) arr.push(index-1);
 								//console.log(index-colors.length, i, arr);
 								unit.dungeon.push(arr);
 							}
-							//if (unit.dungeon.length == 3) unit.origin = 2;
 						}
 					}
 				});
@@ -197,7 +195,7 @@ function initBoard() {
 							? visitedData[y-2][x] ? Math.random() < .5 ? visitedData[y-2][x]-1 : 1 : Math.random() < .5 ? 1 : 2
 							: 0
 						: stage < 9
-							? Math.random() >= stage/9 ? 2 : 1//&& mapData[y-2][x] == 1
+							? Math.random() >= stage/9 ? 2 : 1
 							: 0;
 				} else if (visitedData[y-2][x] ) {
 					visitedData[y-2][x] = 0;
@@ -219,53 +217,57 @@ function initBoard() {
 						treasures.push(idsData[y][x]);
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
-						//sconsole.log("G1", unitsList.length+"("+treasures.length+")", idsData[y][x], x+"x"+y);
+						console.log("GOLD", unitsList.length+"("+treasures.length+")", idsData[y][x], x+"x"+y);
 						//g1 ++;
-					} else if (mapData[y][x] >= TileType.LAND && idsData[y][x] > 1 && treasures.indexOf(-idsData[y][x]) == -1) {
-						// place knight (isles 2-6) or crab (isles 7-13) enemies on 
-						unit = createUnit(x, y, idsData[y][x] > dungeonId ? UnitType.ENEMY4 : UnitType.ENEMY3);
+					}
+					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && treasures.indexOf(-idsData[y][x]) == -1) {
+						// place knight (isles 2-6) or crab (isles 7-13)
+						unit = createUnit(x, y, idsData[y][x] > dungeonId ? UnitType.CRAB : UnitType.KNIGHT);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
 						treasures.push(-idsData[y][x]);
 						unitsList.push(unit);
-						unitsData[y][x] = idsData[y][x] > dungeonId ? UnitType.ENEMY4 : UnitType.ENEMY3;
-						//console.log("E3", unitsList.length+"("+treasures.length+")", -idsData[y][x], x+"x"+y);
+						unitsData[y][x] = idsData[y][x] > dungeonId ? UnitType.CRAB : UnitType.KNIGHT;
+						console.log(dungeonId ? "CRAB" : "KNIGHT", unitsList.length+"("+treasures.length+")", -idsData[y][x], x+"x"+y);
 						//e3 ++;
 					}
 				} else if (isSailable(x, y)) {
-					if (mapData[y][x] && treasures.indexOf(y) == -1 && y > 13 && e2 < 9 && idsData[y][x] != 1) {
-						// place water enemies on riffs
-						let enemy1 = isSailable(x, y, 2) && e1 < 9;
-						unit = createUnit(x, y, enemy1 ? UnitType.ENEMY1 : UnitType.ENEMY2)
-						if (!enemy1) enemies.push(unit);
-						treasures.push(y);
-						unitsList.push(unit);
-						unitsData[y][x] = enemy1 ? UnitType.ENEMY1 : UnitType.ENEMY2;
-						//console.log(enemy1 ? "E1" : "E2", unitsList.length+"("+treasures.length+")", y, x+"x"+y);
-						if (enemy1) e1 ++; else e2 ++;
-					} else if (isSailable(x, y, 1) && x > 13 && y > 13 && treasures.indexOf(y) == -1) {
-						// place gold wreckage in deep water
+					if (isSailable(x, y, TileType.RIFF2) && x > 9 && y > 13 && treasures.indexOf(y) == -1) {
+						// place gold wreckage
 						treasures.push(y);
 						unitsList.push(createUnit(x, y, UnitType.WRECK));
 						unitsData[y][x] = UnitType.WRECK;
-						//console.log("G2", unitsList.length+"("+treasures.length+")", y, x+"x"+y);
+						console.log("WRECK", unitsList.length+"("+treasures.length+")", y, x+"x"+y);
 						//g2 ++;
+					}
+					if (treasures.indexOf(-y) == -1 && x > 9 && y > 13 && e2 < 9) {//mapData[y][x] && 
+						// place water enemies
+						let enemySerpent = isSailable(x, y, TileType.RIFF1) && e1 > 9;
+						unit = createUnit(x, y, enemySerpent ? UnitType.SERPENT : UnitType.SQUID)
+						enemies.push(unit);
+						treasures.push(-y);
+						unitsList.push(unit);
+						unitsData[y][x] = enemySerpent ? UnitType.SERPENT : UnitType.SQUID;
+						console.log(enemySerpent ? "SERPENT" : "SQUID", unitsList.length+"("+treasures.length+")", -y, x+"x"+y);
+						if (enemySerpent) e2 ++; else e1 ++;
 					}
 				}
 			}
 		}
 	}
 
-	/*if (_debug) console.log(
+	console.log(treasures)
+
+	if (_debug) console.log(
 		unitsList.length,
 		"trees:"+t,
 		//"castles:"+c,
 		//"g1:"+g1,
 		//"g2:"+g2,
-		//"e1:"+e1,
-		//"e2:"+e2,
+		"e1:"+e1,
+		"e2:"+e2
 		//"e3:"+e3
-	);*/
+	);
 
 	// starting town position
 	townX = playerX = shipX = stageData.x;
@@ -285,12 +287,15 @@ function initBoard() {
 		playerY --;
 	}
 	// setting the ship around on a water tile
-	while (mapData[shipY][shipX] > TileType.RIFF2) {
+	while (
+		mapData[shipY][shipX] > TileType.RIFF2 ||
+		isWalkable(shipX-1, shipY) && isWalkable(shipX+1, shipY) && isWalkable(shipX, shipY-1) && isWalkable(shipX, shipY+1)
+	) {
 		if (Math.random() < .5) shipX ++;
 		else shipY ++;
 	}
 
-	gamePlayer = createUnit(playerX, playerY, UnitType.PLAYER);//new Unit(playerX, playerY, UnitType.PLAYER);
+	gamePlayer = createUnit(playerX, playerY, UnitType.PLAYER);
 	unitsList.push(gamePlayer);
 	unitsData[playerY][playerX] = UnitType.PLAYER;
 
@@ -324,7 +329,7 @@ function initBoard() {
 
 			if (state) {
 				button = new BoardButton(x - screenOut/2, y - screenOut/2, determineDirection(x, y));
-				addButtonListeners(button.btn);
+				button.btn.addEventListener(interactionDown, buttonDown);
 				btnArr.push(button);
 			}
 		}
@@ -334,14 +339,8 @@ function initBoard() {
 	}
 
 	revealAroundUnit(playerX, playerY);
-	revealAroundUnit(shipX, shipY);
-	revealAroundUnit(townX, townY);
-
-	//...
-}
-
-function addButtonListeners(button) {
-	button.addEventListener(interactionDown, buttonDown);
+	//revealAroundUnit(shipX, shipY);
+	//revealAroundUnit(townX, townY);
 }
 
 function buttonDown(event) {
@@ -376,6 +375,11 @@ function moveButton(event) {
 function clickButton(event) {
 	window.removeEventListener(interactionUp, clickButton);
 	window.removeEventListener(interactionMove, moveButton);
+	// were we zooming the map by double touch?
+	if (touchZ) {
+		touchZ = false;
+		return;
+	}
 	// determine clicks and swipes
 	const target = /touch/.test(event.type) ? event.changedTouches[0] : event;
 
@@ -396,19 +400,14 @@ function clickButton(event) {
 		}
 	}
 
-	// were we zooming the map by double touch?
-	if (touchZ) {
+	// clicked index (x/y)
+	currentButtonX = target.target.x;
+	currentButtonY = target.target.y;
+	//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
 
-	} else {
-		// clicked index (x/y)
-		currentButtonX = target.target.x;
-		currentButtonY = target.target.y;
-		//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
-
-		if (state == 1) {
-			let direction = determineDirection(currentButtonX, currentButtonY);
-			action(direction);
-		}
+	if (state == 1) {
+		let direction = determineDirection(currentButtonX, currentButtonY);
+		action(direction);
 	}
 }
 
@@ -417,6 +416,7 @@ function determineDirection(x, y) {
 	return oddDirectionalArray[y][x];
 }
 
+// assign direction values of the boardButtons
 function generateOddArray(size) {
 	const array = islandGenerator.initArray(0, size);
 
@@ -445,7 +445,7 @@ function generateOddArray(size) {
 function drawBoard() {
 	// the game canvas context is cleared every 7 frames or each frame while moving (doAnimationFrame, gameDirty)
 	// the map canvas context is cleared only when zooming or while moving
-	let _unit, _x, _y, _z,
+	let _unit, _x, _y, _data,
 		_ox = portrait ? screenSide : screenSide + screenOut/2,
 		_oy = !portrait ? screenSide : screenSide + screenOut/2;
 
@@ -453,22 +453,20 @@ function drawBoard() {
 		// Update base tiles
 		gameDirty --;
 		if (gameDirty) {
-			//bgrContext.globalAlpha = 0.5;
-			bgrContext.fillStyle = "#1f76b5";
+			bgrContext.fillStyle = "#27b";
 			bgrContext.fillRect(0, 0, bgrCanvas.width, bgrCanvas.height);
-			//bgrContext.globalAlpha = 1;
 			for(let y = 0; y < screenWidth + screenOut; y++) {
 				for(let x = 0; x < screenWidth + screenOut; x++) {
 					if (tileScreen[y]) {
 						if (tileScreen[y][x]) {
 							_x = x + playerX - _ox - (portrait?screenOut/2:0);
 							_y = y + playerY - _oy - (!portrait?screenOut/2:0);
-							_z = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
+							_data = mapData[_y] && mapData[_y].length > _x ? mapData[_y][_x] : 0;
 							tileScreen[y][x].visited = 0;
 							tileScreen[y][x].realX = _x;
 							tileScreen[y][x].realY = _y;
 							if (visitedData[_y] && visitedData[_y][_x]) tileScreen[y][x].visited = visitedData[_y][_x];
-							tileScreen[y][x].update(_z);
+							tileScreen[y][x].update(_data);
 						}
 					}
 				}
@@ -491,17 +489,17 @@ function drawBoard() {
 				if (unitScreen[y][x]) {
 					_x = x + playerX - _ox - (portrait?screenOut/2:0);
 					_y = y + playerY - _oy - (!portrait?screenOut/2:0);
-					_z = unitsData[_y] && unitsData[_y].length > _x ? unitsData[_y][_x] : 0;
+					_data = unitsData[_y] && unitsData[_y].length > _x ? unitsData[_y][_x] : 0;
 
 					unitScreen[y][x].reset();
 
 					// draw units
-					if (state && _z) {
+					if (state && _data) {
 						if (_x == playerX && _y == playerY) {
 							boardPlayer = unitScreen[y][x];
 							if (!_player) {// drawing the player at the end of the row itteration to be drawn on top
 								shouldSkipDrawingUnit = true;
-								_player = _z;
+								_player = _data;
 							}
 							boardPlayer.overlay = gamePlayer.overlay;
 							boardPlayer.selection = gamePlayer.selection;
@@ -521,7 +519,7 @@ function drawBoard() {
 								unitScreen[y][x].enemy = _unit.enemy;
 								// some units are visible in the fog, others not
 								shouldSkipDrawingUnit = visitedData[_y][_x] < (
-									_unit.type > UnitType.ENEMY1 &&
+									_unit.type > UnitType.SQUID &&
 									_unit.type < UnitType.WRECK ? 1 : 2
 								);
 							}
@@ -529,14 +527,17 @@ function drawBoard() {
 					}
 
 					// update units
-					if (state && !shouldSkipDrawingUnit || _player) {
-						unitScreen[y][x].update(_z);
+					if (state && !shouldSkipDrawingUnit) {
+						unitScreen[y][x].update(_data);
 					}
 
 					// draw tile clouds
 					tileScreen[y][x].drawOverlay();
 				}
 			}
+		}
+		if (_player) {
+			boardPlayer.update(_player);
 		}
 	}
 
