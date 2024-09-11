@@ -45,9 +45,6 @@ class BoardUnit extends BoardTile {
 			let _offsetY = this == boardPlayer && !this.overlay
 				|| this == boardShip ? 3 : 4;
 
-			if (this.type < 6) {
-				debugger;
-			}
 			// draw the object beneath this unit
 			if (this.overlay) {
 				this.drawImage(this.overlay, true);

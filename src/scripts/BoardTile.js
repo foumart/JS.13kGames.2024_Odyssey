@@ -34,9 +34,6 @@ class BoardTile extends BoardElement {
 	reset() {
 		// reflected variables from the corresponding game unit
 		// When performing a move all board elements are reset and new data is assigned
-		if (this.overlay) {
-			console.log("GGG");// TODO: fix unit overlapping
-		}
 		this.overlay = 0;
 		this.origin = 0;
 		this.selection = 0;

@@ -86,7 +86,7 @@ function initSound() {
 	}
 }
 
-function toggleSound() {
+function toggleSound(e) {
 	initSound();
 	if (SoundFXvolume == 1) {
 		SoundFXvolume = 0;

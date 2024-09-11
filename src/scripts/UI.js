@@ -103,7 +103,8 @@ function createUI() {
 	// Fullscreen and Sound buttons
 	//if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
 
-	soundButton = generateUIButton(uiDiv, '', toggleSound);
+	soundButton = generateUIButton(uiDiv, '');
+	soundButton.addEventListener(interactionTap, toggleSound);
 
 	if (!state) {
 		// Create Play Button
