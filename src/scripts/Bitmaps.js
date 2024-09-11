@@ -49,17 +49,16 @@ const offscreenPixelData = [
 	"2db22d3d963d2bc82b32db32ffb0691066a4176fb01f76b5",// 35
 
 	// DUNGEON ENEMIES
-	"ff004d7e25534e48421d2b535f574f333e5f918b85",// 36
-	"ff004d7e25531d2b535f574f333e5f918b85",// 37
-	"ff004d4e48425f574f918b85",// 38
-	"ff004d4e48421d2b535f574f333e5f918b85",// 39
-	"ff004d7e25534e48421d2b535f574f333e5f918b85",// 40
-	"ff004d4e48421d2b535f574f333e5f918b85",// 41
-	"7e25534e48421d2b535f574f333e5f918b85",// 42
-	"ff004d4e48425f574f333e5f918b85",// 43
-	"ff004d4e48421d2b535f574f333e5f",// 44
-	"7e25534e48421d2b535f574f333e5f918b85",// 45
-	"ff004d4e48421d2b535f574f333e5f"// 46
+	"ff004d7e25534e48421d2b535f574f333e5f85807b",// 36 bat
+	"ff004d7e25531d2b535f574f333e5f85807b",// 37 slime
+	"ff004d4e48425f574f85807b",// 38 wolf
+	"ff004d4e48421d2b535f574f333e5f85807b",// 39 imp
+	"ff004d4e48421d2b53922d615f574f333e5f85807b",// 40 orc
+	"ff004d7e25534e48421d2b535f574f333e5f85807b",// 41 wizard
+	"ff004d4e48421d2b535f574f333e5f85807b",// 42 troll
+	"7e25534e48421d2b535f574f333e5f",// 43 lich
+	"ff004d7e25534e48421d2b535f574f333e5f",// 44 dragon
+	"ff004d4e48421d2b53922d615f574f333e5f"// 45 balrog
 ];
 
 const offscreenColorData = [
@@ -107,17 +106,16 @@ const offscreenColorData = [
 	"nLuMRiUbj]Zunm~wv",// ⧈ 0F 35
 
 	// DUNGEON ENEMIES
-	"@EEpPUpfQav\\_t\`me@hh@@@@@",// 36 1 bat
-	"@hE@tD@jmmXMkYmmmEkmC@DD@",// 37 2 slime
-	"\`@Dd@X\\cdYAd\\[dd\\dP\`PDCDC",// 38 3 wolf
-	"@]ExHOEGmuxff_htWE\`f]hG_@",// 39 4 goblin
-	"tf\`HLTedd]ERT[@tDCddFdP\`F",// 40 5 imp
-	"@]ExHOEGmuxff_htWE\`f]hG_@",// 41 6 orc
-	"@mE@mmEm[kELMDhTtmtvtBfT@",// 42 7 wizard
-	"@mE@HM@mkkmbcj]d\\EUSE\`Dd@",// 43 8 troll
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@",// 44 lich
-	"@mE@mmEm[kELMDhTtmtvtBfT@",// 45 dragon
-	"RhdPkLLjdlTd\\@Bbd@@Pd\`dd@"// 46 balrog
+	"@EEpPUpfQav\\_t\`]e@hh@@@@@",// 36 1 bat
+	"@hB@tD@jmmXMkYjmmEkmC@DD@",// 37 2 slime
+	"\`@Dd@X\\cdYAd\\Zdd\\dP\`PCCCC",// 38 3 wolf
+	"el\`HNDetT]ET]]@UEEfeFf@\`F",// 39 5 imp
+	"psC@HOFG_xX^tUsdDhSDhGP@",// 40 6 orc
+	"@fFGfdnfbbFMNkp]mvkm{@[CG",// 41 7 wizard
+	"@bB@LND\`bb\`]]efUeF]]EXE]@",// 42 8 troll
+	"@]E@][E]K[]LMZHPH@KLC@P@@",// 43 lich
+	"vpm\`vMLfkUu\\c@Fvf@@Xfpvf@",// 44 dragon
+	"DFFtusuSaQ[^^^F^FFUPEpCs@"// 45 balrog
 ];
 
 for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
