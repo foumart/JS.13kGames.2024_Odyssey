@@ -8,8 +8,7 @@ function action(direction) {
 	let _unit;
 	switch (direction) {
 		case 1: // Up
-			// check collision
-			if (inDialog) return;
+			if (inDialog || inBattle) return;
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
@@ -37,8 +36,7 @@ function action(direction) {
 
 			break;
 		case 2: // Right
-			// check collision
-			if (inDialog) return;
+			if (inDialog || inBattle) return;
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
@@ -66,8 +64,7 @@ function action(direction) {
 
 			break;
 		case 3: // Down
-			// check collision
-			if (inDialog) return;
+			if (inDialog || inBattle) return;
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
@@ -95,8 +92,7 @@ function action(direction) {
 
 			break;
 		case 4: // Left
-			// check collision
-			if (inDialog) return;
+			if (inDialog || inBattle) return;
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {

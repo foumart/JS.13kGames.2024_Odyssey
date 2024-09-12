@@ -151,7 +151,7 @@ function resizeUI(event) {
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			!state ? portrait ? 88 : 80 : portrait ? 60 : inBattle ? 44 : 35
+			!state ? portrait ? 88 : 80 : portrait ? inBattle ? 64 : 56 : inBattle ? 44 : 35
 		}%) translateX(-${
 			portrait || !state ? 50 : inBattle ? 47 : 44
 		}%)`, 60, 60

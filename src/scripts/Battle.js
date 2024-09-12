@@ -62,8 +62,8 @@ function displayDungeon(_dungeon) {
 	prepareDialog(
 		_dungeon[0],
 		"",
-		_dungeon[1] ? descendInDungeon : displayDialog, _dungeon[1] ? "Enter" : "Exit",
-		_dungeon[1] ? displayDialog : 0, _dungeon[1] ? "Exit" : 0
+		_dungeon[1] ? descendInDungeon : closeAllScreens, _dungeon[1] ? "Enter" : "Exit",
+		_dungeon[1] ? closeAllScreens : 0, _dungeon[1] ? "Exit" : 0
 	);
 }
 
@@ -191,25 +191,47 @@ function animateUnitHit(_id, _callback) {
 						if (inBattle == 4) {
 							// attacks the ship
 							shipHealth -= dungeonEnemyAttack;
-							if (shipHealth < 1) prepareDialog("<br>Ship sunk!", "<br>Game Over<br>", quitGame);
+							checkShipHealth(_callback);
 						} else if (Math.random() < .5 || crewHealth < dungeonEnemyAttack) {
 							// attacks the hero
 							playerHealth -= dungeonEnemyAttack;
-							if (playerHealth < 1) prepareDialog("<br>Hero fell!", "<br>Game Over<br>", quitGame, "Menu");
+							checkPlayerHealth(_callback);
 						} else {
 							// attacks the crew
 							crewHealth -= dungeonEnemyAttack;
+							checkCrewHealth(_callback);
 						}
 					} else {
 						dungeonEnemyHealth -= getAttackDamage(_id);
 						dungeonEnemyHealthBar.innerHTML = getEnemyHealthBar();
 						//dialog
 						battleScreen.children[2].innerHTML = getEnemyStatsString();
+
+						animateDamage(battleScreen.children[0], _callback);
 					}
 
 					resizeUI();
+				}
+			);
+		}
+	);
+}
 
-					_callback();
+function animateDamage(_damagedUnit, _callback) {//TODO: aniamte bgr color? background: #adfb;
+	disableBattleInteractions();
+	tween.transitionZ = 1;
+	TweenFX.to(tween, 3, {transitionZ: .9},
+		e => {
+			_damagedUnit.style.transform = `scale(${tween.transitionZ})`;
+		},
+		e => {
+			TweenFX.to(tween, 3, {transitionZ: 1},
+				e => {
+					_damagedUnit.style.transform = `scale(${tween.transitionZ})`;
+				},
+				e => {
+					enableBattleInteractions();
+					if (_callback) _callback();
 				}
 			);
 		}
@@ -224,6 +246,34 @@ function enableBattleInteractions() {
 function disableBattleInteractions() {
 	dungeonFighting = 1;
 	actButton.style.opacity = .5;
+}
+
+function checkShipHealth(_callback) {
+	if (shipHealth < 1) {
+		animateDamage(shipBitmap, () => {
+			prepareDialog("<br>Ship sunk!", "<br>Game Over<br>", quitGame);
+		});
+	} else {
+		animateDamage(shipBitmap, _callback);
+	}
+}
+
+function checkPlayerHealth(_callback) {
+	if (playerHealth < 1) {
+		animateDamage(playerBitmap, () => {
+			prepareDialog("<br>Hero fell!", "<br>Game Over<br>", quitGame);
+		});
+	} else {
+		animateDamage(playerBitmap, _callback);
+	}
+}
+
+function checkCrewHealth(_callback) {
+	if (crewHealth < 0) {
+		crewHealth = 0;
+		crewButton.style.opacity = .5;
+	}
+	animateDamage(crewBitmap, _callback);
 }
 
 function beginNewRound() {

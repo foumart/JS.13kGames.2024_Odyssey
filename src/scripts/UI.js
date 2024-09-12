@@ -52,6 +52,7 @@ function createUI() {
 
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
+			if (dungeon && !inBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
 			prepareDialog(
 				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
 				"<br>" + (
@@ -285,6 +286,7 @@ function closeButtonClick(e) {
 }
 
 function infoButtonClick(id = 0, _hp, _att) { 
+	if (dungeon && !inBattle) return; // disallow info clicks when in the dungeon entrance (dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
 		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) + " &nbsp; " : '') +

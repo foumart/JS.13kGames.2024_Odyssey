@@ -46,7 +46,7 @@ class BoardUnit extends BoardTile {
 
 			// draw the object beneath this unit
 			if (this.overlay) {
-				this.drawImage(this.overlay, true, true);
+				this.drawImage(this.overlay, true, this != boardShip && this != boardPlayer);
 				_offsetX += tileWidth * tween.transitionX;
 				_offsetY -= tileWidth * tween.transitionY;
 			}
@@ -98,7 +98,7 @@ class BoardUnit extends BoardTile {
 		);
 	}
 
-	drawImage(_type, reverse, underlay) {
+	drawImage(_type, underlay, enemy) {
 		gameContext.drawImage(
 			(
 				this.type == UnitType.PLAYERRIGHT ||
@@ -107,11 +107,11 @@ class BoardUnit extends BoardTile {
 			) && !underlay ? offscreenBitmapsFlipped[_type-2] : offscreenBitmaps[_type-1],
 
 			0, 0, unitWidth, unitWidth,
-			this.getX(reverse) - this.width/2 - this.width/tileWidth * (
+			this.getX(underlay && !enemy) - this.width/2 - this.width/tileWidth * (
 				(_type == UnitType.SERPENT || _type == UnitType.CRAB) && ((step + this.y * 9) / 50 | 0) % 2
 					? 2 : 1
 			),
-			this.getY(reverse) - this.height - this.width/tileWidth * (
+			this.getY(underlay && !enemy) - this.height - this.width/tileWidth * (
 				_type == UnitType.SQUID || _type == UnitType.WRECK
 					? ((step + this.y * 9) / 70 | 0) % 2 ? 0 : -1
 					: _type > UnitType.SHIPRIGHT ? 2 : 1

@@ -44,7 +44,6 @@ function createUnit(x, y, z) {
 }
 
 function prepareToMove(dir) {
-	//if (inDialog) displayDialog();// hide the dialog
 	hasTutorial = 0;// disable tutorial presented as "?" at the beginning
 	gameDirty = 2;
 	gamePlayer.overlay = unitsData[playerY][playerX];
@@ -61,6 +60,12 @@ function prepareToMove(dir) {
 		SoundFXmoveSail();
 	} else {
 		SoundFXmoveStep();
+	}
+
+	// damage ship if sailing through shallow riffs
+	if (!onFoot && mapData[playerY][playerX] == 3) {
+		shipHealth -= 5;
+		checkShipHealth();
 	}
 
 	// change character/ship appearance as player moves
@@ -113,7 +118,7 @@ function finalizeMove(dir) {
 	if (!onFoot && dir) {
 		moveLeft -= 1;
 		if (moveLeft < 1) {
-			crewHealth -= shipHealthMax / 9;
+			crewHealth -= shipHealthMax / 9 | 0;
 			moveLeft += moveLimit / 2 | 0;
 			checkCrewSailing();
 		}
@@ -225,7 +230,7 @@ function isSailable(x, y, tileId = TileType.RIFF2, enemy = false) {
 	return (
 		!(unitsData[y][x] && enemy) ||
 		(unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] == UnitType.WRECK) && !enemy
-	) && mapData[y][x] < tileId;
+	) && mapData[y][x] <= tileId;
 }
 
 // only used for player
