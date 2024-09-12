@@ -27,6 +27,7 @@ let stageData,
 let boardPlayer,
 	boardShip,
 	enemies,
+	castles,
 	playerX,
 	playerY,
 	shipX,
@@ -67,6 +68,7 @@ function initBoard() {
 	islesData = stageData.islands.splice(0);// start location and directions of consecutive generation (-1,0) left, (0,-1) up, etc.
 	unitsList = [];
 	enemies = [];
+	castles = [];
 
 	// determine tiles and create some random units
 	for(y = 0; y < boardWidth; y++) {

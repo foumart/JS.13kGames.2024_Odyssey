@@ -153,7 +153,6 @@ function addLabelToDialog(_dialog, _label, _label2) {
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {//hardChoice
-	//if (inDialog) return;
 	addLabelToDialog(dialog, _label, _label2);
 	prepareDialogButtons(dialog, displayDialog, _callback1, _btn1, _callback2, _btn2);
 	if (!inDialog) displayDialog();
@@ -171,11 +170,25 @@ function prepareBattleScreen(_label, _label2, _callback1, _btn1, _callback2, _bt
 	}
 }
 
-function prepareDialogButtons(_dialog, _close, _callback1, _btn1, _callback2, _btn2) {
-	_dialog.innerHTML += `<button style="color:#f009;background:#fda">${_btn1||"Okay"}</button>`;
-	if (_callback2) _dialog.innerHTML += `<button style="color:#0a09">${_btn2||"Cancel"}</button>`;
-	if (_callback2) _dialog.children[_dialog.children.length - 2].addEventListener(interactionTap, _callback1 || _close);
-	_dialog.lastChild.addEventListener(interactionTap, _callback2 ? _callback2 : _callback1 || _close);
+function prepareDialogButtons(_dialog, close, callback1, btn1, callback2, _btn2) {
+	let button1 = document.createElement('button');
+	button1.style.color = '#f009';
+	button1.style.background = '#fda';
+	let span1 = document.createElement('span');
+	span1.innerHTML = btn1 || 'Okay';
+	button1.appendChild(span1);
+	button1.addEventListener('click', callback1 || close);
+	_dialog.appendChild(button1);
+	
+	if (callback2) {
+		let button2 = document.createElement('button');
+		button2.style.color = '#0a09';
+		let span2 = document.createElement('span');
+		span2.innerHTML = _btn2 || 'Exit';
+		button2.appendChild(span2);
+		button2.addEventListener('click', callback2);
+		_dialog.appendChild(button2);
+	}
 }
 
 function displayDialog() {
@@ -282,6 +295,7 @@ function backFromDialog() {
 }
 
 function closeButtonClick(e) {
+	if (playerHealth < 0 || shipHealth < 0) return;
 	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
 }
 
@@ -308,6 +322,7 @@ function checkCrewSailing() {
 		resizeUI();
 		hardChoice = true;
 		if (gold < crewHealthMax * crewPaid) {
+			paused = true;
 			prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
 		} else {
 			prepareDialog("Revolt!", "Crew demands:", () => {

@@ -206,10 +206,10 @@ function beginNewRound() {
 	}
 }
 
-function animateUnitHit(_id, _callback) {
+function animateUnitHit(_id, _callback, _animationOnly) {
 	let _unitBitmap = !_id ? playerBitmap : _id==1 ? shipBitmap : _id==2 ? crewBitmap : dungeonEnemyBitmap;
 	tween.transitionZ = 1;
-	TweenFX.to(tween, 3, {transitionZ: 1.2},
+	TweenFX.to(tween, _animationOnly ? 9 : 3, {transitionZ: 1.2},
 		e => {
 			_unitBitmap.style.transform = `scale(${tween.transitionZ})`;
 		},
@@ -219,30 +219,30 @@ function animateUnitHit(_id, _callback) {
 					_unitBitmap.style.transform = `scale(${tween.transitionZ})`;
 				},
 				e => {
-					if (_id > 2) {
-						if (inBattle == 4 || !onFoot) {
-							// attacks the ship
-							shipHealth -= dungeonEnemyAttack;
-							checkShipHealth(_callback);
-						} else if (Math.random() < .5 || crewHealth < dungeonEnemyAttack) {
-							// attacks the hero
-							playerHealth -= dungeonEnemyAttack;
-							checkPlayerHealth(_callback);
+					if (!_animationOnly) {
+						if (_id > 2) {
+							if (inBattle == 4 || !onFoot) {
+								// attacks the ship
+								shipHealth -= dungeonEnemyAttack;
+								checkShipHealth(_callback);
+							} else if (Math.random() < .5 || crewHealth < dungeonEnemyAttack) {
+								// attacks the hero
+								playerHealth -= dungeonEnemyAttack;
+								checkPlayerHealth(_callback);
+							} else {
+								// attacks the crew
+								crewHealth -= dungeonEnemyAttack;
+								checkCrewHealth(_callback);
+							}
 						} else {
-							// attacks the crew
-							crewHealth -= dungeonEnemyAttack;
-							checkCrewHealth(_callback);
+							dungeonEnemyHealth -= getAttackDamage(_id);
+							dungeonEnemyHealthBar.innerHTML = getEnemyHealthBar();
+							battleScreen.children[2].innerHTML = getEnemyStatsString();
+							animateDamage(battleScreen.children[0], _callback);
 						}
-					} else {
-						dungeonEnemyHealth -= getAttackDamage(_id);
-						dungeonEnemyHealthBar.innerHTML = getEnemyHealthBar();
-						//dialog
-						battleScreen.children[2].innerHTML = getEnemyStatsString();
-
-						animateDamage(battleScreen.children[0], _callback);
+	
+						resizeUI();
 					}
-
-					resizeUI();
 				}
 			);
 		}
@@ -283,6 +283,7 @@ function disableBattleInteractions() {
 function checkShipHealth(_callback) {
 	if (shipHealth < 1) {
 		animateDamage(shipBitmap, () => {
+			paused = true;
 			prepareDialog("<br>Ship sunk!", "<br>Game Over<br>", quitGame);
 		});
 	} else {
@@ -293,6 +294,7 @@ function checkShipHealth(_callback) {
 function checkPlayerHealth(_callback) {
 	if (playerHealth < 1) {
 		animateDamage(playerBitmap, () => {
+			paused = true;
 			prepareDialog("<br>Hero fell!", "<br>Game Over<br>", quitGame);
 		});
 	} else {
@@ -334,10 +336,20 @@ function battleVictory() {
 				);
 			} else {
 				let bonus = islandGenerator.rand(9, getEnemyHP(dungeonEnemy)*2);
+				
+				if (dungeonEnemyUnit.type == UnitType.CASTLE) {
+					// castle conquered
+					bonus *= 3;
+					castles.push([dungeonEnemyUnit.origin, dungeonEnemyUnit.x, dungeonEnemyUnit.y, 0]);
+					dungeonEnemyUnit.origin = 1;
+				} else {
+					// regular surfce unit destroyed
+					removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
+					unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
+					enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
+				}
 				gold += bonus;
-				removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
-				unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
-				enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
+				
 				prepareBattleScreen(
 					getSpan("<br>Victory!", "#fe8", "9vmin"),
 					`<br>Found ${bonus} gold.<br>`,
@@ -364,7 +376,7 @@ function prepareSurfaceBattle(_unit, _siege) {
 	updateInfoTab();
 	updateActionButton();
 	prepareDialog(
-		dungeonSiege ? `Enemy Castle ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
+		dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
 		dungeonSiege ? `` : `<br>You see ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 		closeAllScreens, "Run"
