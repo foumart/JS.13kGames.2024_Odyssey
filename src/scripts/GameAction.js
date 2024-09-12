@@ -1,5 +1,5 @@
 function action(direction, additionalParam) {
-	if (paused || inDialog) return;//hardChoice
+	if (paused) return;//hardChoice
 	if (!direction && !additionalParam) additionalParam = isPlayerDamaged;
 	if (inBattle && !direction) {
 		// Attack button clicked
@@ -10,12 +10,13 @@ function action(direction, additionalParam) {
 	switch (direction) {
 		case 1: // Up
 			// check collision
+			if (inDialog) return;
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
 				_unit = getUnit(playerX, playerY-1);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
-					prepareCastleSiegeDialog(_unit);
+					prepareSurfaceBattle(_unit, 1);
 					return;
 				}
 				if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
@@ -38,12 +39,13 @@ function action(direction, additionalParam) {
 			break;
 		case 2: // Right
 			// check collision
+			if (inDialog) return;
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
 				_unit = getUnit(playerX+1, playerY);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
-					prepareCastleSiegeDialog(_unit);
+					prepareSurfaceBattle(_unit, 1);
 					return;
 				}
 				if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
@@ -66,12 +68,13 @@ function action(direction, additionalParam) {
 			break;
 		case 3: // Down
 			// check collision
+			if (inDialog) return;
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
 				_unit = getUnit(playerX, playerY+1);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
-					prepareCastleSiegeDialog(_unit);
+					prepareSurfaceBattle(_unit, 1);
 					return;
 				}
 				if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
@@ -94,12 +97,13 @@ function action(direction, additionalParam) {
 			break;
 		case 4: // Left
 			// check collision
+			if (inDialog) return;
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
 				_unit = getUnit(playerX-1, playerY);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
-					prepareCastleSiegeDialog(_unit);
+					prepareSurfaceBattle(_unit, 1);
 					return;
 				}
                 if (_unit && _unit.type > UnitType.SHIPRIGHT && _unit.type < UnitType.CASTLE) {
@@ -139,7 +143,7 @@ function action(direction, additionalParam) {
 					_hp ? "Restores Hero and Crew HP, refreshes Ship movement and advances time by 1 day.<br>" : secondMenu ?
 						shipHealth < shipHealthMax ? "<br>Repair Ship damage ("+(shipHealthMax-shipHealth)+")<br><br>" :
 						shipLevel > 3 ? '<br>Ship maxed<br>' :
-						`<br>Increase Ship HP by ${shipLevel == 2 ? 10 : 12} ?<br><br>` : '',
+						`<br>Upgrade Ship HP+${shipLevel == 2 ? 10 : 12}?<br><br>` : '',
 
 					_hp ? e => {
 						if (spendGold(_amount)) return;

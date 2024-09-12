@@ -1,6 +1,7 @@
 let dungeon,// an array of all the floors and their enemies in the dungeon
 	dungeonStage,// current floor
 	dungeonRoom,// current battle in the floor
+	dungeonSiege,// are we atacking a castle currently
 	dungeonEnemy,// current enemy fighting
 	dungeonEnemyHealth,
 	dungeonEnemyAttack,
@@ -11,6 +12,7 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 	dungeonFighting;// bool if we are currently animating a fight
 
 function getEnemyName(_id) {
+	if (dungeonSiege) return "Castle";
 	return [
 		"Bat", "Slime", "Wolf", "Imp", "Orc",
 		"Wizard", "Troll", "Lich", "Dragon", "Balrog",
@@ -19,6 +21,7 @@ function getEnemyName(_id) {
 }
 
 function getEnemyAttack(_id) {
+	if (dungeonSiege) return 5;
 	return [
 		1, 2, 2, 1, 3,
 		3, 6, 5, 12, 16,
@@ -27,6 +30,7 @@ function getEnemyAttack(_id) {
 }
 
 function getEnemyHP(_id) {
+	if (dungeonSiege) return 30;
 	return [
 		6, 10, 12, 16, 24,
 		20, 42, 32, 60, 90,
@@ -145,23 +149,24 @@ function closeAllScreens() {
 
 function tryToFleeBattle() {
 	if (dungeonFighting) return;
-	let _level = dungeonStage + 1;
-	if (Math.random() * _level > dungeonEnemy && dungeonFlee > -1) {
+	let _level = inBattle == 1 ? dungeonStage + 1 : getEnemyName(dungeonEnemy).length - 3;
+	let _enemy = dungeonEnemy > 9 ? dungeonEnemy - 9 : dungeonEnemy;
+	if (Math.random() * _level > _enemy && dungeonFlee > -1) {
 		// player will escape
 		//console.log(1, Math.random() * _level , dungeonEnemy)
 		if (Math.random() * _level < dungeonEnemy) {
 			// player will however suffer a hit
-			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
+			animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
 		} else {
 			prepareDialog("<br>Fled", "<br>", closeAllScreens);
 		}
 	} else {
 		// player cannot escape
 		//console.log(2, Math.random() * _level , dungeonEnemy)
-		if (Math.random() * _level < dungeonEnemy && dungeonFlee < _level) {
+		if (Math.random() * _level < _enemy && dungeonFlee < _level) {
 			// player will receive a hit on top of that
-			dungeonFlee ++;
-			animateUnitHit(dungeonEnemy + 3, e => prepareDialog("Escaping...", "<br>Got hit trying.<br>", displayDialog));
+			dungeonFlee ++;// TODO: fix fleeing in land and marine battles
+			animateUnitHit(_enemy + 3, e => prepareDialog("Escaping...", "<br>Got hit trying.<br>", displayDialog));
 		} else {
 			dungeonFlee = -1;
 			prepareDialog("<br>Cannot flee battle!", "<br>", displayDialog);
@@ -183,14 +188,14 @@ function animateUnitHit(_id, _callback) {
 				},
 				e => {
 					if (_id > 2) {
-						if (inBattle == 3) {
+						if (inBattle == 4) {
 							// attacks the ship
 							shipHealth -= dungeonEnemyAttack;
-							if (shipHealth < 1) prepareDialog("Ship sunk!", "Game Over", quitGame);
+							if (shipHealth < 1) prepareDialog("<br>Ship sunk!", "<br>Game Over<br>", quitGame);
 						} else if (Math.random() < .5 || crewHealth < dungeonEnemyAttack) {
 							// attacks the hero
 							playerHealth -= dungeonEnemyAttack;
-							if (playerHealth < 1) prepareDialog("Hero fell!", "Game Over", quitGame);
+							if (playerHealth < 1) prepareDialog("<br>Hero fell!", "<br>Game Over<br>", quitGame, "Menu");
 						} else {
 							// attacks the crew
 							crewHealth -= dungeonEnemyAttack;
@@ -224,7 +229,7 @@ function disableBattleInteractions() {
 function beginNewRound() {
 	if (dungeonFighting) return;
 	disableBattleInteractions();
-	if (inBattle == 3) {
+	if (inBattle == 4) {
 		// ship attacks
 		animateUnitHit(1, e => {
 			// enemy fight back
@@ -271,7 +276,7 @@ function battleVictory() {
 					lastStage ? 0 : closeAllScreens, "Exit"
 				);
 			} else {
-				let bonus = islandGenerator.rand(9, getEnemyHP(dungeonEnemy));
+				let bonus = islandGenerator.rand(9, getEnemyHP(dungeonEnemy)*2);
 				gold += bonus;
 				removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
 				unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
@@ -292,18 +297,8 @@ function completeDungeon() {
 	closeAllScreens();
 }
 
-function prepareCastleSiegeDialog(_unit) {
-	/*updateInfoTab();
-	updateActionButton();// TODO: fix
-	prepareDialog(
-		`<br>CASTLE ${_unit.type}`,
-		`<br>You approached a ${_unit.origin}<br>`,
-		dungeonBattle, "Fight",
-		closeAllScreens, "Exit"
-	);*/
-}
-
-function prepareSurfaceBattle(_unit) {
+function prepareSurfaceBattle(_unit, _siege) {
+	dungeonSiege = _siege;
 	dungeonEnemyUnit = _unit;
 	dungeonEnemy = _unit.type + 3;
 	dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
@@ -312,9 +307,9 @@ function prepareSurfaceBattle(_unit) {
 	updateInfoTab();
 	updateActionButton();// TODO: fix
 	prepareDialog(
-		`<br>`,
-		`<br>You see a ${getEnemyName(dungeonEnemy)}<br>`,
-		dungeonBattle, "Fight",
+		dungeonSiege ? `Enemy Castle ${dungeonEnemyUnit.origin - 1}<br>` : `<br>`,
+		dungeonSiege ? `heavily guarded` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br>`,
+		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 		closeAllScreens, "Run"
 	);
 

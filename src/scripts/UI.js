@@ -162,7 +162,11 @@ function prepareBattleScreen(_label, _label2, _callback1, _btn1, _callback2, _bt
 	addLabelToDialog(battleScreen, _label, _label2);
 	prepareDialogButtons(battleScreen, displayBattleScreen, _callback1, _btn1, _callback2, _btn2);
 	if (!inBattle) {
-		displayBattleScreen(dungeonEnemy == 10 || dungeonEnemy == 11 ? 3 : dungeonEnemy == 12 || dungeonEnemy == 13 ? 2 : 1);
+		displayBattleScreen(
+			dungeonEnemy == 10 || dungeonEnemy == 11 ? 4 :
+			dungeonEnemy == 12 || dungeonEnemy == 13 ? 3 :
+			dungeonSiege ? 2 : 1
+		);
 	}
 }
 
@@ -225,7 +229,7 @@ function updateActionButton(event) {
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
 		actButton.innerHTML = `${
 			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
-		}<div style='font-size:6vmin;position:relative;margin-top:-2vmin'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
+		}<div style='font-size:6vmin;position:relative;margin:-1vmin 0'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
@@ -237,7 +241,7 @@ function updateActionButton(event) {
 		gold += 50;
 		backFromDialog();
 	} else {
-		actButton.innerHTML = hasTutorial ? "?" : '&#187';
+		actButton.innerHTML = hasTutorial ? "?" : '@';//'&#187';
 	}
 
 	resizeUI(event);
@@ -245,19 +249,25 @@ function updateActionButton(event) {
 
 function updateInfoTab() {
 	let _char = "&#9608";
-	if (inBattle == 1) {// dungeon
-		infoTab.innerHTML = getSpan(`Stage ${dungeonStage}, Room ${dungeonRoom}`, 0, '3em', 'line-height:2vmin');
+	let _html;
+	if (inBattle) {// dungeon, land, siege or marine battles
+		_html = getSpan(
+			inBattle==1
+				? `Stage ${dungeonStage}, Room ${dungeonRoom}`
+				: `${inBattle==4?"Marine":inBattle==2?"Siege":"Land"} Battle`,
+			0, '3em', 'line-height:2vmin'
+		);
 	} else {
-		infoTab.innerHTML = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
+		_html = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
 			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')
 		}&#9612${
 			getSpan(_char.repeat(moveLimit - moveLeft), '#57f8')
 		}<div style="font-size:3em;top:42%;left:16%">${
 			getSpan(moveLeft, '#8ff')
-		}</div><div style="font-size:4em;top:180%">${
-			getSpan(goldIcon + gold, 'gold')
 		}</div>`;
 	}
+	_html += `<div style="font-size:4em;top:180%">${getSpan(goldIcon + gold, 'gold')}</div>`;
+	infoTab.innerHTML = _html;
 }
 
 function backFromDialog() {
@@ -272,18 +282,18 @@ function closeButtonClick(e) {
 }
 
 function infoButtonClick(id, _hp, _att) {
-	prepareDialog(
-		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) +
-			(id < 3 ? " <b>(lvl: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') + "<br>",
-		"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
+	prepareDialog(//(id < 3 ? " <b>(level " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') +
+		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
+		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) : '') +
+		" &nbsp; HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
-			" &nbsp Attack: " + getAttackDamage(id) + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
+			"<br>Attack: " + getAttackDamage(id),// + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
 		displayDialog
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
 		: offscreenBitmapsFlipped[33 + id];
 
-	bmp.style.marginBottom = "1vmin";
+	bmp.style.margin = "1vmin";
 	dialog.firstChild.append(bmp)
 }
 

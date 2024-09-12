@@ -151,7 +151,7 @@ function resizeUI(event) {
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
-			!state ? portrait ? 88 : 80 : portrait ? 60 : inBattle ? 44 : 38
+			!state ? portrait ? 88 : 80 : portrait ? 60 : inBattle ? 44 : 35
 		}%) translateX(-${
 			portrait || !state ? 50 : inBattle ? 47 : 44
 		}%)`, 60, 60
@@ -172,14 +172,14 @@ function resizeUI(event) {
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
-		updateStyleUI(actButton, `bottom:${inBattle?5:3}vmin;right:${inBattle?5:3}vmin;width:auto;padding:2vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
+		updateStyleUI(actButton, `bottom:${inBattle?5:3}vmin;right:${inBattle?5:3}vmin;width:auto;padding:0 3vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
 		rightButton.style.fontSize = 112 * scale + 'px';
 		if (gamePlayer.overlay) {
 			offscreenBitmaps[gamePlayer.overlay-1].style =
-				`margin:2vmin 0;border:2vmin solid #0000;border-radius:2vmin;background:#2266;position:relative;width:16vmin`;
+				`margin:3vmin 0 1vmin;border:2vmin solid #0000;border-radius:2vmin;background:#2266;position:relative;width:16vmin`;
 		}
 	}
 
@@ -214,7 +214,7 @@ function resizeUI(event) {
 		);
 		updateStyleUI(
 			shipButton,
-			event + (inBattle?portrait?'':`top:${infoTab.offsetHeight}px`:''),
+			event + (inBattle?portrait?'bottom:0;left:0;margin-left:5%':`top:30%`:''),
 			inBattle ? 18 : 14, inBattle ? 12 : 9
 		);
 		updateStyleUI(
