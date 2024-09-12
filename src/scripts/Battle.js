@@ -9,7 +9,8 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 	dungeonEnemyHealthBar,// the enemy element span holding enemy health bar symbols
 	dungeonEnemyUnit,// only for surface battles (yeah, we use dungeon battle screen for that too)
 	dungeonFlee,// increases on unsuccessfull flee attempts to increase the chance to escape battle
-	dungeonFighting;// bool if we are currently animating a fight
+	dungeonFighting,// bool if we are currently animating a fight
+	battleIntro;// bool if we are preparing for battle, showing who will fight depending if sailing
 
 function getEnemyName(_id) {
 	if (dungeonSiege) return "Castle";
@@ -85,14 +86,16 @@ function descendInDungeon(event, _skip) {
 	if (_skip == 1) {
 		dungeonBattle();
 	} else {
+		battleIntro = true;
 		updateInfoTab();
-		updateActionButton();// TODO: fix
+		updateActionButton();
 		prepareDialog(
 			`<br>`,
-			`You see ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} 
+			`You see ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} // an imp, an orc, etc.
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
+		shipButton.style.opacity = .5;
 	}
 
 	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
@@ -138,6 +141,7 @@ function getEnemyHealthBar() {
 }
 
 function closeAllScreens() {
+	battleIntro = false;
 	fadeBackground(0);
 	if (inBattle) displayBattleScreen();// close the battle screen
 	if (inDialog) displayDialog();// close any visible dialogs
@@ -145,6 +149,9 @@ function closeAllScreens() {
 	updateInfoTab();
 	dungeon = 0;
 	updateActionButton();
+	playerButton.style.opacity = 1;
+	crewButton.style.opacity = 1;
+	shipButton.style.opacity = 1;
 }
 
 function tryToFleeBattle() {
@@ -174,6 +181,31 @@ function tryToFleeBattle() {
 	}
 }
 
+function beginNewRound() {
+	if (dungeonFighting) return;
+	disableBattleInteractions();
+	if (inBattle == 4 || !onFoot) {
+		// ship attacks
+		animateUnitHit(1, e => {
+			// enemy fight back
+			if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
+				enableBattleInteractions();
+			}); else battleVictory();
+		});
+	} else {
+		// hero attacks
+		animateUnitHit(0, e => {
+			// crew attacks
+			if (dungeonEnemyHealth > 0) animateUnitHit(2, e => {
+				// enemy fight back
+				if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
+					enableBattleInteractions();
+				}); else battleVictory();
+			}); else battleVictory();
+		});
+	}
+}
+
 function animateUnitHit(_id, _callback) {
 	let _unitBitmap = !_id ? playerBitmap : _id==1 ? shipBitmap : _id==2 ? crewBitmap : dungeonEnemyBitmap;
 	tween.transitionZ = 1;
@@ -188,7 +220,7 @@ function animateUnitHit(_id, _callback) {
 				},
 				e => {
 					if (_id > 2) {
-						if (inBattle == 4) {
+						if (inBattle == 4 || !onFoot) {
 							// attacks the ship
 							shipHealth -= dungeonEnemyAttack;
 							checkShipHealth(_callback);
@@ -276,31 +308,6 @@ function checkCrewHealth(_callback) {
 	animateDamage(crewBitmap, _callback);
 }
 
-function beginNewRound() {
-	if (dungeonFighting) return;
-	disableBattleInteractions();
-	if (inBattle == 4) {
-		// ship attacks
-		animateUnitHit(1, e => {
-			// enemy fight back
-			if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
-				enableBattleInteractions();
-			}); else battleVictory();
-		});
-	} else {
-		// hero attacks
-		animateUnitHit(0, e => {
-			// crew attacks
-			if (dungeonEnemyHealth > 0) animateUnitHit(2, e => {
-				// enemy fight back
-				if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
-					enableBattleInteractions();
-				}); else battleVictory();
-			}); else battleVictory();
-		});
-	}
-}
-
 function battleVictory() {
 	TweenFX.to(tween, 9, {transitionZ: 2},
 		e => {
@@ -352,16 +359,17 @@ function prepareSurfaceBattle(_unit, _siege) {
 	dungeonEnemy = _unit.type + 3;
 	dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
 	dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
+	battleIntro = true;
 
 	updateInfoTab();
-	updateActionButton();// TODO: fix
+	updateActionButton();
 	prepareDialog(
-		dungeonSiege ? `Enemy Castle ${dungeonEnemyUnit.origin - 1}<br>` : `<br>`,
-		dungeonSiege ? `heavily guarded` : `<br>You see ${getEnemyName(dungeonEnemy)}<br>`,
+		dungeonSiege ? `Enemy Castle ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
+		dungeonSiege ? `` : `<br>You see ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 		closeAllScreens, "Run"
 	);
 
-	dialog.firstChild.append(offscreenBitmaps[_unit.type-1]);
+	dialog.firstChild.append((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
 	fadeBackground();
 }

@@ -187,21 +187,12 @@ function initBoard() {
 
 			// obscure the stage in clouds, 00: full clouds, 01: partially visible, 02: no clouds
 			if (y>1 && x) {
-				if (stage < 13 && state) {
-					visitedData[y-2][x] = idsData[y-2][x] > 1
-						? stage == 1 && idsData[y-2][x] < 9
-							? visitedData[y-2][x] ? Math.random() < .5 ? visitedData[y-2][x]-1 : 1 : Math.random() < .5 ? 1 : 2
-							: 0
-						: stage < 9
-							? Math.random() >= stage/9 ? 2 : 1
-							: 0;
-				} else if (visitedData[y-2][x] ) {
-					visitedData[y-2][x] = 0;
-				}
-				//if (idsData[y-1][x-1] > 1 && stage>1) visitedData[y-1][x-1] = 0;
+				obscureTile(x, y);
 			}
 		}
 	}
+
+	obscureStage();
 
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
@@ -340,6 +331,33 @@ function initBoard() {
 	revealAroundUnit(playerX, playerY);
 	//revealAroundUnit(shipX, shipY);
 	//revealAroundUnit(townX, townY);
+}
+
+// obscure the stage in clouds, 00: full clouds, 01: partially visible, 02: no clouds
+function obscureStage(x, y) {
+	for(y = 0; y < boardWidth; y++) {
+		for(x = 0; x < boardWidth; x++) {
+			// Update base land tiles (0: water, 1: land)
+			if (mapData[y][x]) {
+				if (y>1 && x) {
+					obscureTile(x, y);
+				}
+			}
+		}
+	}
+}
+
+function obscureTile(x, y) {
+	if (timePassed < 13 && state) {
+		visitedData[y-2][x] = idsData[y-2][x] > 1
+			? timePassed == 1 && idsData[y-2][x] < 9
+				? visitedData[y-2][x] ? Math.random() < .5 ? visitedData[y-2][x]-1 : 1 : Math.random() < .5 ? 1 : 2
+				: 0
+			: Math.random() >= timePassed/30 ? 2 : 1;
+	} else if (visitedData[y-2][x] ) {
+		visitedData[y-2][x] = 0;
+	}
+	//if (idsData[y-1][x-1] > 1 && timePassed>1) visitedData[y-1][x-1] = 0;
 }
 
 function buttonDown(event) {

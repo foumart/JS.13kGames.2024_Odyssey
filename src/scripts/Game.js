@@ -13,7 +13,7 @@ let unit,
 const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta"];
 const shipPrices = [250,500,1e3];
 
-let stage, turn, gold,
+let turn, gold,
 	moveLeft, moveLimit, timePassed,
 	crewHealth, crewHealthMax, crewLevel, crewPaid,
 	playerHealth, playerHealthMax, playerLevel,
@@ -24,10 +24,9 @@ let enemiesKilled;
 
 // initialize vars for new game
 function initVars() {
-	stage = 1;
 	turn = 0;
-	gold = 5;
-	moveLeft = 24; moveLimit = 24;// 35
+	gold = 50;
+	moveLeft = 24; moveLimit = 24;
 	crewPaid = 2;// it's 2 initialy for optimization purposes
 	timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
@@ -203,7 +202,7 @@ function upgradeCrew() {
 }
 
 function getAttackDamage(id) {
-	return (id == 1 ? 1 + shipLevel * 2 : id == 2 ? crewLevel : !id
+	return (id == 1 ? 2 + shipLevel * 2 : id == 2 ? crewLevel : !id
 		? playerLevel + 1
 		: getEnemyAttack(id - 3)
 	);

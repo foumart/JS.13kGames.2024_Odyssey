@@ -1,9 +1,12 @@
 function action(direction) {
 	if (paused) return;//hardChoice
-	if (inBattle && !direction) {
+	if (!direction && (inBattle || battleIntro)) {
 		// Attack button clicked
 		beginNewRound();
 		return;
+	}
+	if (battleIntro && direction) {// equivalent to tapping Run
+		closeAllScreens();
 	}
 	let _unit;
 	switch (direction) {
@@ -127,7 +130,7 @@ function action(direction) {
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("", hasTutorial + "<br>");
+				prepareDialog("", hasTutorial + "<br><br>13 days to defeat the Balrog!<br>");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
@@ -154,6 +157,8 @@ function action(direction) {
 						updateInfoTab();
 						fadeBackground();
 						prepareDialog("Day " + timePassed, "<br>", closeAllScreens);
+						obscureStage();
+						revealAroundUnit(playerX, playerY);
 						//action();
 					} : shipLevel < 4 ? upgradeShip : displayDialog,
 					_rest ? "Rest " + goldIcon + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?

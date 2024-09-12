@@ -206,7 +206,7 @@ function resizeUI(event) {
 			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;
 
-		let landBattle = inBattle && inBattle < 4;
+		let landBattle = inBattle && inBattle < 4 && onFoot;
 		updateStyleUI(
 			playerButton,
 			event + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
@@ -225,6 +225,10 @@ function resizeUI(event) {
 		shipButton.style.display = landBattle ? "none" : "block";
 		playerButton.style.display = !landBattle && inBattle ? "none" : "block";
 		crewButton.style.display = !landBattle && inBattle ? "none" : "block";
+		
+		shipButton.style.opacity = onFoot && battleIntro ? .5 : 1;
+		playerButton.style.opacity = !onFoot && battleIntro ? .5 : 1;
+		crewButton.style.opacity = !onFoot && battleIntro ? .5 : 1;
 	}
 
 	// Fullscreen button
@@ -254,7 +258,7 @@ function resizeUI(event) {
 function switchState() {
 	inDialog = 0;
 	gameDirty = 2;
-	state = 1;
+	state ++;
 	gameInit();
 	createUI();
 	//tryToShowInstallButton();

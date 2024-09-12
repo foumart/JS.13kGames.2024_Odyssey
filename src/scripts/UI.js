@@ -31,7 +31,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 	if (_max < _num) _num = _max;
 	const _step = _max / _num;
 	for (let i = 0; i < _num; i++) {
-		if (i * _step < _health) {
+		if (i * _step < _health-1) {
 			str += _char;
 		} else {
 			str += getSpan(_char, "red");
@@ -52,7 +52,7 @@ function createUI() {
 
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
-			if (dungeon && !inBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
+			if (battleIntro) return; // disallow clicks when in the dungeon entrance (dialog is being used)
 			prepareDialog(
 				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
 				"<br>" + (
@@ -221,7 +221,7 @@ function updateActionButton(event) {
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
 
 	//unit = getUnit(playerX, playerY);
-	if (dungeon || inBattle) {
+	if (dungeon || inBattle || battleIntro) {
 		actButton.innerHTML = "&#9876<br>" + getSpan("ATTACK", 0, "5vmin");
 	} else
 	if (
@@ -230,7 +230,6 @@ function updateActionButton(event) {
 		gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
 	) {
 
-		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
 		actButton.innerHTML = `${
 			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
 		}<div style='font-size:6vmin;position:relative;margin:-1vmin 0'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
@@ -258,7 +257,7 @@ function updateInfoTab() {
 		_html = getSpan(
 			inBattle==1
 				? `Stage ${dungeonStage}, Room ${dungeonRoom}`
-				: `${inBattle==4?"Marine":inBattle==2?"Siege":"Land"} Battle`,
+				: `${inBattle==4||!onFoot?"Naval":inBattle==2?"Siege":"Land"} Battle`,
 			0, '3em', 'line-height:2vmin'
 		);
 	} else {
@@ -268,9 +267,10 @@ function updateInfoTab() {
 			getSpan(_char.repeat(moveLimit - moveLeft), '#57f8')
 		}<div style="font-size:3em;top:42%;left:16%">${
 			getSpan(moveLeft, '#8ff')
-		}</div>`;
+		}</div>`
+		//`<span style="font-size:2em">${timePassed}</span>`
 	}
-	_html += `<div style="font-size:4em;top:180%">${getSpan(goldIcon + gold, 'gold')}</div>`;
+	_html += `<div style="font-size:3em;${inBattle&&!portrait?'left:40vmin;margin:-1vmin':'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
 	infoTab.innerHTML = _html;
 }
 
@@ -286,7 +286,7 @@ function closeButtonClick(e) {
 }
 
 function infoButtonClick(id = 0, _hp, _att) { 
-	if (dungeon && !inBattle) return; // disallow info clicks when in the dungeon entrance (dialog is being used)
+	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
 		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) + " &nbsp; " : '') +
