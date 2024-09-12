@@ -206,7 +206,7 @@ function resizeUI(event) {
 			? `padding:3vmin;position:absolute;margin:5vmin;border-radius:4vmin;`
 			: `padding:2vmin;position:relative;float:left;margin:2vmin 0 0 2vmin;border-radius:2vmin`;
 
-		let landBattle = inBattle && inBattle < 3;
+		let landBattle = inBattle && inBattle < 4;
 		updateStyleUI(
 			playerButton,
 			event + (inBattle?portrait?`bottom:0;left:0`:`top:12%`:''),
@@ -251,11 +251,10 @@ function resizeUI(event) {
 	}
 }
 
-function switchState(event) {
-	//console.log("switchState", state);
+function switchState() {
 	inDialog = 0;
 	gameDirty = 2;
-	state ++;
+	state = 1;
 	gameInit();
 	createUI();
 	//tryToShowInstallButton();

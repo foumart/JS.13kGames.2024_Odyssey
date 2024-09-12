@@ -58,7 +58,7 @@ function createUI() {
 					state
 					? inBattle==1
 						? getDungeonStagesString()[0]
-						: getSpan("&#9881 Sail points left: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
+						: getSpan("&#9881 Sail: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
 					: "<br>Game by Noncho Savov") + "<br>",
 				displayDialog
 			);
@@ -185,19 +185,22 @@ function displayDialog() {
 	battleScreen.style.opacity = inDialog ? 0.5 : 1;
 }
 
-function displayBattleScreen(battleType) {console.log("displayBattleScreen", battleType);
+function displayBattleScreen(battleType) {
 	inBattle = battleType || !inBattle;
 	battleScreen.style.display = inBattle ? 'block' : 'none';
 	gameContainer.style.display = inBattle ? 'none' : 'block';
 	uiDiv.style.pointerEvents = inBattle ? 'auto' : 'none';
-	//uiDiv.style.background = inBattle ? "#222b" : "0";
 }
 
-function displayRumors(_rumors, _amount) {
+function fadeBackground(_clr = "#222b") {
+	uiDiv.style.background = _clr;
+}
+
+/*function displayRumors(_rumors, _amount) {
 	if (spendGold(_amount)) return;
 	backFromDialog();
 	prepareDialog("Rumors", _rumors);
-}
+}*/
 
 function displayNoFunds() {
 	backFromDialog();
@@ -223,7 +226,7 @@ function updateActionButton(event) {
 	if (
 		gamePlayer.overlay == UnitType.CASTLE ||
 		gamePlayer.overlay == UnitType.SHRINE ||
-		gamePlayer.overlay == UnitType.TREE
+		gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
 	) {
 
 		//actButton.innerHTML = gamePlayer.origin>1 ? '&#9876' : '&#9881'; //getSpan('&#11044', '#fc6', 0, 'position:absolute;margin-left:-99%')
@@ -281,17 +284,18 @@ function closeButtonClick(e) {
 	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
 }
 
-function infoButtonClick(id, _hp, _att) {
-	prepareDialog(//(id < 3 ? " <b>(level " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) +")</b>" : '') +
+function infoButtonClick(id = 0, _hp, _att) { 
+	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
-		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) : '') +
-		" &nbsp; HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
+		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) + " &nbsp; " : '') +
+			"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
-			"<br>Attack: " + getAttackDamage(id),// + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
+			(id < 3 ? "" : " &nbsp; ") + "<br>Attack: " + getAttackDamage(id),
+			// + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
 		displayDialog
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
-		: offscreenBitmapsFlipped[33 + id];
+		: offscreenBitmaps[33 + id];
 
 	bmp.style.margin = "1vmin";
 	dialog.firstChild.append(bmp)

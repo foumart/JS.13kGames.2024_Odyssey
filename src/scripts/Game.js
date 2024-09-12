@@ -113,8 +113,8 @@ function finalizeMove(dir) {
 	if (!onFoot && dir) {
 		moveLeft -= 1;
 		if (moveLeft < 1) {
-			crewHealth -= shipHealthMax/9;
-			moveLeft += 13;//moveLimit/2;
+			crewHealth -= shipHealthMax / 9;
+			moveLeft += moveLimit / 2 | 0;
 			checkCrewSailing();
 		}
 	}
@@ -130,13 +130,13 @@ function performEnemyMoves() {
 	// move enemies
 	enemies.forEach(enemy => { // RIGHT
 		if (islandGenerator.rand(0,1)) {
-			if (((enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x + 1, enemy.y, 1) ||
-					enemy.type == UnitType.SERPENT && isSailable(enemy.x + 1, enemy.y, TileType.RIFF1, 1)
+			if (((enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x + 1, enemy.y, 1)
+					//enemy.type == UnitType.SERPENT && isSailable(enemy.x + 1, enemy.y, TileType.RIFF1, 1)
 				) && islandGenerator.rand(0, enemy.x > playerX ? 1 : 3)) {
 					enemy.movingX = 1; enemy.movingY = 0;
 			} else if (( // LEFT
-					(enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x - 1, enemy.y, 1) ||
-					enemy.type == UnitType.SERPENT && isSailable(enemy.x - 1, enemy.y, TileType.RIFF1, 1)
+					(enemy.type == UnitType.KNIGHT || enemy.type == UnitType.CRAB) && isWalkable(enemy.x - 1, enemy.y, 1)
+					//enemy.type == UnitType.SERPENT && isSailable(enemy.x - 1, enemy.y, TileType.RIFF1, 1)
 				) && islandGenerator.rand(0, enemy.x < playerX ? 1 : 3)) {
 					enemy.movingX = -1; enemy.movingY = 0;
 			} else if (( // DOWN
@@ -161,24 +161,19 @@ function spendGold(_amount) {
 	return 0;
 }
 
-function isPlayerDamaged() {
-	return playerHealth < playerHealthMax || crewHealth < crewHealthMax ? 0: 1;
-}
-
 function healPlayer(_hp = 9) {
 	if (playerHealth < playerHealthMax) {
 		playerHealth += _hp;
+		_hp = 0;
 		if (playerHealth > playerHealthMax) {
-			_hp -= playerHealthMax - playerHealth;
+			_hp += playerHealth - playerHealthMax;
 			playerHealth = playerHealthMax;
-		} else _hp = 1;
+		}
 	}
-	if (crewHealth < crewHealthMax) {
+	if (crewHealth < crewHealthMax && _hp) {
 		crewHealth += _hp;
 		if (crewHealth > crewHealthMax) crewHealth = crewHealthMax;
-		_hp = 0;
 	}
-	return _hp;
 }
 
 function upgradeShip() {

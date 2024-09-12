@@ -93,7 +93,7 @@ function initBoard() {
 						unitsData[y][x] = index < colors.length ? UnitType.CASTLE : UnitType.SHRINE;
 						// set castle origin color flag
 						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
-						unit.rumors = 1;
+						//unit.rumors = 1;
 
 						// Add enemies to dungeons
 						if (index >= colors.length) {// colors.length is 6
@@ -388,7 +388,7 @@ function clickButton(event) {
 
 	if (currentButtonX || currentButtonY) {
 		//console.log("swipe: "+currentButtonX+"x"+currentButtonY);
-		if (state == 1) {
+		if (state) {
 			if (Math.abs(currentButtonX) > Math.abs(currentButtonY)) {
 				action(currentButtonX > 0 ? 4 : 2);
 				return;
@@ -404,7 +404,7 @@ function clickButton(event) {
 	currentButtonY = target.target.y;
 	//console.log("clickButton: "+currentButtonX+"x"+currentButtonY);
 
-	if (state == 1) {
+	if (state) {
 		let direction = determineDirection(currentButtonX, currentButtonY);
 		action(direction);
 	}

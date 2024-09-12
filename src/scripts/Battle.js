@@ -40,7 +40,7 @@ function getEnemyHP(_id) {
 
 function getDungeonStagesString(label = "") {
 	let haveEnemies, notCleared, previousEmpty, dungeonStages = label + "Stages: ";
-	dungeon.forEach((_nextStage, _index) => {console.log(_index, _nextStage, _nextStage.length);
+	dungeon.forEach((_nextStage, _index) => {
 		haveEnemies = !_nextStage.every(x => x == -1);
 		if (_index > 2 && haveEnemies) {
 			notCleared = 1;
@@ -52,7 +52,7 @@ function getDungeonStagesString(label = "") {
 		previousEmpty = !haveEnemies;
 	});
 	if (dungeon.length > 3 && notCleared) {
-		dungeonStages += ' &#8943';// add ⋯ after stages if there are unexplored dungeon rooms
+		dungeonStages += ' &#8943';// add [⋯] at the end if there are unexplored dungeon rooms
 	}
 	return [dungeonStages, haveEnemies];
 }
@@ -89,14 +89,14 @@ function descendInDungeon(event, _skip) {
 		updateActionButton();// TODO: fix
 		prepareDialog(
 			`<br>`,
-			`Stage ${dungeonStage}: you see a${dungeonEnemy==3?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
+			`You see ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} 
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
 	}
 
 	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
-	uiDiv.style.background = "#2228";
+	fadeBackground();
 }
 
 function dungeonBattle() {
@@ -138,7 +138,7 @@ function getEnemyHealthBar() {
 }
 
 function closeAllScreens() {
-	uiDiv.style.background = "0";
+	fadeBackground(0);
 	if (inBattle) displayBattleScreen();// close the battle screen
 	if (inDialog) displayDialog();// close any visible dialogs
 	resizeUI();
@@ -280,7 +280,6 @@ function battleVictory() {
 				gold += bonus;
 				removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
 				unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
-				console.log(enemies.indexOf(dungeonEnemyUnit));
 				enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
 				prepareBattleScreen(
 					getSpan("<br>Victory!", "#fe8", "9vmin"),
@@ -308,11 +307,11 @@ function prepareSurfaceBattle(_unit, _siege) {
 	updateActionButton();// TODO: fix
 	prepareDialog(
 		dungeonSiege ? `Enemy Castle ${dungeonEnemyUnit.origin - 1}<br>` : `<br>`,
-		dungeonSiege ? `heavily guarded` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br>`,
+		dungeonSiege ? `heavily guarded` : `<br>You see ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 		closeAllScreens, "Run"
 	);
 
 	dialog.firstChild.append(offscreenBitmaps[_unit.type-1]);
-	uiDiv.style.background = "#2228";
+	fadeBackground();
 }

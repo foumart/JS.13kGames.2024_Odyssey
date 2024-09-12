@@ -1,6 +1,5 @@
-function action(direction, additionalParam) {
+function action(direction) {
 	if (paused) return;//hardChoice
-	if (!direction && !additionalParam) additionalParam = isPlayerDamaged;
 	if (inBattle && !direction) {
 		// Attack button clicked
 		beginNewRound();
@@ -132,30 +131,41 @@ function action(direction, additionalParam) {
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("<u>Ahoy Corsair !</u>", hasTutorial + "<br>");
+				prepareDialog("", hasTutorial + "<br>");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
-				let _hp = !additionalParam && !isPlayerDamaged();
-				let _amount = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
-				let secondMenu = shipHealth < shipHealthMax || shipLevel < 4;
+				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
+				let _rest = _hplost || moveLeft < moveLimit;
+				let _shiplost = shipHealthMax - shipHealth;
+				let _shipmenu = _shiplost || shipLevel < 4;
+				let _amount = _shipmenu
+					? _shiplost * 2
+					: 1 + (playerHealthMax - playerHealth + crewHealthMax - crewHealth + moveLimit - moveLeft) / 2 | 0;
+				
 				prepareDialog(
-					_hp ? "Inn" : "Shipyard",
-					_hp ? "Restores Hero and Crew HP, refreshes Ship movement and advances time by 1 day.<br>" : secondMenu ?
-						shipHealth < shipHealthMax ? "<br>Repair Ship damage ("+(shipHealthMax-shipHealth)+")<br><br>" :
+					_rest ? "Inn" : "Shipyard",
+					_rest ? "Restore Crew HP<br>Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd") : _shipmenu ?
+						_shiplost ? "<br>Repair Ship damage<br><br>" :
 						shipLevel > 3 ? '<br>Ship maxed<br>' :
 						`<br>Upgrade Ship HP+${shipLevel == 2 ? 10 : 12}?<br><br>` : '',
 
-					_hp ? e => {
+					_rest ? e => {
 						if (spendGold(_amount)) return;
-						healPlayer(_amount);
+						healPlayer(_hplost);
 						backFromDialog();
-						action();
+						moveLeft = moveLimit;
+						timePassed ++;
+						updateInfoTab();
+						fadeBackground();
+						prepareDialog("Day " + timePassed, "<br>", closeAllScreens);
+						//action();
 					} : shipLevel < 4 ? upgradeShip : displayDialog,
-					_hp ? "Rest " + goldIcon + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
-						"Repair " + goldIcon + (shipHealthMax - shipHealth) * 2 :
+					_rest ? "Rest " + goldIcon + _amount : shipLevel < 4 ? shipHealth < shipHealthMax ?
+						"Repair " + goldIcon + _shiplost * 2 :
 						"Deal " + goldIcon + shipPrices[shipLevel-1] : 0,
 
-					_unit.rumors && !additionalParam ? () => action(0, 1) : secondMenu ? e => {
+					displayDialog, "Exit"
+					/*_unit.rumors && !additionalParam ? () => action(0, 1) : _shipmenu ? e => {
 						_hp = (_unit.origin)*(crewHealthMax / 5 | 0);
 						prepareDialog(
 							"Tavern",
@@ -165,7 +175,7 @@ function action(direction, additionalParam) {
 							displayDialog, "Exit"
 						);
 					} : displayDialog,
-					secondMenu ? "Next" : "Exit"
+					_shipmenu ? "Next" : "Exit"*/
 				);
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
@@ -174,21 +184,18 @@ function action(direction, additionalParam) {
 				displayDungeon();
 
 			} else
-			if (gamePlayer.overlay == UnitType.TREE) {
-				let _hp = healPlayer();
-				if (!_hp) getUnit(playerX, playerY).apple = 0;
+			if (gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)) {
+				healPlayer();
+				getUnit(playerX, playerY).apple = 0;
 				updateActionButton();
-			} else
-			if (gamePlayer.overlay == UnitType.GOLD) {
-				prepareDialog("Gold Ore", "Will you ?", quitGame, "Mine", closeAllScreens, "Exit");
 			} else {
-				// PASS
+				// PASS action
 				if (inDialog) displayDialog();// hide the dialog
 				tween.transitionZ = 1;
 				TweenFX.to(tween, 6, {transitionZ: 0}, e => doFrameAnimationMove(), e => finalizeMove(0));
 				performEnemyMoves();
 			}
 
-			break;
+		break;
 	}
 }

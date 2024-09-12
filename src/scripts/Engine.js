@@ -48,11 +48,11 @@ function doAnimationFrame(timeStamp) {
 		}
 		drawBoard();
 		// level has actually ended
-		if (state > 1) {
+		/*if (state > 1) {
 			gameStop();
 			console.log("stage complete");
 			return;
-		}
+		}*/
 
 		if (_debug) {
 			var time = Date.now();
@@ -64,19 +64,15 @@ function doAnimationFrame(timeStamp) {
 			}
 		}
 	} else if (gameDirty > 1) {
-		// chose a central deep water tile to position the title screen map (somewhere between the islands)
-		let waterId = 0, limit = 0;
-		while(mapData[playerY+1][playerX] > waterId || mapData[playerY+2][playerX] > waterId) {
+		// chose a central water tile to position the title screen map (somewhere between the islands)
+		let waterId = 2;
+		while(mapData[playerY][playerX] > waterId || mapData[playerY+1][playerX] > waterId) {
 			playerX = islandGenerator.rand(9,boardWidth*.6);
 			playerY = islandGenerator.rand(9,boardWidth*.6);
-			limit ++;
-			if (limit == 99) {
-				waterId ++;
-			}
 		}
 
 		// reveal clouds around the title and the play button
-		for (waterId = 1; waterId < 6; waterId ++) {
+		for (let waterId = 1; waterId < 6; waterId ++) {
 			revealAroundUnit(playerX - 6 + waterId * 2, playerY);
 			revealAroundUnit(playerX, playerY - 6 + waterId * 2);
 		}
