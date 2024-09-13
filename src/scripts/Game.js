@@ -7,8 +7,9 @@ let unit,
 	holding,// is player holding a direction button for constant moving
 	inDialog,// is a dialog on screen
 	inBattle,// is player in battle, battle types: 1:dungeon, 2:land, 3:sea
-	//hardChoice,// make a dialog permanent non skippable
-	hasTutorial;
+	hardChoice,// make a dialog permanent non skippable
+	hasTutorial,// displays initial info with the "?" button
+	autoBattle;// allows automatic battles
 
 const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f"];
 const shipPrices = [250,500,1e3];
@@ -185,10 +186,11 @@ function healPlayer(_hp = 9) {
 }
 
 function getAttackDamage(id) {
-	return (id == 1 ? shipAttack : id == 2 ? crewAttack : !id ? playerAttack : getEnemyAttack(id - 3));
+	return (id == 1 ? shipAttack : id == 2 ? crewAttack : !id ? playerAttack : getEnemyAttack(id == 12 ? 12 : id - 3));
 }
 
 function quitGame() {
+	closeAllScreens();
 	state = -1;
 	switchState();
 }

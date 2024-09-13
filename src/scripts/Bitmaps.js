@@ -11,7 +11,7 @@ const offscreenPixelData = [
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// 02 ship up
 	"",// 03 ship down (m 02)
 	"864404452d15f77b00bf6812c6c6d4e3e3f1ffffff",// 04 ship left
-	"",// 05 ship right (m 04)
+	"ff2b00c926062a2a3f565662da8763ffb08effffff",// 05 ship right (m 04) (tmp knight usage)
 	
 	"008c4600a55309498719548e2296e74dbafd4ddffd",// 06 enemy 1 - fish
 	"c92606ff3d1700970b00b90d5aff0023d61e19548e",// 07 enemy 2 - serpent
@@ -68,7 +68,7 @@ const offscreenColorData = [
 	"@nc@pwt@x}Fpw|Gh~qE@PF@PacA@JL@",// ship up
 	"",
 	"@\\uE@\`~o@owuxenonH}FcPPhH\\\\Q@IIB",// ship left
-	"",
+	"@JQCPQJZXw{MhnT\\XeIae[RZX\\SC@[XC",// tmp
 	
 	"pwE@~JnDuwMflVDZacQctY\\D\`ca@@\`SA",// enemy1 fish
 	"\`uC@YJuytulV\`{plJGfn@\`sux\\l{_cfG",// enemy2 serpent

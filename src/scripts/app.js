@@ -173,7 +173,7 @@ function resizeUI(event) {
 	// Resize in-game UI elements
 	if (upButton) {
 		updateStyleUI(controls, `display:${inBattle?"none":"block"};bottom:1vmin;width:${portrait?54:26}%`);
-		updateStyleUI(actButton, `bottom:${inBattle?5:3}vmin;right:${inBattle?5:3}vmin;width:auto;padding:0 3vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
+		updateStyleUI(actButton, `opacity:${paused||dungeonFighting||autoBattle?.5:1};bottom:${inBattle?5:3}vmin;right:${inBattle?5:3}vmin;width:auto;padding:0 3vmin 3vmin;min-width:14vmin;min-height:12vmin`, 160, -1);
 		upButton.style.fontSize =
 		downButton.style.fontSize =
 		leftButton.style.fontSize =
@@ -196,7 +196,7 @@ function resizeUI(event) {
 		crewButton.innerHTML = addHealthbar(crewHealth, crewHealthMax);
 		playerBitmap = offscreenBitmapsFlipped[0];
 		shipBitmap = offscreenBitmapsFlipped[4];
-		crewBitmap = offscreenBitmaps[8];
+		crewBitmap = offscreenBitmaps[5];
 
 		playerButton.prepend(playerBitmap);
 		shipButton.prepend(shipBitmap);

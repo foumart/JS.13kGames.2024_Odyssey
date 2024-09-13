@@ -1,5 +1,9 @@
 function action(direction) {
-	if (paused) return;//hardChoice
+	if (paused || hardChoice) return;
+	if (autoBattle || dungeonFighting) {
+		autoBattle = false;
+		return;
+	}
 	if (!direction && (inBattle || battleIntro)) {
 		// Attack button clicked
 		if (inBattle) beginNewRound(); else dungeonBattle();
@@ -130,7 +134,7 @@ function action(direction) {
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("", hasTutorial + " to<br>recruit crew. You have 13 days to defeat the Balrog!<br>");
+				prepareDialog("", hasTutorial + "<br><br>13 days to defeat the <u>Balrog</u>!<br>");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
@@ -184,7 +188,7 @@ function action(direction) {
 								}, "Back"
 							);
 						}
-					}, getSpan("Inn", _rest ? 0 : "#caa"),
+					}, getSpan("Inn", _rest ? 0 : "#daa"),
 					
 					e => {
 						if (_hplost) {
@@ -203,7 +207,7 @@ function action(direction) {
 								}, "Back"
 							);
 						}
-					}, getSpan("Healer", _hplost ? 0 : "#aca"),
+					}, getSpan("Healer", _hplost ? 0 : "#ada"),
 				);
 
 				prepareDialogButtons(
@@ -260,8 +264,8 @@ function action(direction) {
 							);
 						}
 					}, _shipMenu
-						? getSpan("Shipyard", shipLevel < 4 ? 0 : "#caa")
-						: getSpan("Barracks", !_crewUpgraded ? 0 : "#caa"),
+						? getSpan("Shipyard", shipLevel < 4 ? 0 : "#daa")
+						: getSpan("Barracks", !_crewUpgraded ? 0 : "#daa"),
 					
 					displayDialog
 				);

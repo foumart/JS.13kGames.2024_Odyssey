@@ -45,6 +45,7 @@ button {
 	background: #adfb;
 	filter: drop-shadow(1vmin 1vmin 0 #1267);
 	border-bottom: 1vmin solid #fff9;
+	transition: opacity 0.5s;
 }
 
 .css_controls {

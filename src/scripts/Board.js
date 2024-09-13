@@ -567,6 +567,9 @@ function drawBoard() {
 }
 
 function removeUnit(x, y) {
+	if (getUnit(x, y).overlay) {
+		unitsData[y][x] = getUnit(x, y).overlay;
+	}
 	unitsList.splice(getUnitId(x, y), 1);
 }
 

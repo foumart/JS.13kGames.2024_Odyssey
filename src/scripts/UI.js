@@ -60,7 +60,7 @@ function createUI() {
 				displayDialog
 			);
 			if (!state) {
-				let bitmap = offscreenBitmaps[37];
+				let bitmap = offscreenBitmaps[38];
 				dialog.firstChild.prepend(bitmap);
 				bitmap.style.marginTop = "4vmin";
 			}
@@ -81,7 +81,7 @@ function createUI() {
 		bgrCanvas.style.opacity = .6;
 	} else {
 		hasTutorial = 1;
-		actButton = generateUIButton(uiDiv, '', e => action(), "css_icon css_controls");
+		actButton = generateUIButton(uiDiv, '?', e => action(), "css_icon");
 
 		controls = document.createElement('div');
 		uiDiv.append(controls);
@@ -148,7 +148,8 @@ function addLabelToDialog(_dialog, _label, _label2) {
 	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") + '<br>' : ''}<b>${_label2}</b><br>`;
 }
 
-function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {//hardChoice
+function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
+	if (hardChoice) return;
 	addLabelToDialog(dialog, _label, _label2);
 	prepareDialogButtons(dialog, displayDialog, _callback1, _btn1, _callback2, _btn2);
 	if (!inDialog) displayDialog();
@@ -295,20 +296,21 @@ function closeButtonClick(e) {
 	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
 }
 
-function infoButtonClick(id = 0, _hp, _att) { 
+function infoButtonClick(id = 0, _hp, _att) {
+	if (paused || hardChoice) return;
 	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
 	prepareDialog(
-		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
-		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) + " &nbsp; " : '') +
+		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id == 12 ? 12 : id - 3)) + "<br>",
+		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp; " : '') +
 			"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
-			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
+			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id == 12 ? 12 : id - 3)) +
 			(id < 3 ? "" : " &nbsp; ") + `<br>${
 				!id ? 'Exp: ' + experience + ` (${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]}) &nbsp; ` : ''
 			}Attack: ${getAttackDamage(id)}`,
 		displayDialog
 	);
-	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
-		: offscreenBitmaps[33 + id];
+	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmaps[8] : !id ? offscreenBitmaps[0]
+		: id == 12 ? offscreenBitmapsFlipped[5] : offscreenBitmaps[33 + id];
 
 	bmp.style.margin = "1vmin";
 	dialog.firstChild.append(bmp)
@@ -317,19 +319,18 @@ function infoButtonClick(id = 0, _hp, _att) {
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		//hardChoice = true;
 		if (gold < crewHealthMax * crewPaid) {
-			paused = true;
 			prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
 		} else {
 			prepareDialog("Revolt!", "Crew demands:", () => {
 				spendGold(crewHealthMax * crewPaid);
 				crewPaid ++;
 				crewHealth = crewHealthMax;
-				//hardChoice = false;
+				hardChoice = false;
 				backFromDialog();
 			}, "Pay " + goldIcon + crewHealthMax * crewPaid);
 		}
+		hardChoice = true;
 	}
 }
 

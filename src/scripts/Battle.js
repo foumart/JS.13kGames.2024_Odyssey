@@ -13,7 +13,7 @@ let dungeon,// an array of all the floors and their enemies in the dungeon
 	battleIntro;// bool if we are preparing for battle, showing who will fight depending if sailing
 
 function getEnemyName(_id) {
-	if (dungeonSiege) return "Castle";
+	if (dungeonSiege) return "Fortress";
 	return [
 		"Bat", "Slime", "Wolf", "Imp", "Orc",
 		"Wizard", "Troll", "Lich", "Dragon", "Balrog",
@@ -22,20 +22,20 @@ function getEnemyName(_id) {
 }
 
 function getEnemyAttack(_id) {
-	if (dungeonSiege) return 5;
+	if (dungeonSiege) return 2 + (1+castles.length) * 2;
 	return [
 		1, 2, 2, 1, 3,
 		3, 6, 5, 12, 16,
-		2, 5, 4, 3
+		2, 5, 3, 2
 	][_id > 13 ? _id - 20 : _id];
 }
 
 function getEnemyHP(_id) {
-	if (dungeonSiege) return 30;
+	if (dungeonSiege) return 24 + castles.length * 12;
 	return [
 		6, 10, 12, 16, 24,
 		20, 42, 32, 60, 90,
-		24, 50, 32, 24
+		24, 50, 24, 20
 	][_id > 13 ? _id - 20 : _id];
 }
 
@@ -109,7 +109,10 @@ function dungeonBattle() {
 	prepareBattleScreen(
 		"<br>",
 		getEnemyStatsString(),
-		beginNewRound, "Attack",
+		e => {
+			autoBattle = true;
+			beginNewRound(1);
+		}, "Auto Battle",
 		tryToFleeBattle, "Flee"
 	);
 
@@ -119,7 +122,7 @@ function dungeonBattle() {
 		getEnemyName(dungeonEnemy),
 		getEnemyHealthBar(),
 		"scale(1.5)",
-		() => infoButtonClick(dungeonEnemy + 3, dungeonEnemyHealth, dungeonEnemyAttack)
+		() => infoButtonClick(dungeonEnemy == 12 ? dungeonEnemy : dungeonEnemy + 3, dungeonEnemyHealth, dungeonEnemyAttack)
 	);
 
 	dungeonEnemyHealthBar = dungeonEnemyBitmap.lastChild;
@@ -142,6 +145,7 @@ function getEnemyHealthBar() {
 }
 
 function closeAllScreens() {
+	hardChoice = false;
 	battleIntro = false;
 	fadeBackground(0);
 	if (inBattle) displayBattleScreen();// close the battle screen
@@ -182,7 +186,7 @@ function tryToFleeBattle() {
 	}
 }
 
-function beginNewRound() {
+function beginNewRound(_manual) {
 	if (dungeonFighting) return;
 	disableBattleInteractions();
 	if (inBattle == 4 || !onFoot) {
@@ -190,6 +194,9 @@ function beginNewRound() {
 		animateUnitHit(1, e => {
 			// enemy fight back
 			if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
+				if (_manual == 1) {
+					beginNewRound(autoBattle);
+				}
 				enableBattleInteractions();
 			}); else battleVictory();
 		});
@@ -200,6 +207,9 @@ function beginNewRound() {
 			if (dungeonEnemyHealth > 0) animateUnitHit(2, e => {
 				// enemy fight back
 				if (dungeonEnemyHealth > 0) animateUnitHit(dungeonEnemy + 3, e => {
+					if (_manual == 1) {
+						beginNewRound(autoBattle);
+					}
 					enableBattleInteractions();
 				}); else battleVictory();
 			}); else battleVictory();
@@ -250,7 +260,7 @@ function animateUnitHit(_id, _callback, _animationOnly) {
 	);
 }
 
-function animateDamage(_damagedUnit, _callback) {//TODO: aniamte bgr color? background: #adfb;
+function animateDamage(_damagedUnit, _callback) {//TODO: aniamate bgr color? background: #adfb;
 	disableBattleInteractions();
 	tween.transitionZ = 1;
 	TweenFX.to(tween, 3, {transitionZ: .9},
@@ -273,7 +283,7 @@ function animateDamage(_damagedUnit, _callback) {//TODO: aniamte bgr color? back
 
 function enableBattleInteractions() {
 	dungeonFighting = 0;
-	actButton.style.opacity = 1;
+	if (!autoBattle) actButton.style.opacity = 1;
 }
 
 function disableBattleInteractions() {
@@ -284,8 +294,8 @@ function disableBattleInteractions() {
 function checkShipHealth(_callback) {
 	if (shipHealth < 1) {
 		animateDamage(shipBitmap, () => {
-			paused = true;
 			prepareDialog("<br>Ship sunk!", "<br>Game Over<br>", quitGame);
+			hardChoice = true;
 		});
 	} else {
 		animateDamage(shipBitmap, _callback);
@@ -295,8 +305,8 @@ function checkShipHealth(_callback) {
 function checkPlayerHealth(_callback) {
 	if (playerHealth < 1) {
 		animateDamage(playerBitmap, () => {
-			paused = true;
 			prepareDialog("<br>Hero fell!", "<br>Game Over<br>", quitGame);
+			hardChoice = true;
 		});
 	} else {
 		animateDamage(playerBitmap, _callback);
@@ -312,6 +322,8 @@ function checkCrewHealth(_callback) {
 }
 
 function battleVictory() {
+	autoBattle = false;
+	hardChoice = true;
 	TweenFX.to(tween, 9, {transitionZ: 2},
 		e => {
 			dungeonEnemyBitmap.style.transform = `scale(${tween.transitionZ})`;
@@ -346,8 +358,8 @@ function battleVictory() {
 					dungeonEnemyUnit.origin = 1;
 				} else {
 					// regular surface unit destroyed
-					removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
 					unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
+					removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
 					enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
 				}
 				gold += bonus;
