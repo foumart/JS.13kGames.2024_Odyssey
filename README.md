@@ -1,71 +1,15 @@
-# JS13kGames Progressive Web App starter pack
+# The Isle-Hop Odyssey
 
-JS13K Games Competition website: https://js13kgames.com/
+#### A game made for JS13kGames 2024 with theme: Triskaidekaphobia
 
-This template targets the compo's **Mobile** category by providing a convenient way to build Progressive Web Apps.
+### Ahoy Corsair! Welcome to The Isle-Hop Odyssey, where you are stranded on an island with little more than your two legs and a soon-to-be-rusty ship nearby. Hop from island to island like a seafaring kangaroo - or maybe more like a seagull after a cake - conquering forts, battling crabs, and other scallywags as you sail through treacherous seas filled with giant squids and sea serpents just waiting to ruin your day.
 
-PWAs at minimum need a service worker script, web manifest and icon files, which increases the final archive size by around a kilobyte.
+### Your mission? Siege castles, recruit a ragtag crew (who might not know port from starboard), and loot dungeons, all while trying not to sink your ship or get pinched by a particularly grumpy crab. But don't get too cozy! There is a mysterious island no one talks about - except when they’re screaming in terror. The 13th island, The Cursed Isle, hides the nastiest dungeon of them all, home to a certain Balrog (or was it Balron?) who's been feeling a bit cranky lately and definitely doesn’t like visitors. So, buckle up, sailor! Your Odyssey awaits - if you don’t get eaten by a squid first!
 
-The template also uses a sophisticated Gulp process to parse JS code with Google Closure Compiler and to pack it along with any CSS into a single minified HTML file. Additional compression is achieved utilizing Roadroller JS packer. Once successfully built the game will be opened in the default browser with BrowserSync live-reload enabled. Any modification in src/ folder will invoke a game reload on the localhost.
+![Game Thumb](https://www.foumartgames.com/games/Odyssey/Icon_320.png)
 
-## Installation
-Run **`npm install`** to install build dependencies.
+### Controls:
 
-## Tasks
-**`npm build`** builds the game, reports archive size and serves locally with browser sync live reload enabled.
+In-game mobile controls are available in the bottom left and bottom right part of the screen.
 
-**`npm debug`** builds the game without any minifying for easier debugging. Includes detailed console logs.
-
-**`npm test`** repacks the contents of the public folder to report archive filesize.
-
-**`npm sync`** rebuilds the game and refreshes the browser, automated via BrowserSync.
-
-## Build task parameters
-*`--pwa`* instructs to build a Progressive Web App - will add 842 bytes when zipped.
-
-*`--roadroll`* instructs to use a JS packer to achieve up to 15% compression on top of the ZIP/gzip.
-
-*`--mobile`* adds some HTML tags regarding mobile and iOS icons - increases the ZIP filesize with 42 bytes.
-
-*`--social`* adds some HTML tags for SEO and social media (Twitter) - will add around 100 bytes, depending on description length.
-
-## Template Structure
-```
-root/
-├── resources/
-│   ├── externs.js         - externs for Closure Compiler
-│   ├── mf.webmanifest     - needed for the PWA functionality
-│   ├── service_worker.js  - PWA
-│   └── sw_init.js         - PWA
-├── src/
-│   ├── index.html         - template ("rep_css" and "rep_js" should be kept intact)
-│   ├── ico.svg            - PWA
-│   ├── scripts/           - should contain all JS scripts
-│   ├── styles/            - should contain all CSS styles
-│   └── assets/            - should contain any images the game needs
-├── public                 - output folder
-├── zip                    - output ZIP archives
-└── package.json           - check Setup
-```
-
-## Setup
-Setup is done in the **`package.json`**. Variables you have to modify:
-
-- name - *used for generating the cache name in the service_worker.js file*
-- version - *used for generating the cache name in the service_worker.js file*
-- title - *populated in the title tag of the HTML, in the webmanifest file and in the social meta tags*
-- description - *used only if social option is turned on*
-- keywords - *used only if social option is turned on*
-- orientation - *populated only in the webmanifest file*
-- icon extension - *needed for the HTML's icon link tag, used in the webmanifest file and in the service_worker.js file*
-- icon type - *needed for the HTML's icon link tag, in the webmanifest file and in the service_worker.js file*
-- icon size - *used in the webmanifest file*
-
-## Filesize overview:
-Currently the ZIP output of the default *`npm:build`* is 3.34 KB (3,430 bytes), of which:
- - 1,312 bytes are occupied by the interactive demo (ship.png 612 bytes + scripts)
- - 842 bytes for PWA functionality (serviceworker + webmanifest + initialization scripts)
- - 256 bytes for ico.svg (an icon is needed for PWA functionality)
- - 900 bytes for an index.html with a default basic structure
-
-Regarding the icon - it needs to be at least 144x144 pixels in size minimum. Using the PNG format will provide no less than 500 bytes image, so the SVG format remains best in terms of compression.
+Desktop controls: Arrow keys to move or interact; Space to act.
