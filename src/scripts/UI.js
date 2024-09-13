@@ -1,9 +1,5 @@
 const goldIcon = "&#164;";// currency sign
 
-function getIcon(size) {
-	return `<img src=ico.png height=${size} width=${size}>`;
-}
-
 function getScale() {
 	return (height < width ? height : width) / 1000;
 }
@@ -31,7 +27,7 @@ function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
 	if (_max < _num) _num = _max;
 	const _step = _max / _num;
 	for (let i = 0; i < _num; i++) {
-		if (i * _step < _health-1) {
+		if (i * _step < _health) {
 			str += _char;
 		} else {
 			str += getSpan(_char, "red");
@@ -80,7 +76,7 @@ function createUI() {
 	}
 
 	if (!state) {
-		titlePng = generateUIButton(uiDiv, "", switchState, "");
+		//titlePng = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
 		bgrCanvas.style.opacity = .6;
 	} else {
@@ -257,7 +253,7 @@ function updateActionButton(event) {
 		gold += 50;
 		backFromDialog();
 	} else {
-		actButton.innerHTML = hasTutorial ? "?" : '@';//'&#187';
+		actButton.innerHTML = hasTutorial ? "?" : '<b>@</b>';//'&#187';
 	}
 
 	resizeUI(event);
@@ -283,7 +279,7 @@ function updateInfoTab() {
 		}</div>`
 		//`<span style="font-size:2em">${timePassed}</span>`
 	}
-	_html += `<div style="font-size:3em;${inBattle&&!portrait?'left:40vmin;margin:-1vmin':'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
+	_html += `<div style="font-size:3.5em;${inBattle&&!portrait?'left:40vmin;margin:-1vmin':'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
 	infoTab.innerHTML = _html;
 }
 
@@ -352,6 +348,9 @@ function debugBoard() {
 	visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
 );*/
 
+/*function getIcon(size) {
+	return `<img src=ico.png height=${size} width=${size}>`;
+}*/
 
 /*function tryToShowInstallButton() {
 	if (!state && installPrompt) {

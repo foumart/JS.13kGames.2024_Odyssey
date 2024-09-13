@@ -10,3 +10,33 @@
  * @record
  */
 CanvasRenderingContext2D.prototype.roundRect
+
+/**
+ * mainDiv
+ * @record
+ */
+var mainDiv
+
+/**
+ * bgrCanvas
+ * @record
+ */
+var bgrCanvas
+
+/**
+ * gameCanvas
+ * @record
+ */
+var gameCanvas
+
+/**
+ * gameContainer
+ * @record
+ */
+var gameContainer
+
+/**
+ * uiDiv
+ * @record
+ */
+var uiDiv

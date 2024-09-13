@@ -32,6 +32,7 @@ const iconExtension = packageJson.iconExtension;
 const iconType = packageJson.iconType;
 const iconSize = packageJson.iconSize;
 const orientation = packageJson.orientation;
+const replacedIds = [];
 
 // Script Arguments:
 // --dir: set the output directory
@@ -73,12 +74,17 @@ const social = argv.social != undefined || argv.all != undefined ? `
 // Prepare a web icon to be used by html and pwa
 function ico(callback) {
 	(async () => {
+		// Keep the imports, even if not copying an icon, the gulp image modules are needed for the assets.
 		const gulpImageminModule = await import('gulp-imagemin');
 		imagemin = gulpImageminModule.default;
 		gifsicle = gulpImageminModule.gifsicle;
 		mozjpeg = gulpImageminModule.mozjpeg;
 		optipng = gulpImageminModule.optipng;
 		svgo = gulpImageminModule.svgo;
+
+		if (!mobile) {
+			return callback();
+		}
 
 		if (iconExtension == "svg") {
 			src(['src/ico.svg'], { allowEmpty: true })
@@ -193,6 +199,22 @@ async function mangle() {
 	js = fs.readFileSync(dir + '/tmp/app.js', 'utf8');
 
 	if (!debug) {
+		//
+		const elementIds = ['mainDiv', 'bgrCanvas', 'gameCanvas', 'gameContainer', 'uiDiv'];
+		for (let i = 0; i < elementIds.length; i++) {
+			const regex = new RegExp(elementIds[i], 'g');
+			js = js.replace(regex, String.fromCharCode(i + 97) + "z");
+			replacedIds.push(String.fromCharCode(i + 97) + "z");
+		}
+
+		// Rename CSS classes with a single letter starting from letter "a"..
+		const classIds = ['css_button', 'css_icon', 'css_space', 'css_controls'];
+		for (let i = 0; i < classIds.length; i++) {
+			const regex = new RegExp(classIds[i], 'g');
+			css = css.replace(regex, String.fromCharCode(i + 97));
+			js = js.replace(regex, String.fromCharCode(i + 97));
+		}
+
 		if (roadroll) {
 			const packer = new roadroller.Packer(
 				[{
@@ -228,6 +250,12 @@ function pack(callback) {
 	let stream = src('src/index.html', { allowEmpty: true });
 
 	stream
+		.pipe(gulpif(!pwa, replace('<link rel="icon" type="{ICON_TYPE}" sizes="any" href="ico.{ICON_EXTENSION}">', '', replaceOptions)))
+		.pipe(replace('mainDiv', replacedIds[0], replaceOptions))
+		.pipe(replace('bgrCanvas', replacedIds[1], replaceOptions))
+		.pipe(replace('gameCanvas', replacedIds[2], replaceOptions))
+		.pipe(replace('gameContainer', replacedIds[3], replaceOptions))
+		.pipe(replace('uiDiv', replacedIds[4], replaceOptions))
 		.pipe(replace('{TITLE}', title, replaceOptions))
 		.pipe(replace('{ICON_EXTENSION}', iconExtension, replaceOptions))
 		.pipe(replace('{ICON_TYPE}', iconType, replaceOptions))

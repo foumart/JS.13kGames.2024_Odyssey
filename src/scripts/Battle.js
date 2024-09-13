@@ -104,6 +104,7 @@ function descendInDungeon(event, _skip) {
 
 function dungeonBattle() {
 	if (inDialog) displayDialog();// hide dialog screen
+	battleIntro = false;
 
 	prepareBattleScreen(
 		"<br>",

@@ -15,7 +15,7 @@
 	"scripts": {
 		"preinstall": "npx npm-force-resolutions",
 		"build": "gulp --dir public --mobile",
-		"prod": "gulp --dir public --mobile --prod --roadroll",
+		"prod": "gulp --dir public --prod --roadroll",
 		"debug": "gulp --dir public --debug",
 		"sync": "gulp sync --dir public --pwa --mobile",
 		"test": "gulp zip --dir public"

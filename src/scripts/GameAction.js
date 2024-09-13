@@ -130,9 +130,10 @@ function action(direction) {
 				for (_unit = 2; _unit < colors.length; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("", hasTutorial + "<br><br>13 days to defeat Balrog!<br>");
+				prepareDialog("", hasTutorial + " to<br>recruit crew. You have 13 days to defeat the Balrog!<br>");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
+				// CASTLES AND FORTS
 				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
 				let _rest = moveLimit - moveLeft;
 				let _shiplost = shipHealthMax - shipHealth;
@@ -153,18 +154,6 @@ function action(direction) {
 				let _shipMenu = _castleId == 1;
 				let _crewMenu = _castleId > 1;
 
-				/*console.log(
-					"_hplost:"+_hplost,
-					"_rest:"+_rest,
-					"_shiplost:"+_shiplost,
-					"_castleId:"+_castleId,
-					"_crewUpgraded:"+_crewUpgraded,
-					"_shipMenu:"+_shipMenu,
-					"_crewMenu:"+_crewMenu,
-					"_amount:"+_amount,
-					shipLevel, crewLevel
-				);*/
-
 				prepareDialog(
 					// Label
 					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "Castle"),
@@ -182,7 +171,7 @@ function action(direction) {
 									timePassed ++;
 									updateInfoTab();
 									fadeBackground();
-									prepareDialog("Day " + timePassed, "<br>", closeAllScreens);
+									prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
 									obscureStage();
 									revealAroundUnit(playerX, playerY);
 								}, "Rest",
@@ -272,79 +261,6 @@ function action(direction) {
 					
 					displayDialog
 				);
-
-				/*prepareDialog(
-					// Label
-					(_castleId > 1 ? "<br>Town " + getSpan('&#9873', colors[_castleId-1]) : "Castle") + " " +
-					(_hplost ? "Healer" : _rest ? "Inn" : _crewMenu ? "Barracks" : "Shipyard"),
-
-					// Description
-					_hplost ? "<br>Restore Hero and Crew HP<br>" :
-					_rest ? "Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd") :
-					_crewMenu ? crewLevel > 3 ? "<br>Crew maxed<br>" : `<br>Upgrade Crew HP +10<br>Attack +${crewLevel*2-1}<br>` :
-					_shiplost ? "<br>Repair Ship damage<br><br>" :
-					_shipMenu ? `<br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br>Ship Attack +2<br>` : '<br>Ship maxed<br>',
-
-					// Functionality
-					_hplost ? e => {
-						// Heal
-						if (spendGold(_amount)) return;
-						healPlayer(_hplost);
-						backFromDialog();
-						updateInfoTab();
-					} : 
-					_rest ? e => {
-						// Rest
-						if (spendGold(_amount)) return;
-						backFromDialog();
-						moveLeft = moveLimit;
-						timePassed ++;
-						updateInfoTab();
-						fadeBackground();
-						prepareDialog("Day " + timePassed, "<br>", closeAllScreens);
-						obscureStage();
-						revealAroundUnit(playerX, playerY);
-						//action();
-					} :
-					_crewMenu ? e => {
-						// Upgrade Crew
-						if (spendGold(_amount)) return;
-						_castleToUpdate[3] = 1;
-						crewHealth += 12;
-						crewAttack += 2;
-						crewLevel ++;
-						animateUnitHit(2, 0, 2);
-						backFromDialog();
-					} :
-					_shipMenu || _shiplost ? e => {
-						// Upgrade or Repair Ship
-						if (spendGold(_amount)) return;
-						if (shipHealth < shipHealthMax) {
-							if (spendGold((shipHealthMax - shipHealth) * 5)) return;
-							shipHealth += shipHealthMax - shipHealth;
-						} else {
-							if (spendGold(shipPrices[shipLevel-1])) return;
-							shipAttack += 2;
-							shipLevel ++;
-							shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
-						}
-						animateUnitHit(1, 0, 2);
-						backFromDialog();
-						resizeUI();
-						infoButtonClick(1);
-					} :
-					displayDialog,
-
-					_hplost || _rest || _shipMenu || _crewMenu ?
-						(_hplost ? "Heal" : _rest ? "Rest" : "Deal") + " " + goldIcon + (
-							_hplost || _rest ? _amount :
-							_crewMenu && !_crewUpgraded ? crewPrices[crewLevel-1] :
-							shipLevel < 4 ? shipPrices[shipLevel-1] : 0
-						) : 0,
-
-					_hplost || _rest || _crewMenu || _shipMenu || _shiplost ? e => action(0, _hplost ? 1 : _rest ? 2 : 3) : 0,
-					_hplost || _rest || _crewMenu || _shipMenu || _shiplost ? "Next" : "Exit"
-				);*/
 			} else
 			if (gamePlayer.overlay == UnitType.SHRINE) {
 				dungeon = _unit.dungeon;

@@ -1,10 +1,11 @@
 // All elements with IDs are global objects in js, but the closure compiler needs declared objects
 // to work, so these will be removed by the gulp 'mangle' process afterwards..
-const mainDiv = document.getElementById("mainDiv");
-const uiDiv = document.getElementById("uiDiv");
-const gameCanvas = document.getElementById("gameCanvas");
-const gameContainer = document.getElementById("gameContainer");
-const bgrCanvas = document.getElementById("bgrCanvas");
+//const mainDiv = document.getElementById("mainDiv");
+//const uiDiv = document.getElementById("uiDiv");
+//const gameCanvas = document.getElementById("gameCanvas");
+//const gameContainer = document.getElementById("gameContainer");
+//const bgrCanvas = document.getElementById("bgrCanvas");
+
 const gameContext = gameCanvas.getContext("2d");
 const bgrContext = bgrCanvas.getContext("2d");
 
@@ -43,7 +44,7 @@ let state = 0;
 let tween = { transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, infoTab, dialog, battleScreen, titlePng, titleText;
+let controls, infoTab, dialog, battleScreen, titleText;//titlePng
 let actButton, upButton, leftButton, rightButton, downButton;
 let playButton, soundButton; //fullscreenButton
 let closeButton, playerButton, shipButton, crewButton;
@@ -245,13 +246,13 @@ function resizeUI(event) {
 	if (playButton) {
 		//if (installButton) updateStyleUI(installButton, `top:${portrait?82:84}%;left:50%;transform:translateX(-50%);width:${portrait?35:25}%`, portrait?80:65, portrait?112:90);
 		//updateStyleUI(playButton, `top:${(portrait?installButton?69:75:installButton?66:72)}%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
-		updateStyleUI(playButton, `top:74%;left:50%;transform:translateX(-50%);width:${portrait?60:40}%;background:#4f8a`);
-		titlePng.innerHTML = getIcon(portrait ? 80*getSize() : 80*getSize());
-		updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
+		updateStyleUI(playButton, `position:relative;margin:auto;top:70%;width:${portrait?60:40}%;background:#4f8a`);
+		//titlePng.innerHTML = getIcon(portrait ? 80*getSize() : 80*getSize());
+		//updateStyleUI(titlePng, `top:${portrait?58:54}%;left:50%;transform:translateY(-50%) translateX(-50%) scale(${(portrait?width:height)<600?1:(portrait?width:height)/600})`);
 		titleText.innerHTML = `<div style="filter:drop-shadow(.2em .1em 0 #1267);text-shadow:#f74 .1em .05em;margin-top:-${112*scale}px;margin-left:${235*scale
 			}px;font-size:${45*scale}px;color:#ff9"><i>The</i></div><div style="filter:drop-shadow(.15em .1em 0 #1267);text-shadow:#f74 .07em .03em;margin-top:-${95*scale}px;margin-left:${325*scale
 			}px;font-size:${95*scale}px;color:#ff9"><i><u>Isle&#10556&#8202Hop</u></i></div>${getSpan("O<b>dyssey</b>", "#efe", 0, "filter:drop-shadow(.1em .05em 0 #1267);text-shadow:#1bc .06em .03em")}`;
-		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?340:260}%) translateX(-50%) scale(${getSize(500)})`, 220);
+		updateStyleUI(titleText, `top:50%;left:50%;transform:translateY(-${portrait?280:200}%) translateX(-50%) scale(${getSize(500)})`, 220);
 	}
 }
 

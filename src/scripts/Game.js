@@ -10,7 +10,7 @@ let unit,
 	hardChoice,// make a dialog permanent non skippable
 	hasTutorial;
 
-const colors = ["#000", "red", "#fff", "aqua", "yellow", "magenta"];
+const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f"];
 const shipPrices = [250,500,1e3];
 const crewPrices = [200,300,500];
 
@@ -26,12 +26,12 @@ let enemiesKilled;
 // initialize vars for new game
 function initVars() {
 	turn = 0;
-	gold = 5000;
+	gold = 50;
 	moveLeft = 24; moveLimit = 24;
 	crewPaid = 2;// it's 2 initialy for optimization purposes
 	timePassed = 1;
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
-	playerAttack = 2; playerHealth = 10; playerHealthMax = 20; playerLevel = 1;
+	playerAttack = 2; playerHealth = 20; playerHealthMax = 20; playerLevel = 1;
 	shipAttack = 4; shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
 	crewAttack = 1; crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
 
