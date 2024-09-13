@@ -1,5 +1,5 @@
 // island generator game map constants and title map initialization
-const seaSize = 44, seaOffset = 9, titleMapSize = 38;
+const seaSize = 44, seaOffset = 9;
 let islandGenerator = new IslandGenerator(this);
 
 // game loop vars
@@ -11,7 +11,7 @@ async function gameInit() {
 	step = 0;
 	frame = 0;
 	
-	let data = await getStageData(!state ? titleMapSize : seaSize, seaOffset);
+	let data = await getStageData(seaSize, seaOffset);
 	populateStageData(data);
 	initVars();
 	initBoard();

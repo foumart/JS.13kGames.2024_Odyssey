@@ -251,11 +251,11 @@ function pack(callback) {
 
 	stream
 		.pipe(gulpif(!pwa, replace('<link rel="icon" type="{ICON_TYPE}" sizes="any" href="ico.{ICON_EXTENSION}">', '', replaceOptions)))
-		.pipe(replace('mainDiv', replacedIds[0], replaceOptions))
-		.pipe(replace('bgrCanvas', replacedIds[1], replaceOptions))
-		.pipe(replace('gameCanvas', replacedIds[2], replaceOptions))
-		.pipe(replace('gameContainer', replacedIds[3], replaceOptions))
-		.pipe(replace('uiDiv', replacedIds[4], replaceOptions))
+		.pipe(gulpif(!debug, replace('mainDiv', replacedIds[0], replaceOptions)))
+		.pipe(gulpif(!debug, replace('bgrCanvas', replacedIds[1], replaceOptions)))
+		.pipe(gulpif(!debug, replace('gameCanvas', replacedIds[2], replaceOptions)))
+		.pipe(gulpif(!debug, replace('gameContainer', replacedIds[3], replaceOptions)))
+		.pipe(gulpif(!debug, replace('uiDiv', replacedIds[4], replaceOptions)))
 		.pipe(replace('{TITLE}', title, replaceOptions))
 		.pipe(replace('{ICON_EXTENSION}', iconExtension, replaceOptions))
 		.pipe(replace('{ICON_TYPE}', iconType, replaceOptions))

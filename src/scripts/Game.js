@@ -7,7 +7,7 @@ let unit,
 	holding,// is player holding a direction button for constant moving
 	inDialog,// is a dialog on screen
 	inBattle,// is player in battle, battle types: 1:dungeon, 2:land, 3:sea
-	hardChoice,// make a dialog permanent non skippable
+	//hardChoice,// make a dialog permanent non skippable
 	hasTutorial;
 
 const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f"];
@@ -22,6 +22,8 @@ let turn, gold,
 	playerBitmap, shipBitmap, crewBitmap;
 
 let enemiesKilled;
+let experience;
+let expLevels = [200,500,1e3];
 
 // initialize vars for new game
 function initVars() {
@@ -33,7 +35,8 @@ function initVars() {
 	// 2: 0-24; 3: 25-37-48; 4: 49-60; 6: 61-72
 	playerAttack = 2; playerHealth = 20; playerHealthMax = 20; playerLevel = 1;
 	shipAttack = 4; shipHealth = 38; shipHealthMax = 38; shipLevel = 1;// 38, 48, 60,  72
-	crewAttack = 1; crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60, 
+	crewAttack = 1; crewHealth = 24; crewHealthMax = 24; crewLevel = 1;// 36, 48, 60,
+	experience = 0;
 
 	enemiesKilled = [];
 }

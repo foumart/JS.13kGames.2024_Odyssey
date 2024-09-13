@@ -2,7 +2,7 @@ function action(direction) {
 	if (paused) return;//hardChoice
 	if (!direction && (inBattle || battleIntro)) {
 		// Attack button clicked
-		beginNewRound();
+		if (inBattle) beginNewRound(); else dungeonBattle();
 		return;
 	}
 	if (battleIntro && direction) {// equivalent to tapping Run
@@ -137,10 +137,7 @@ function action(direction) {
 				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
 				let _rest = moveLimit - moveLeft;
 				let _shiplost = shipHealthMax - shipHealth;
-				let _amount =
-					_hplost ? 1 + _hplost / 2 | 0 :
-					_rest ? _rest * 2 :
-					_shiplost ? 1 + _shiplost / 2 | 0 : 0;
+
 				let _castleId = 1;
 				let _crewUpgraded;
 				let _castleToUpdate;
@@ -153,6 +150,13 @@ function action(direction) {
 				});
 				let _shipMenu = _castleId == 1;
 				let _crewMenu = _castleId > 1;
+
+				let _amount =
+					_hplost ? 1 + _hplost / 2 | 0 :
+					_rest ? _rest * 2 :
+					_shiplost ? 1 + _shiplost / 2 | 0 :
+					shipLevel < 4 || _shiplost ? shipPrices[shipLevel-1] :
+					_crewMenu && !_crewUpgraded ? crewPrices[shipLevel-1] : 0;
 
 				prepareDialog(
 					// Label
@@ -174,7 +178,7 @@ function action(direction) {
 									prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
 									obscureStage();
 									revealAroundUnit(playerX, playerY);
-								}, "Rest",
+								}, "Rest " + goldIcon + _amount,
 								e => {
 									action();
 								}, "Back"
@@ -193,7 +197,7 @@ function action(direction) {
 									healPlayer(_hplost);
 									backFromDialog();
 									updateInfoTab();
-								}, "Heal",
+								}, "Heal " + goldIcon + _amount,
 								e => {
 									action();
 								}, "Back"
@@ -228,7 +232,7 @@ function action(direction) {
 									backFromDialog();
 									resizeUI();
 									infoButtonClick(1);
-								}, _shiplost ? "Repair" : "Deal",
+								}, (_shiplost ? "Repair " : "Deal ") + goldIcon + _amount,
 								e => {
 									action();
 								}, "Back"
@@ -249,7 +253,7 @@ function action(direction) {
 									backFromDialog();
 									resizeUI();
 									infoButtonClick(2);
-								}, _shiplost ? "Recruit" : "Deal",
+								}, "Recruit " + goldIcon + _amount,
 								e => {
 									action();
 								}, "Back"

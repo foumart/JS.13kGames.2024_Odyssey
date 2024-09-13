@@ -91,7 +91,7 @@ function descendInDungeon(event, _skip) {
 		updateActionButton();
 		prepareDialog(
 			`<br>`,
-			`You see ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} // an imp, an orc, etc.
+			`You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} // an imp, an orc, etc.
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
@@ -320,6 +320,7 @@ function battleVictory() {
 		e => {
 			enableBattleInteractions();
 			enemiesKilled.push(dungeonEnemy);
+			gainExperience(dungeonEnemy);
 			SoundFXgetGold();
 			if (inBattle==1) {
 				dungeon[dungeonStage - 1][dungeonRoom - 1] = -1;// mark the enemy as destroyed
@@ -344,7 +345,7 @@ function battleVictory() {
 					castles.push([dungeonEnemyUnit.origin, dungeonEnemyUnit.x, dungeonEnemyUnit.y, 0]);
 					dungeonEnemyUnit.origin = 1;
 				} else {
-					// regular surfce unit destroyed
+					// regular surface unit destroyed
 					removeUnit(dungeonEnemyUnit.x, dungeonEnemyUnit.y);
 					unitsData[dungeonEnemyUnit.y][dungeonEnemyUnit.x] = 0;
 					enemies.splice(enemies.indexOf(dungeonEnemyUnit), 1);
@@ -366,6 +367,28 @@ function completeDungeon() {
 	closeAllScreens();
 }
 
+function gainExperience(_enemyId) {
+	experience += getEnemyHP(_enemyId) / 2 | 0;
+	if (
+		playerLevel < 4 &&
+		playerLevel == 1 && experience >= expLevels[playerLevel-1]
+	) {
+		gainLevel();
+	}
+}
+
+function gainLevel() {
+	playerLevel ++;
+	playerAttack ++;
+	playerHealth += 8;
+	playerHealthMax += 8;
+	updateInfoTab();
+	prepareDialog(
+		"<br>Hero level up!</br>",
+		"Attack +1 &nbsp; HP: +8<br>"
+	);
+}
+
 function prepareSurfaceBattle(_unit, _siege) {
 	dungeonSiege = _siege;
 	dungeonEnemyUnit = _unit;
@@ -378,7 +401,7 @@ function prepareSurfaceBattle(_unit, _siege) {
 	updateActionButton();
 	prepareDialog(
 		dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
-		dungeonSiege ? `` : `<br>You see ${getEnemyName(dungeonEnemy)}<br>`,
+		dungeonSiege ? `` : `<br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
 		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 		closeAllScreens, "Run"
 	);

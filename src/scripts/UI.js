@@ -279,7 +279,7 @@ function updateInfoTab() {
 		}</div>`
 		//`<span style="font-size:2em">${timePassed}</span>`
 	}
-	_html += `<div style="font-size:3.5em;${inBattle&&!portrait?'left:40vmin;margin:-1vmin':'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
+	_html += `<div style="font-size:3.5em;${inBattle?`left:${dungeon?50:40}vmin;margin:-1vmin`:'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
 	infoTab.innerHTML = _html;
 }
 
@@ -296,14 +296,15 @@ function closeButtonClick(e) {
 }
 
 function infoButtonClick(id = 0, _hp, _att) { 
-	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (dialog is being used)
+	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id - 3)) + "<br>",
 		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id-3) + " &nbsp; " : '') +
 			"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id-3)) +
-			(id < 3 ? "" : " &nbsp; ") + "<br>Attack: " + getAttackDamage(id),
-			// + "<br>(" + (id == 1 ? "marine battles only" : id==2||id==7||id>9 ? "strikes all enemies" : "hits single target") + ")",
+			(id < 3 ? "" : " &nbsp; ") + `<br>${
+				!id ? 'Exp: ' + experience + ` (${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]}) &nbsp; ` : ''
+			}Attack: ${getAttackDamage(id)}`,
 		displayDialog
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmapsFlipped[8] : !id ? offscreenBitmaps[0]
@@ -316,7 +317,7 @@ function infoButtonClick(id = 0, _hp, _att) {
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		hardChoice = true;
+		//hardChoice = true;
 		if (gold < crewHealthMax * crewPaid) {
 			paused = true;
 			prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
@@ -325,7 +326,7 @@ function checkCrewSailing() {
 				spendGold(crewHealthMax * crewPaid);
 				crewPaid ++;
 				crewHealth = crewHealthMax;
-				hardChoice = false;
+				//hardChoice = false;
 				backFromDialog();
 			}, "Pay " + goldIcon + crewHealthMax * crewPaid);
 		}

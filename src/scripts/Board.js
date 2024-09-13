@@ -1,8 +1,7 @@
 const
 	screenWidth = 7,// must be odd number, so there will be a central tile where player will reside
 	screenSide = 3,// must be screenWidth / 2 | 0
-	screenOut = 14,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
-	tilt = 1,
+	screenOut = 16,// must be even, number of outside tiles total on both sides on a wider mobile screen (affects zooming)
 	jump = 3;// how many tiles to jump when wrapping from map sides
 
 // board vars
