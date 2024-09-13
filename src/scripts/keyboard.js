@@ -2,7 +2,7 @@ const keysHeld = [];
 function onKeyDown(event) {
 	//console.log(event.keyCode);
 
-	if (event.keyCode == 49) {
+	/*if (event.keyCode == 49) {
 		SoundFXui();
 	} else
 	if (event.keyCode == 50) {
@@ -22,7 +22,7 @@ function onKeyDown(event) {
 	} else
 	if (event.keyCode == 55) {
 		debugBoard();
-	} else
+	} else*/
 
 	/*if (event.keyCode == 55) {// summon dungeon
 		unitsList.forEach(_unit => {

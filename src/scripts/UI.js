@@ -48,7 +48,7 @@ function createUI() {
 
 	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
 		() => {
-			if (battleIntro) return; // disallow clicks when in the dungeon entrance (dialog is being used)
+			if (battleIntro || autoBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
 			prepareDialog(
 				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
 				"<br>" + (
@@ -292,12 +292,12 @@ function backFromDialog() {
 }
 
 function closeButtonClick(e) {
-	if (playerHealth < 0 || shipHealth < 0) return;
+	if (playerHealth < 0 || shipHealth < 0 || autoBattle) return;
 	prepareDialog("<br>Quit Game", "<br>Are you sure?<br>", quitGame, "Yes", displayDialog, "No");
 }
 
 function infoButtonClick(id = 0, _hp, _att) {
-	if (paused || hardChoice) return;
+	if (paused || hardChoice || autoBattle) return;
 	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id == 12 ? 12 : id - 3)) + "<br>",
@@ -335,11 +335,11 @@ function checkCrewSailing() {
 }
 
 
-function debugBoard() {
+/*function debugBoard() {
 	if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
 	);
-}
+}*/
 
 // debug visitedData
 /*if (_debug) console.log(

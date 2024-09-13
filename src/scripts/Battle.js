@@ -24,8 +24,8 @@ function getEnemyName(_id) {
 function getEnemyAttack(_id) {
 	if (dungeonSiege) return 2 + (1+castles.length) * 2;
 	return [
-		1, 2, 2, 1, 3,
-		3, 6, 5, 12, 16,
+		1, 2, 2, 3, 3,
+		6, 4, 5, 9, 16,
 		2, 5, 3, 2
 	][_id > 13 ? _id - 20 : _id];
 }
@@ -34,7 +34,7 @@ function getEnemyHP(_id) {
 	if (dungeonSiege) return 24 + castles.length * 12;
 	return [
 		6, 10, 12, 16, 24,
-		20, 42, 32, 60, 90,
+		12, 42, 32, 60, 90,
 		24, 50, 24, 20
 	][_id > 13 ? _id - 20 : _id];
 }
@@ -86,6 +86,7 @@ function descendInDungeon(event, _skip) {
 	if (_skip == 1) {
 		dungeonBattle();
 	} else {
+		hardChoice = false;
 		battleIntro = true;
 		updateInfoTab();
 		updateActionButton();
@@ -110,8 +111,10 @@ function dungeonBattle() {
 		"<br>",
 		getEnemyStatsString(),
 		e => {
-			autoBattle = true;
-			beginNewRound(1);
+			if (!autoBattle) {
+				beginNewRound(1);
+				autoBattle = true;
+			}
 		}, "Auto Battle",
 		tryToFleeBattle, "Flee"
 	);
@@ -160,12 +163,14 @@ function closeAllScreens() {
 }
 
 function tryToFleeBattle() {
-	if (dungeonFighting) return;
+	if (dungeonFighting || autoBattle || paused) return;
 	let _level = inBattle == 1 ? dungeonStage + 1 : getEnemyName(dungeonEnemy).length - 3;
 	let _enemy = dungeonEnemy > 9 ? dungeonEnemy - 9 : dungeonEnemy;
+	if ((!onFoot && timePassed < 9) || dungeonSiege) {
+		animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
+	} else
 	if (Math.random() * _level > _enemy && dungeonFlee > -1) {
 		// player will escape
-		//console.log(1, Math.random() * _level , dungeonEnemy)
 		if (Math.random() * _level < dungeonEnemy) {
 			// player will however suffer a hit
 			animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
@@ -174,7 +179,6 @@ function tryToFleeBattle() {
 		}
 	} else {
 		// player cannot escape
-		//console.log(2, Math.random() * _level , dungeonEnemy)
 		if (Math.random() * _level < _enemy && dungeonFlee < _level) {
 			// player will receive a hit on top of that
 			dungeonFlee ++;// TODO: fix fleeing in land and marine battles
@@ -340,17 +344,27 @@ function battleVictory() {
 				let bonus = islandGenerator.rand(dungeonStage, getEnemyHP(dungeonEnemy)/2) * (stageCleared ? 2 : 1) + (stageCleared ? dungeonStage*9 : 0);
 				gold += bonus;
 				let lastStage = dungeonStage == dungeon.length && stageCleared;
+				hardChoice = false;
+				actButton.style.opacity = .5;
+				if (lastStage && dungeonStage > 5) {
+					crewAttack += 1;
+				}
 
 				prepareBattleScreen(
-					getSpan(stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
-					`<br>Found ${bonus} gold.<br>` + (lastStage ? "<br>Found Healing Potion.<br>" : ""),
+					getSpan(lastStage ? 'Dungeon cleared!' : stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
+					`<br>Found ${bonus} gold.<br>` +
+						(lastStage && dungeonStage > 5 ? "<br>Crew Attack +1<br>" : ""),
 					lastStage ? completeDungeon : stageCleared ? descendInDungeon : e => descendInDungeon(0, 1),
 					lastStage ? "Complete" : stageCleared ? "Descend" : "Advance",
 					lastStage ? 0 : closeAllScreens, "Exit"
 				);
 			} else {
 				let bonus = islandGenerator.rand(9, getEnemyHP(dungeonEnemy)*2);
-				
+				// TODO: fix this hack
+				if (dungeonEnemy == 9) {
+					completeGame();
+					return;
+				} else
 				if (dungeonEnemyUnit.type == UnitType.CASTLE) {
 					// castle conquered
 					bonus *= 3;
@@ -407,17 +421,51 @@ function prepareSurfaceBattle(_unit, _siege) {
 	dungeonEnemy = _unit.type + 3;
 	dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
 	dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
-	battleIntro = true;
+	console.log(dungeonEnemy)
 
-	updateInfoTab();
-	updateActionButton();
+	if (_unit.type == UnitType.SERPENT) {
+		// direct battle with a serpent
+		dungeonBattle();
+	} else {
+		battleIntro = true;
+
+		updateInfoTab();
+		updateActionButton();
+		prepareDialog(
+			dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
+			dungeonSiege ? `` : `<br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
+			dungeonBattle, dungeonSiege ? "Siege" : "Fight",
+			closeAllScreens, "Run"
+		);
+
+		dialog.firstChild.append((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
+		fadeBackground();
+	}
+}
+
+function finalBattle(_forced = 1) {
+	inBattle = 4;
+	dungeonEnemy = 9;
+	dungeonEnemyHealth = getEnemyHP(dungeonEnemy) * _forced;
+	dungeonEnemyAttack = getEnemyAttack(dungeonEnemy) * _forced;
+
 	prepareDialog(
-		dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
-		dungeonSiege ? `` : `<br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,
-		dungeonBattle, dungeonSiege ? "Siege" : "Fight",
-		closeAllScreens, "Run"
+		`<br>`,
+		`<br>Ambushed by the ${getEnemyName(dungeonEnemy)}!<br>`,
+		dungeonBattle, "Suffer"
 	);
 
-	dialog.firstChild.append((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
+	dialog.firstChild.append(offscreenBitmaps[36 + dungeonEnemy]);
 	fadeBackground();
+}
+
+function completeGame() {
+	inBattle = 0;
+	hardChoice = 0;
+	prepareDialog(
+		`<br>YOU MADE IT JUNIOR!<br>`,
+		`<br>exp: ${experience} score: ${enemiesKilled.length} turn: ${turn}<br>`,
+		quitGame
+	);
+
 }

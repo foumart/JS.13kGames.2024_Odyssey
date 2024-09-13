@@ -1,17 +1,22 @@
 function action(direction) {
-	if (paused || hardChoice) return;
+	if (paused || hardChoice || actButton.style.opacity < 1) return;
 	if (autoBattle || dungeonFighting) {
-		autoBattle = false;
+		//autoBattle = false; // prevent bugs with stopping the autobattle, TODO: fix
 		return;
 	}
+	//if (actButton.style.opacity < 1) return;
 	if (!direction && (inBattle || battleIntro)) {
 		// Attack button clicked
 		if (inBattle) beginNewRound(); else dungeonBattle();
 		return;
 	}
-	if (battleIntro && direction) {// equivalent to tapping Run
-		closeAllScreens();
+	if ((inBattle || battleIntro) && direction) {
+		return;
 	}
+	/*if (battleIntro && direction) {// equivalent to tapping Run
+		closeAllScreens();
+	}*/
+	
 	let _unit;
 	switch (direction) {
 		case 1: // Up
@@ -139,7 +144,7 @@ function action(direction) {
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
 				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
-				let _rest = moveLimit - moveLeft;
+				let _rest = moveLimit - moveLeft && timePassed < 13;
 				let _shiplost = shipHealthMax - shipHealth;
 
 				let _castleId = 1;
@@ -155,12 +160,7 @@ function action(direction) {
 				let _shipMenu = _castleId == 1;
 				let _crewMenu = _castleId > 1;
 
-				let _amount =
-					_hplost ? 1 + _hplost / 2 | 0 :
-					_rest ? _rest * 2 :
-					_shiplost ? 1 + _shiplost / 2 | 0 :
-					shipLevel < 4 || _shiplost ? shipPrices[shipLevel-1] :
-					_crewMenu && !_crewUpgraded ? crewPrices[shipLevel-1] : 0;
+				let _amount;
 
 				prepareDialog(
 					// Label
@@ -173,7 +173,7 @@ function action(direction) {
 								"Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
 								e => {
 									// Rest
-									if (spendGold(_amount)) return;
+									if (spendGold(_rest * 2)) return;
 									backFromDialog();
 									moveLeft = moveLimit;
 									timePassed ++;
@@ -182,7 +182,7 @@ function action(direction) {
 									prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
 									obscureStage();
 									revealAroundUnit(playerX, playerY);
-								}, "Rest " + goldIcon + _amount,
+								}, "Rest " + (goldIcon + _rest * 2),
 								e => {
 									action();
 								}, "Back"
@@ -192,6 +192,7 @@ function action(direction) {
 					
 					e => {
 						if (_hplost) {
+							_amount = 1 + _hplost / 2 | 0;
 							prepareDialog(
 								"Healer",
 								"<br>Restore Hero and Crew HP<br>",
@@ -215,6 +216,7 @@ function action(direction) {
 					displayDialog,
 					e => {
 						if (_shipMenu && (shipLevel < 4 || _shiplost)) {
+							_amount = _shiplost ? 1 + _shiplost / 2 | 0 : shipPrices[shipLevel-1];
 							prepareDialog(
 								"Shipyard",
 								_shiplost
@@ -222,12 +224,11 @@ function action(direction) {
 									: `<br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br>Ship Attack +2<br>`,
 								e => {
 									// Upgrade or Repair Ship
-									if (spendGold(_amount)) return;
 									if (_shiplost) {
-										if (spendGold(_shiplost * 5)) return;
+										if (spendGold(_amount)) return;
 										shipHealth += _shiplost;
 									} else {
-										if (spendGold(shipPrices[shipLevel-1])) return;
+										if (spendGold(_amount)) return;
 										shipAttack += 2;
 										shipLevel ++;
 										shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
@@ -242,16 +243,17 @@ function action(direction) {
 								}, "Back"
 							);
 						} else if (_crewMenu && !_crewUpgraded) {
+							_amount = _crewMenu && !_crewUpgraded ? crewPrices[shipLevel-1] : 0;
 							prepareDialog(
 								"Barracks",
-								`<br>Crew HP +10<br>Attack +2<br>`,
+								`<br>Crew HP +10<br>Attack +1<br>`,
 								e => {
 									// Upgrade Crew
 									if (spendGold(_amount)) return;
 									_castleToUpdate[3] = 1;
 									crewHealth += 12;
 									crewHealthMax += 12;
-									crewAttack += 2;
+									crewAttack += 1;
 									crewLevel ++;
 									animateUnitHit(2, 0, 2);
 									backFromDialog();
