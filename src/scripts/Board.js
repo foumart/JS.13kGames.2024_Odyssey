@@ -88,16 +88,15 @@ function initBoard() {
 				// walk through all islands to place castles and shrines
 				islesData.forEach((data, index) => {
 					if (x == data[0] && y == data[1]) {
-						// there are colors.length-2 castles available
-						unit = createUnit(x, y, index < colors.length ? UnitType.CASTLE : UnitType.SHRINE);
+						unit = createUnit(x, y, index < 6 ? UnitType.CASTLE : UnitType.SHRINE);
 						unitsList.push(unit);
-						unitsData[y][x] = index < colors.length ? UnitType.CASTLE : UnitType.SHRINE;
+						unitsData[y][x] = index < 6 ? UnitType.CASTLE : UnitType.SHRINE;
 						// set castle origin color flag
-						unit.origin = index < colors.length ? 2 + (index ? index % 3 : -1) : 0;
+						unit.origin = index < 6 ? 1 + index : 0;
 						//unit.rumors = 1;
 
 						// Add enemies to dungeons
-						if (index >= colors.length) {// colors.length is 6
+						if (index >= 6) {
 							unit.dungeon = [];
 							// generate at least 3 floors per dungeon up to 9 floors for the last 7th dungeon
 							for (let i = 0; i < index-3; i++) {
@@ -107,18 +106,15 @@ function initBoard() {
 									rand = 0;
 									while (!rand || arr.length && newEnemy == arr[arr.length-1]) {
 										rand = Math.random();
-										newEnemy = islandGenerator.rand(i/2 + (j-3)*rand, i + 1);
-										if (newEnemy > 9) newEnemy = 9;
+										newEnemy = islandGenerator.rand(i/2 + (j-3)*rand, i - 1);
+										if (newEnemy > 8) newEnemy = 8;
 									}
 									arr.push(newEnemy);
 								}
 								// generate 1st floor boss
 								if (!i) arr.push(islandGenerator.rand(index/2-2, index-6));
-								// generate pre-final boss
-								if (i == index-5 && arr[arr.length-1] < index-3) arr.push(index-3);
 								// generate final floor boss
-								if (i == index-4) arr.push(index-1);
-								//console.log(index-colors.length, i, arr);
+								if (i > 3) arr.push(i + 1);
 								unit.dungeon.push(arr);
 							}
 						}
@@ -193,29 +189,61 @@ function initBoard() {
 		}
 	}
 
-	obscureStage();
+	// starting town position
+	townX = playerX = shipX = stageData.x;
+	townY = playerY = shipY = stageData.y;
+	// setting player next to the town
+	if (isPassable(playerX+1, playerY+1)) {
+		playerX ++; playerY ++;
+	} else if (isPassable(playerX-1, playerY+1)) {
+		playerX --; playerY ++;
+	} else if (isPassable(playerX, playerY+1)) {
+		playerY ++;
+	} else if (isPassable(playerX+1, playerY)) {
+		playerX ++;
+	} else if (isPassable(playerX-1, playerY)) {
+		playerX --;
+	} else if (isPassable(playerX, playerY-1)) {
+		playerY --;
+	}
+	// setting the ship around on a water tile
+	while (
+		mapData[shipY][shipX] > TileType.RIFF2 ||
+		isWalkable(shipX-1, shipY) && isWalkable(shipX+1, shipY) && isWalkable(shipX, shipY-1) && isWalkable(shipX, shipY+1)
+	) {
+		if (Math.random() < .5) shipX ++;
+		else shipY ++;
+	}
+
+	gamePlayer = createUnit(playerX, playerY, UnitType.PLAYER);
+	unitsList.push(gamePlayer);
+	unitsData[playerY][playerX] = UnitType.PLAYER;
+
+	gameShip = createUnit(shipX, shipY, UnitType.SHIPRIGHT);
+	unitsList.push(gameShip);
+	unitsData[shipY][shipX] = UnitType.SHIPRIGHT;
 
 	for(y = 0; y < boardWidth; y++) {
 		for(x = 0; x < boardWidth; x++) {
 			// generate enemies and items
 			if (!unitsData[y][x]) {
 				if (isWalkable(x, y)) {
-					if (idsData[y][x] >= colors.length && treasures.indexOf(-idsData[y][x]) == -1) {
-						// place gold piles on isles 7-13
+					if (idsData[y][x] > 6 && idsData[y][x] < 13 && treasures.indexOf(-idsData[y][x]) == -1) {
+						// place gold piles on isles 6-12
 						treasures.push(-idsData[y][x]);
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
 						//if (state) console.log("GOLD", x+"x"+y);
 						g1 ++;
-					}
+					} else
 					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && treasures.indexOf(idsData[y][x]) == -1) {
 						// place knight (isles 2-6) or crab (isles 7-13)
-						unit = createUnit(x, y, idsData[y][x] >= colors.length ? UnitType.CRAB : UnitType.KNIGHT);
+						unit = createUnit(x, y, idsData[y][x] > 6 ? UnitType.CRAB : UnitType.KNIGHT);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
 						treasures.push(idsData[y][x]);
 						unitsList.push(unit);
-						unitsData[y][x] = idsData[y][x] >= colors.length ? UnitType.CRAB : UnitType.KNIGHT;
+						unitsData[y][x] = idsData[y][x] >= 6 ? UnitType.CRAB : UnitType.KNIGHT;
 						//if (state) console.log(idsData[y][x] >= colors.length ? "CRAB" : "KNIGHT", x+"x"+y);
 						e3 ++;
 					}
@@ -259,40 +287,6 @@ function initBoard() {
 		"e3:"+e3
 		//treasures
 	);*/
-
-	// starting town position
-	townX = playerX = shipX = stageData.x;
-	townY = playerY = shipY = stageData.y;
-	// setting player next to the town
-	if (isPassable(playerX+1, playerY+1)) {
-		playerX ++; playerY ++;
-	} else if (isPassable(playerX-1, playerY+1)) {
-		playerX --; playerY ++;
-	} else if (isPassable(playerX, playerY+1)) {
-		playerY ++;
-	} else if (isPassable(playerX+1, playerY)) {
-		playerX ++;
-	} else if (isPassable(playerX-1, playerY)) {
-		playerX --;
-	} else if (isPassable(playerX, playerY-1)) {
-		playerY --;
-	}
-	// setting the ship around on a water tile
-	while (
-		mapData[shipY][shipX] > TileType.RIFF2 ||
-		isWalkable(shipX-1, shipY) && isWalkable(shipX+1, shipY) && isWalkable(shipX, shipY-1) && isWalkable(shipX, shipY+1)
-	) {
-		if (Math.random() < .5) shipX ++;
-		else shipY ++;
-	}
-
-	gamePlayer = createUnit(playerX, playerY, UnitType.PLAYER);
-	unitsList.push(gamePlayer);
-	unitsData[playerY][playerX] = UnitType.PLAYER;
-
-	gameShip = createUnit(shipX, shipY, UnitType.SHIPRIGHT);
-	unitsList.push(gameShip);
-	unitsData[shipY][shipX] = UnitType.SHIPRIGHT;
 
 	// data initialization completed
 
@@ -528,12 +522,12 @@ function drawBoard() {
 							_unit = getUnit(_x, _y);
 							if (_unit) {
 								unitScreen[y][x].overlay = _unit.overlay;
-								unitScreen[y][x].movingX = _unit.movingX;
-								unitScreen[y][x].movingY = _unit.movingY;
+								unitScreen[y][x].movingX = _unit.movingX || 0;
+								unitScreen[y][x].movingY = _unit.movingY || 0;
 								unitScreen[y][x].origin = _unit.origin;
 								unitScreen[y][x].apple = _unit.apple;
 								unitScreen[y][x].dungeon = _unit.dungeon;
-								unitScreen[y][x].enemy = _unit.enemy;
+								//unitScreen[y][x].enemy = _unit.enemy;
 								// some units are visible in the fog, others not
 								shouldSkipDrawingUnit = visitedData[_y][_x] < (
 									_unit.type > UnitType.SQUID &&

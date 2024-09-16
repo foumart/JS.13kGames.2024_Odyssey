@@ -20,7 +20,7 @@ function action(direction) {
 	let _unit;
 	switch (direction) {
 		case 1: // Up
-			if (inDialog || inBattle) return;
+			if (inDialog || inBattle || playerY < 5) return;
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
@@ -48,7 +48,7 @@ function action(direction) {
 
 			break;
 		case 2: // Right
-			if (inDialog || inBattle) return;
+			if (inDialog || inBattle || playerX > 38) return;
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
@@ -76,7 +76,7 @@ function action(direction) {
 
 			break;
 		case 3: // Down
-			if (inDialog || inBattle) return;
+			if (inDialog || inBattle || playerY > 38) return;
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
@@ -104,7 +104,7 @@ function action(direction) {
 
 			break;
 		case 4: // Left
-			if (inDialog || inBattle) return;
+			if (inDialog || inBattle || playerX < 5) return;
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
@@ -136,7 +136,7 @@ function action(direction) {
 			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
 				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Forts ';
-				for (_unit = 2; _unit < colors.length; _unit++) {
+				for (_unit = 2; _unit < 6; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
 				prepareDialog("", hasTutorial + "<br><br>13 days to defeat the <u>Balrog</u>!<br>");
@@ -144,7 +144,7 @@ function action(direction) {
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
 				let _hplost = playerHealthMax - playerHealth + crewHealthMax - crewHealth;
-				let _rest = moveLimit - moveLeft && timePassed < 13;
+				let _rest = timePassed < 13 ? moveLimit - moveLeft : 0;
 				let _shiplost = shipHealthMax - shipHealth;
 
 				let _castleId = 1;
@@ -173,16 +173,9 @@ function action(direction) {
 								"Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
 								e => {
 									// Rest
-									if (spendGold(_rest * 2)) return;
-									backFromDialog();
-									moveLeft = moveLimit;
-									timePassed ++;
-									updateInfoTab();
-									fadeBackground();
-									prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
-									obscureStage();
-									revealAroundUnit(playerX, playerY);
-								}, "Rest " + (goldIcon + _rest * 2),
+									if (spendGold(1 + _rest / 2 | 0)) return;
+									startNewDay();
+								}, "Rest " + goldIcon + (1 + _rest / 2 | 0),
 								e => {
 									action();
 								}, "Back"
@@ -216,7 +209,7 @@ function action(direction) {
 					displayDialog,
 					e => {
 						if (_shipMenu && (shipLevel < 4 || _shiplost)) {
-							_amount = _shiplost ? 1 + _shiplost / 2 | 0 : shipPrices[shipLevel-1];
+							_amount = _shiplost ? 9 + _shiplost / 2 | 0 : shipPrices[shipLevel-1];
 							prepareDialog(
 								"Shipyard",
 								_shiplost
@@ -243,10 +236,10 @@ function action(direction) {
 								}, "Back"
 							);
 						} else if (_crewMenu && !_crewUpgraded) {
-							_amount = _crewMenu && !_crewUpgraded ? crewPrices[shipLevel-1] : 0;
+							_amount = _crewMenu && !_crewUpgraded ? crewPrices[crewLevel-1] : 0;
 							prepareDialog(
 								"Barracks",
-								`<br>Crew HP +10<br>Attack +1<br>`,
+								`<br>Crew HP +12<br>Attack +1<br>`,
 								e => {
 									// Upgrade Crew
 									if (spendGold(_amount)) return;
@@ -290,4 +283,15 @@ function action(direction) {
 
 		break;
 	}
+}
+
+function startNewDay() {
+	backFromDialog();
+	moveLeft = moveLimit;
+	timePassed ++;
+	updateInfoTab();
+	fadeBackground();
+	prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
+	obscureStage();
+	revealAroundUnit(playerX, playerY);
 }

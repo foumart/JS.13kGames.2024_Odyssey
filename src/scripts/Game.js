@@ -11,9 +11,9 @@ let unit,
 	hasTutorial,// displays initial info with the "?" button
 	autoBattle;// allows automatic battles
 
-const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f"];
-const shipPrices = [250,500,1e3];
-const crewPrices = [200,300,500];
+const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f", "#0f0"];
+const shipPrices = [300,600,1200];
+const crewPrices = [250,500,1e3];
 
 let turn, gold,
 	moveLeft, moveLimit, timePassed,
@@ -28,6 +28,7 @@ let expLevels = [200,500,1e3];
 
 // initialize vars for new game
 function initVars() {
+	onFoot = true;
 	turn = 0;
 	gold = 50;
 	moveLeft = 24; moveLimit = 24;
@@ -119,20 +120,21 @@ function finalizeMove(dir) {
 		backFromDialog();
 	}
 
-	if (!onFoot && dir) {
+	if (!onFoot && dir && !boarding) {
 		moveLeft -= 1;
 		if (moveLeft < 1) {
 			// Final Boss coming for you
 			if (timePassed == 13) {
 				finalBattle(2);
 			} else {
-				crewHealth -= shipHealthMax / 9 | 0;
+				crewHealth -= shipHealthMax / 3 | 0;
 				moveLeft += moveLimit / 2 | 0;
-				checkCrewSailing();
 			}
-			
 		}
+		resizeUI();
 	}
+
+	checkCrewSailing();
 
 	revealAroundUnit(playerX, playerY);
 
@@ -207,7 +209,7 @@ function isWalkable(x, y, enemyType) {
 	return (
 		!unitsData[y][x] ||
 		(unitsData[y][x] < UnitType.SHIPUP || unitsData[y][x] > UnitType.SHIPRIGHT && unitsData[y][x] < UnitType.CASTLE) && !enemyType ||
-		(unitsData[y][x] > UnitType.CRAB && unitsData[y][x] < UnitType.BAT && (!enemyType || enemyType && (enemyType != UnitType.CRAB || unitsData[y][x] != UnitType.SHRINE)))
+		(unitsData[y][x] > UnitType.CRAB && unitsData[y][x] < UnitType.BAT)
 	) && mapData[y][x] > TileType.RIFF2;
 }
 

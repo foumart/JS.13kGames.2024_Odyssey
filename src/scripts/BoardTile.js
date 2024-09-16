@@ -65,8 +65,8 @@ class BoardTile extends BoardElement {
 			// use flipped cloud images every second tile
 			gameContext.drawImage(
 				odd ? offscreenBitmapsFlipped[15] : offscreenBitmaps[15], 0, 0, tileWidth+2, tileWidth+2,
-				this.getX() - (odd ? this.width/6 : this.width/6),
-				this.getY() - (odd ? this.width/6 : this.width/6),
+				this.getX() - this.width/6,
+				this.getY() - this.width/2,
 				this.width + this.width/3,
 				this.width + this.width/3
 			);

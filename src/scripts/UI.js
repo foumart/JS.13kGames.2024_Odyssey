@@ -190,6 +190,7 @@ function prepareDialogButtons(_dialog, close, callback1, btn1, callback2, _btn2)
 
 function displayDialog() {
 	inDialog = !inDialog;
+	SoundFXui();
 	dialog.style.display = inDialog ? 'block' : 'none';
 	gameContainer.style.display = inDialog ? 'none' : 'block';
 	uiDiv.style.pointerEvents = inDialog ? 'auto' : 'none';
@@ -319,17 +320,18 @@ function infoButtonClick(id = 0, _hp, _att) {
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		if (gold < crewHealthMax * crewPaid) {
-			prepareDialog("Fatal Crew Mutiny!", "Game Over", quitGame);
-		} else {
-			prepareDialog("Revolt!", "Crew demands:", () => {
-				spendGold(crewHealthMax * crewPaid);
-				crewPaid ++;
-				crewHealth = crewHealthMax;
-				hardChoice = false;
-				backFromDialog();
-			}, "Pay " + goldIcon + crewHealthMax * crewPaid);
-		}
+		prepareDialog("Revolt!", "<br>Crew demands:<br>", () => {
+			if (gold < crewHealthMax * crewPaid) {
+				completeGame("Fatal Mutiny");
+				return;
+			}
+			spendGold(crewHealthMax * crewPaid);
+			crewPaid ++;
+			crewHealth = crewHealthMax/2|0;
+			hardChoice = false;
+			backFromDialog();
+			startNewDay();
+		}, "Pay " + goldIcon + crewHealthMax * crewPaid);
 		hardChoice = true;
 	}
 }

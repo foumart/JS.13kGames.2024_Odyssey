@@ -10,23 +10,25 @@ class BoardUnit extends BoardTile {
 	}
 
 	isEnemyMovingX() {
-		return this.type > UnitType.SQUID && this.type < UnitType.CASTLE ? this.movingX : 0;
+		return (this.type > UnitType.SQUID && this.type < UnitType.CASTLE ? this.movingX : 0) * this.width *
+			((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1);
 	}
 
 	isEnemyMovingY() {
-		return this.type > UnitType.SERPENT && this.type < UnitType.CASTLE ? this.movingY : 0;
+		return (this.type > UnitType.SERPENT && this.type < UnitType.CASTLE ? this.movingY : 0) * this.width *
+			((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1);
 	}
 
-	getX(reverse) {
+	getX(reverse, enemy) {
 		return (reverse ? this.width * tween.transitionX : 0) + this.width/2 + super.getX()
 			- (this.shouldAnimate() ? tween.transitionX * this.width : 0)
-			- (this.isEnemyMovingX() * ((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.width);
+			- (enemy ? 0 : this.isEnemyMovingX());
 	}
 
-	getY(reverse) {
+	getY(reverse, enemy) {
 		return (reverse ? this.height * tween.transitionY : 0) + this.height/2 + super.getY()
 			- (this.shouldAnimate() ? tween.transitionY * this.height : 0)
-			- (this.isEnemyMovingY() * ((tween.transitionZ || Math.abs(tween.transitionX) || Math.abs(tween.transitionY))-1) * this.height);
+			- (enemy ? 0 : this.isEnemyMovingY());
 	}
 
 	reset() {
@@ -46,9 +48,9 @@ class BoardUnit extends BoardTile {
 
 			// draw the object beneath this unit
 			if (this.overlay) {
-				this.drawImage(this.overlay, true, this != boardShip && this != boardPlayer);
-				_offsetX += tileWidth * tween.transitionX;
-				_offsetY -= tileWidth * tween.transitionY;
+				this.drawImage(this.overlay, this == boardPlayer || this == boardShip, this.movingX || this.movingY);
+				_offsetX += this != boardPlayer && this != boardShip ? 0 : tileWidth * tween.transitionX;
+				_offsetY -= this != boardPlayer && this != boardShip ? 0 : tileWidth * tween.transitionY;
 			}
 
 			// draw animated colored flag
@@ -64,7 +66,7 @@ class BoardUnit extends BoardTile {
 				// animate flag
 				gameContext.fillStyle = colors[this.origin||1];
 				this.fillRect(_offsetX, _offsetY + 1, (2 + (step / 7 | 0) % 2));
-				this.fillRect(_offsetX + 1, _offsetY, (1 + (step / 5 | 0) % 2));
+				this.fillRect(_offsetX + 1, _offsetY + .1, (1 + (step / 5 | 0) % 2));
 			}
 
 			this.drawImage(this.type);
@@ -91,8 +93,8 @@ class BoardUnit extends BoardTile {
 
 	fillRect(_x = 1, _y = 1, _w = 1, _h = 1) {
 		gameContext.fillRect(
-			this.getX() - this.width/2 + this.width/tileWidth*_x,
-			this.getY() - this.height - this.width/tileWidth*_y,
+			this.getX(0, this.movingX) - this.width/2 + this.width/tileWidth*_x,
+			this.getY(0, this.movingY) - this.height - this.width/tileWidth*_y,
 			this.width/tileWidth*_w,
 			this.width/tileWidth*_h
 		);
@@ -107,14 +109,14 @@ class BoardUnit extends BoardTile {
 			) && !underlay ? offscreenBitmapsFlipped[_type-2] : offscreenBitmaps[_type-1],
 
 			0, 0, unitWidth, unitWidth,
-			this.getX(underlay && !enemy) - this.width/2 - this.width/tileWidth * (
+			this.getX(underlay, enemy) - this.width/2 - this.width/tileWidth * (
 				(_type == UnitType.SERPENT || _type == UnitType.CRAB) && ((step + this.y * 9) / 50 | 0) % 2
 					? 2 : 1
 			),
-			this.getY(underlay && !enemy) - this.height - this.width/tileWidth * (
+			this.getY(underlay, enemy) - this.height - this.width/tileWidth * (
 				_type == UnitType.SQUID || _type == UnitType.WRECK
 					? ((step + this.y * 9) / 70 | 0) % 2 ? 0 : -1
-					: _type > UnitType.SHIPRIGHT ? 2 : 1
+					: _type > UnitType.CRAB ? 2 : 1
 			),
 			this.width/tileWidth*unitWidth,
 			this.width/tileWidth*unitWidth
