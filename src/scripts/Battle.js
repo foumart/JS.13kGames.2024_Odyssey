@@ -425,12 +425,12 @@ function prepareSurfaceBattle(_unit, _siege) {
 		updateActionButton();
 		prepareDialog(
 			dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
-			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br>`,
+			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
 			dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 			closeAllScreens, "Run"
 		);
 
-		dialog.firstChild.append((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
+		dialog.firstChild.prepend((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
 		fadeBackground();
 	}
 }

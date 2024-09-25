@@ -45,9 +45,10 @@ class BoardTile extends BoardElement {
 	}
 
 	draw() {
+		let odd = this.realY % 2;
 		let mirrored = [7,11,12,16].indexOf(this.type) > -1;
 		bgrContext.drawImage(
-			(mirrored ? offscreenBitmapsFlipped : offscreenBitmaps)[
+			(mirrored || (odd && !this.type) ? offscreenBitmapsFlipped : offscreenBitmaps)[
 				!state || this.visited ? (this.type || 0) + (mirrored ? 14 : 16) : 15
 			],
 			0, 0, tileWidth, tileWidth,

@@ -46,7 +46,7 @@ function SoundFXstart() {
 }
 
 function SoundFXui() {
-	SoundFXplayTune("U;", 2, 1, 2);
+	SoundFXplayTune("U;", 2, .2, 2);
 }
 
 function SoundFXmute() {
@@ -54,7 +54,7 @@ function SoundFXmute() {
 }
 
 function SoundFXgetGold() {
-	SoundFXplayTune(`X_a`, 6, 1);
+	SoundFXplayTune(`X_a`, 6, .2);
 }
 
 function SoundFXmoveStep() {
@@ -62,7 +62,7 @@ function SoundFXmoveStep() {
 }
 
 function SoundFXmoveSail() {
-	SoundFXplayTune(`2 4`, 2, 1, 2);
+	SoundFXplayTune(`* & '`, 4, .5);
 }
 
 function SoundFXdisabled() {
@@ -74,3 +74,35 @@ function SoundFXhilight() {
 	SoundFXplayTune(" AA  C", 3, 1, 2);
 }
 
+
+/*
+function SoundFXui() {
+	//SoundFXplayTune("^a", 3, .1, 0);
+	SoundFXplayTune("t7", 2, .5, 2);
+}
+
+function SoundFXmute() {
+	SoundFXplayTune("9NA", 3, 1, 2);
+}
+
+function SoundFXgetGold() {
+	SoundFXplayTune(`X_a`, 6, .5);
+}
+
+function SoundFXmoveStep() {
+	SoundFXplayTune(`' *`, 4, .5);
+}
+
+function SoundFXmoveSail() {
+	SoundFXplayTune(`* & '`, 4, .5);
+}
+
+function SoundFXdisabled() {
+	SoundFXplayTune("- + ) ' % #!", 3, 1);
+}
+
+function SoundFXhilight() {
+	SoundFXplayTune("#(09", 3, 1);
+	SoundFXplayTune(" AA  C", 3, 1, 2);
+}
+*/

@@ -63,6 +63,10 @@ function createUI() {
 				let bitmap = offscreenBitmaps[38];
 				dialog.firstChild.prepend(bitmap);
 				bitmap.style.marginTop = "4vmin";
+				bitmap.style.background = 0;
+				dialog.style.background = "#adfd";
+			} else {
+				bitmap.style.background = "#1166";
 			}
 		}
 	);
@@ -76,7 +80,7 @@ function createUI() {
 	}
 
 	if (!state) {
-		//titlePng = generateUIButton(uiDiv, "", switchState, "");
+		titlePng = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
 		bgrCanvas.style.opacity = .6;
 	} else {
@@ -98,7 +102,7 @@ function createUI() {
 	dialog = generateUIButton(uiDiv, '');
 
 	// Fullscreen and Sound buttons
-	//if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
+	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
 
 	soundButton = generateUIButton(uiDiv, '');
 	soundButton.addEventListener(interactionTap, toggleSound);
@@ -337,11 +341,11 @@ function checkCrewSailing() {
 }
 
 
-/*function debugBoard() {
+function debugBoard() {
 	if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
 	);
-}*/
+}
 
 // debug visitedData
 /*if (_debug) console.log(
@@ -352,17 +356,17 @@ function checkCrewSailing() {
 	visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
 );*/
 
-/*function getIcon(size) {
+function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
-}*/
+}
 
-/*function tryToShowInstallButton() {
+function tryToShowInstallButton() {
 	if (!state && installPrompt) {
-		installButton = generateUIButton(uiDiv, `Install`, e => displayInstallPrompt(), 'css_icon');
+		installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt, 'css_icon');
 	}
-}*/
+}
 
-/*async function displayInstallPrompt() {
+async function displayInstallPrompt() {
 	if (!installPrompt) {
 		return;
 	}
@@ -380,4 +384,4 @@ function checkCrewSailing() {
 function hideInstallButton() {
 	installButton.display = "none";
 	installPrompt = null;
-}*/
+}

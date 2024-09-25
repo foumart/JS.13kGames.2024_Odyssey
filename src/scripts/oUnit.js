@@ -7,10 +7,7 @@ class Unit {
 		this.overlay = UnitType.EMPTY;
 
 		this.origin = 0;// flag color
-		this.transitionX = 0;
-		this.transitionY = 0;
 		//this.apple = 0;
-		//this.enemy = 0;
 		//this.dungeon = 0;
 	}
 	

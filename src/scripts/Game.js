@@ -138,7 +138,7 @@ function finalizeMove(dir) {
 
 	revealAroundUnit(playerX, playerY);
 
-	//debugBoard();
+	debugBoard();
 }
 
 function performEnemyMoves() {
