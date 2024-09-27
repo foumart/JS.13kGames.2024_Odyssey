@@ -239,14 +239,16 @@ function updateActionButton(event) {
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | "₪" "ϵ"
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
 
-	//unit = getUnit(playerX, playerY);
+	let unit = getUnit(playerX, playerY);
+	let apple = 0;
+	if (unit && unit.hasOwnProperty("apple")) apple = unit.apple;
 	if (dungeon || inBattle || battleIntro) {
 		actButton.innerHTML = "&#9876<br>" + getSpan("ATTACK", 0, "5vmin");
 	} else
 	if (
 		gamePlayer.overlay == UnitType.CASTLE ||
 		gamePlayer.overlay == UnitType.SHRINE ||
-		gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
+		apple && gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
 	) {
 
 		actButton.innerHTML = `${
@@ -323,14 +325,14 @@ function infoButtonClick(id = 0, _hp, _att) {
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmaps[8] : !id ? offscreenBitmaps[0]
 		: id == 12 ? offscreenBitmapsFlipped[5] : offscreenBitmaps[33 + id];
 
-	bmp.style.margin = "1vmin 1vmin 3vmin";
+	if (bmp) bmp.style.margin = "1vmin 1vmin 3vmin";
 	dialog.firstChild.append(bmp)
 }
 
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		prepareDialog("Revolt!", "<br>Crew demands:<br>", () => {
+		prepareDialog("Revolt!<br>", "<br>Crew demands:<br>", () => {
 			if (gold < crewHealthMax * crewPaid) {
 				completeGame("Fatal Mutiny");
 				return;

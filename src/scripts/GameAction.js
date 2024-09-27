@@ -135,11 +135,7 @@ function action(direction) {
 		default: // Action
 			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
-				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Forts ';
-				for (_unit = 2; _unit < 6; _unit++) {
-					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
-				}
-				prepareDialog("", hasTutorial + "<br><br><br style='line-height:4px'>Defeat the <u>Balrog</u> in 13 days!<br><br>A lethal foe lurking on level 9<br><br>in the deepest Dungeon.");
+				showTutorialText();
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
@@ -169,11 +165,12 @@ function action(direction) {
 					e => {
 						if (_rest || _hplost) {
 							prepareDialog(
-								"Inn",
-								"Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
+								"Inn<br>",
+								"<br>Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
 								e => {
 									// Rest
 									if (spendGold(1 + _rest / 2 | 0)) return;
+									healPlayer(_hplost);
 									startNewDay();
 								}, "Rest " + goldIcon + (1 + _rest / 2 | 0),
 								e => {
@@ -187,7 +184,7 @@ function action(direction) {
 						if (_hplost) {
 							_amount = 1 + _hplost / 2 | 0;
 							prepareDialog(
-								"Healer",
+								"Healer<br>",
 								"<br>Restore Hero and Crew HP<br>",
 								e => {
 									// Heal
@@ -241,8 +238,8 @@ function action(direction) {
 						} else if (_crewMenu && !_crewUpgraded) {
 							_amount = _crewMenu && !_crewUpgraded ? crewPrices[crewLevel-1] : 0;
 							prepareDialog(
-								"Barracks",
-								`<br>Crew HP +12<br>Attack +1<br>`,
+								"Barracks<br>",
+								`<br>Crew HP +12<br><br>Attack +1<br>`,
 								e => {
 									// Upgrade Crew
 									if (spendGold(_amount)) return;
@@ -272,7 +269,7 @@ function action(direction) {
 				dungeon = _unit.dungeon;
 				displayDungeon();
 			} else
-			if (gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)) {
+			if (_unit && _unit.apple && gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)) {
 				healPlayer();
 				getUnit(playerX, playerY).apple = 0;
 				updateActionButton();
@@ -289,12 +286,18 @@ function action(direction) {
 }
 
 function startNewDay() {
+
+	//if (unit && unit.hasOwnProperty("apple")) apple = unit.apple;
+	unitsList.forEach(unit => {
+		if (unit.hasOwnProperty("apple")) unit.apple = 1;
+	});
+
 	backFromDialog();
 	moveLeft = moveLimit;
 	timePassed ++;
 	updateInfoTab();
 	fadeBackground();
-	prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
+	prepareDialog("Day " + timePassed + "<br>", `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
 	obscureStage();
 	revealAroundUnit(playerX, playerY);
 }

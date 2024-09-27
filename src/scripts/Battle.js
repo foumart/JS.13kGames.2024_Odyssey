@@ -17,7 +17,7 @@ function getEnemyName(_id) {
 	return [
 		"Bat", "Slime", "Wolf", "Imp", "Orc",
 		"Wizard", "Troll", "Lich", "Dragon", "Balrog",
-		"Squid", "Serpent", "Knight", "Crab"
+		"Squid", "Serpent", "Scout", "Crab"
 	][_id > 13 ? _id - 20 : _id];
 }
 
@@ -40,8 +40,10 @@ function getEnemyHP(_id) {
 }
 
 function getDungeonStagesString(label = "") {
-	let haveEnemies, notCleared, previousEmpty, dungeonStages = label + "Stages: ";
+	let haveEnemies, notCleared, previousEmpty, dungeonStages = "Stages: ";
+	let dungeonDepth = 3;
 	dungeon.forEach((_nextStage, _index) => {
+		dungeonDepth = _index;
 		haveEnemies = !_nextStage.every(x => x == -1);
 		if (_index > 2 && haveEnemies && !notCleared) {
 			notCleared = _index;
@@ -55,14 +57,15 @@ function getDungeonStagesString(label = "") {
 	if (dungeon.length > 3 && notCleared < dungeon.length-1) {
 		dungeonStages += ' &#8943';// add [⋯] at the end if there are unexplored dungeon rooms
 	}
-	return [dungeonStages, haveEnemies];
+	dungeonStages = "<br>" + (dungeonDepth < 5 ? "Easy " : "") + label + dungeonStages;
+	return [dungeonStages, haveEnemies, dungeonDepth];
 }
 
 function displayDungeon(_dungeon) {
-	_dungeon = getDungeonStagesString("<br>Dungeon<br>");
+	_dungeon = getDungeonStagesString("Dungeon<br>");
 	prepareDialog(
 		_dungeon[0],
-		"",
+		"<br><br>",
 		_dungeon[1] ? e => descendInDungeon(0, dungeonRoom) : closeAllScreens, _dungeon[1] ? "Enter" : "Exit",
 		_dungeon[1] ? closeAllScreens : 0, _dungeon[1] ? "Exit" : 0
 	);
@@ -93,7 +96,7 @@ function descendInDungeon(event, _skip) {
 		updateActionButton();
 		prepareDialog(
 			`<br>`,
-			`You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br>`,//a${dungeonEnemy==3?"n":""} // an imp, an orc, etc.
+			`<br><br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
@@ -141,7 +144,7 @@ function dungeonBattle() {
 }
 
 function getEnemyStatsString() {
-	return `<br>HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}<br>`;
+	return `<br><br>HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}<br>`;
 }
 
 function getEnemyHealthBar() {
@@ -170,20 +173,20 @@ function tryToFleeBattle() {
 	let _level = inBattle == 1 ? dungeonStage + 1 : getEnemyName(dungeonEnemy).length - 3;
 	let _enemy = dungeonEnemy > 9 ? dungeonEnemy - 9 : dungeonEnemy;
 	if ((!onFoot && timePassed < 9) || dungeonSiege) {
-		animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
+		animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br><br>Not after a hit.<br><br>", closeAllScreens));
 	} else
 	if (Math.random() * _level + dungeonFlee > _enemy) {
 		// player will escape
 		if (Math.random() * _level < dungeonEnemy) {
 			// player will however suffer a hit
-			animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br>Not after a hit.<br>", closeAllScreens));
+			animateUnitHit(_enemy + 3, e => prepareDialog("Fled", "<br><br>Not after a hit.<br><br>", closeAllScreens));
 		} else {
 			prepareDialog("<br>Fled", "<br>", closeAllScreens);
 		}
 	} else {
 		// player cannot escape and will receive a hit on top of that
 		dungeonFlee ++;
-		animateUnitHit(_enemy + 3, e => prepareDialog("Escaping...", "<br>Got hit trying.<br>", displayDialog));
+		animateUnitHit(_enemy + 3, e => prepareDialog("Escaping...", `<br><br>${_enemy==4?'Pinched by the Crab':'Failed'}!<br><br>Got hit trying.<br>`, displayDialog));
 	}
 }
 
@@ -249,7 +252,7 @@ function animateUnitHit(_id, _callback, _animationOnly) {
 						} else {
 							dungeonEnemyHealth -= getAttackDamage(_id);
 							dungeonEnemyHealthBar.innerHTML = getEnemyHealthBar();
-							battleScreen.children[2].innerHTML = getEnemyStatsString();
+							battleScreen.children[1].innerHTML = getEnemyStatsString();
 							animateDamage(battleScreen.children[0], _callback);
 						}
 	
@@ -345,7 +348,7 @@ function battleVictory() {
 				}
 
 				prepareBattleScreen(
-					getSpan(lastStage ? 'Dungeon cleared!' : stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!", "#fe8", "9vmin"),
+					getSpan(lastStage ? 'Dungeon cleared!' : stageCleared ? `<br>Stage ${dungeonStage} cleared!` : "<br>Victory!<br>", "#fe8", "9vmin"),
 					`<br>Found ${bonus} gold.<br>` +
 						(_levelUp ? "<br>Hero level up!<br>" : "") +
 						(lastStage ? dungeonStage % 2 ? "<br>Crew Attack +1<br>" : "<br>Hero Attack +1<br>" : ""),
@@ -373,7 +376,7 @@ function battleVictory() {
 				gold += bonus;
 				
 				prepareBattleScreen(
-					getSpan("<br>Victory!", "#fe8", "9vmin"),
+					getSpan("<br>Victory!<br>", "#fe8", "9vmin"),
 					(_levelUp ? "<br>Hero level up!<br>" : "") +
 					`<br>Found ${bonus} gold.<br>`,
 					closeAllScreens
@@ -415,24 +418,25 @@ function prepareSurfaceBattle(_unit, _siege) {
 	dungeonEnemyHealth = getEnemyHP(dungeonEnemy);
 	dungeonEnemyAttack = getEnemyAttack(dungeonEnemy);
 
-	if (_unit.type == UnitType.SERPENT) {
+	/*if (_unit.type == UnitType.SERPENT) {
 		// direct battle with a serpent
 		dungeonBattle();
-	} else {
+	} else {*/
 		battleIntro = true;
 
 		updateInfoTab();
 		updateActionButton();
 		prepareDialog(
-			dungeonSiege ? `Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br>` : `<br>`,
-			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
+			dungeonSiege ? `<br>Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br><b>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}</b><br>` : `<br>`,
+			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
 			dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 			closeAllScreens, "Run"
 		);
 
 		dialog.firstChild.prepend((dungeonEnemy-3 == UnitType.KNIGHT ? offscreenBitmapsFlipped : offscreenBitmaps)[_unit.type-1]);
+		dialog.firstChild.firstChild.style.marginTop = "2vmin";
 		fadeBackground();
-	}
+	//}
 }
 
 function finalBattle(_forced = 1) {

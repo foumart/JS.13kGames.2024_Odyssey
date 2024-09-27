@@ -283,7 +283,7 @@ function initBoard() {
 		}
 	}
 
-	if (_debug) console.log(
+	/*if (_debug) console.log(
 		unitsList.length,
 		"trees:"+t,
 		"g1:"+g1,
@@ -291,7 +291,7 @@ function initBoard() {
 		"e1:"+e1,
 		"e2:"+e2,
 		"e3:"+e3
-	);
+	);*/
 
 	// data initialization completed
 

@@ -147,7 +147,7 @@ function resizeUI(event) {
 			!state ? portrait ? 88 : 80 : portrait ? inBattle ? 64 : 56 : inBattle ? 44 : 35
 		}%) translateX(-${
 			portrait || !state ? 50 : inBattle ? 47 : 44
-		}%)`, 60, portrait ? 50 : 40
+		}%)`, 60, 40//portrait ? 45 : 40
 	);
 
 	// Resize the Dialog Menu
