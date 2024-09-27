@@ -139,7 +139,7 @@ function action(direction) {
 				for (_unit = 2; _unit < 6; _unit++) {
 					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
 				}
-				prepareDialog("", hasTutorial + "<br><br>13 days to defeat the <u>Balrog</u>!<br>");
+				prepareDialog("", hasTutorial + "<br><br><br style='line-height:4px'>Defeat the <u>Balrog</u> in 13 days!<br><br>A lethal foe lurking on level 9<br><br>in the deepest Dungeon.");
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
@@ -164,10 +164,10 @@ function action(direction) {
 
 				prepareDialog(
 					// Label
-					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "Castle"),
-					"",
+					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "&nbsp; <u>Castle</u> " + getSpan('&#9873', colors[1])),
+					"<br><br style='line-height:9px'>Rest in the Inn sparingly,<br><br>it advances time with 1 day!<br>",
 					e => {
-						if (_rest) {
+						if (_rest || _hplost) {
 							prepareDialog(
 								"Inn",
 								"Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
@@ -211,10 +211,10 @@ function action(direction) {
 						if (_shipMenu && (shipLevel < 4 || _shiplost)) {
 							_amount = _shiplost ? 9 + _shiplost / 2 | 0 : shipPrices[shipLevel-1];
 							prepareDialog(
-								"Shipyard",
+								"<u style='line-height:60px'>Shipyard</u>",
 								_shiplost
-									? "<br>Repair Ship damage<br><br>"
-									: `<br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br>Ship Attack +2<br>`,
+									? "<br><br>Repair Ship damage<br><br>"
+									: `<br><br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br><br>Ship Attack +2<br><br>Sail points +2<br>`,
 								e => {
 									// Upgrade or Repair Ship
 									if (_shiplost) {
@@ -224,7 +224,10 @@ function action(direction) {
 										if (spendGold(_amount)) return;
 										shipAttack += 2;
 										shipLevel ++;
+										moveLimit += 2;
+										moveLeft += 2;
 										shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
+										updateInfoTab();
 									}
 									animateUnitHit(1, 0, 2);
 									backFromDialog();

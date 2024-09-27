@@ -12,8 +12,8 @@ let unit,
 	autoBattle;// allows automatic battles
 
 const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f", "#0f0"];
-const shipPrices = [300,600,1200];
-const crewPrices = [250,500,1e3];
+const shipPrices = [300,600,900,1200];
+const crewPrices = [250,500,1000,1500];
 
 let turn, gold,
 	moveLeft, moveLimit, timePassed,
@@ -23,8 +23,9 @@ let turn, gold,
 	playerBitmap, shipBitmap, crewBitmap;
 
 let enemiesKilled;
+let treasuresTaken;
 let experience;
-let expLevels = [200,500,1e3];
+let expLevels = [200,500,1000,2000];
 
 // initialize vars for new game
 function initVars() {
@@ -41,6 +42,7 @@ function initVars() {
 	experience = 0;
 
 	enemiesKilled = [];
+	treasuresTaken = 0;
 }
 
 function createUnit(x, y, z) {
@@ -72,6 +74,37 @@ function prepareToMove(dir) {
 		shipHealth -= 5;
 		checkShipHealth();
 	}
+
+	if (!onFoot && dir && !boarding) {
+		moveLeft -= 1;
+		if (moveLeft < 0) {
+			// Final Boss coming for you
+			if (timePassed >= 13) {
+				finalBattle(2);
+			} else {
+				crewHealth -= shipHealthMax / 3 | 0;
+				moveLeft += moveLimit / 2 | 0;
+			}
+		} else if (moveLeft < 9) {
+			// Pulse the sail left bar to highlight that it's emptying
+			TweenFX.to(tween, 3, {scale: 1.2},
+				e => {
+					infoTab.style.transform = `scale(${tween.scale})`;
+				},
+				e => {
+					TweenFX.to(tween, 3, {scale: 1},
+						e => {
+							infoTab.style.transform = `scale(${tween.scale})`;
+						}
+					);
+				}
+			);
+		}
+		resizeUI();
+	}
+
+	//update sail points right away
+	updateInfoTab();
 
 	// change character/ship appearance as player moves
 	unitsData[playerY][playerX] = boarding || !onFoot
@@ -118,20 +151,6 @@ function finalizeMove(dir) {
 		action(dir);
 	} else {
 		backFromDialog();
-	}
-
-	if (!onFoot && dir && !boarding) {
-		moveLeft -= 1;
-		if (moveLeft < 1) {
-			// Final Boss coming for you
-			if (timePassed == 13) {
-				finalBattle(2);
-			} else {
-				crewHealth -= shipHealthMax / 3 | 0;
-				moveLeft += moveLimit / 2 | 0;
-			}
-		}
-		resizeUI();
 	}
 
 	checkCrewSailing();
