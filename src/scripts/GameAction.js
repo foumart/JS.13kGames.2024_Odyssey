@@ -135,11 +135,7 @@ function action(direction) {
 		default: // Action
 			_unit = getUnit(playerX, playerY);
 			if (hasTutorial) {
-				hasTutorial = '<br>Upgrade Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Forts ';
-				for (_unit = 2; _unit < 6; _unit++) {
-					hasTutorial += " " + getSpan('&#9873', colors[_unit]);
-				}
-				prepareDialog("", hasTutorial + "<br><br>13 days to defeat the <u>Balrog</u>!<br>");
+				showTutorialText();
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
 				// CASTLES AND FORTS
@@ -164,16 +160,17 @@ function action(direction) {
 
 				prepareDialog(
 					// Label
-					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "Castle"),
-					"",
+					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "&nbsp; <u>Castle</u> " + getSpan('&#9873', colors[1])),
+					"<br><br style='line-height:9px'>Rest in the Inn sparingly,<br><br>it advances time with 1 day!<br>",
 					e => {
-						if (_rest) {
+						if (_rest || _hplost) {
 							prepareDialog(
-								"Inn",
-								"Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
+								"Inn<br>",
+								"<br>Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
 								e => {
 									// Rest
 									if (spendGold(1 + _rest / 2 | 0)) return;
+									healPlayer(_hplost);
 									startNewDay();
 								}, "Rest " + goldIcon + (1 + _rest / 2 | 0),
 								e => {
@@ -187,7 +184,7 @@ function action(direction) {
 						if (_hplost) {
 							_amount = 1 + _hplost / 2 | 0;
 							prepareDialog(
-								"Healer",
+								"Healer<br>",
 								"<br>Restore Hero and Crew HP<br>",
 								e => {
 									// Heal
@@ -211,10 +208,10 @@ function action(direction) {
 						if (_shipMenu && (shipLevel < 4 || _shiplost)) {
 							_amount = _shiplost ? 9 + _shiplost / 2 | 0 : shipPrices[shipLevel-1];
 							prepareDialog(
-								"Shipyard",
+								"<u style='line-height:60px'>Shipyard</u>",
 								_shiplost
-									? "<br>Repair Ship damage<br><br>"
-									: `<br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br>Ship Attack +2<br>`,
+									? "<br><br>Repair Ship damage<br><br>"
+									: `<br><br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br><br>Ship Attack +2<br><br>Sail points +2<br>`,
 								e => {
 									// Upgrade or Repair Ship
 									if (_shiplost) {
@@ -224,7 +221,10 @@ function action(direction) {
 										if (spendGold(_amount)) return;
 										shipAttack += 2;
 										shipLevel ++;
+										moveLimit += 2;
+										moveLeft += 2;
 										shipHealthMax = shipHealth += shipLevel == 3 ? 10 : 12;
+										updateInfoTab();
 									}
 									animateUnitHit(1, 0, 2);
 									backFromDialog();
@@ -238,8 +238,8 @@ function action(direction) {
 						} else if (_crewMenu && !_crewUpgraded) {
 							_amount = _crewMenu && !_crewUpgraded ? crewPrices[crewLevel-1] : 0;
 							prepareDialog(
-								"Barracks",
-								`<br>Crew HP +12<br>Attack +1<br>`,
+								"Barracks<br>",
+								`<br>Crew HP +12<br><br>Attack +1<br>`,
 								e => {
 									// Upgrade Crew
 									if (spendGold(_amount)) return;
@@ -269,7 +269,7 @@ function action(direction) {
 				dungeon = _unit.dungeon;
 				displayDungeon();
 			} else
-			if (gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)) {
+			if (_unit && _unit.apple && gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)) {
 				healPlayer();
 				getUnit(playerX, playerY).apple = 0;
 				updateActionButton();
@@ -286,12 +286,18 @@ function action(direction) {
 }
 
 function startNewDay() {
+
+	//if (unit && unit.hasOwnProperty("apple")) apple = unit.apple;
+	unitsList.forEach(unit => {
+		if (unit.hasOwnProperty("apple")) unit.apple = 1;
+	});
+
 	backFromDialog();
 	moveLeft = moveLimit;
 	timePassed ++;
 	updateInfoTab();
 	fadeBackground();
-	prepareDialog("Day " + timePassed, `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
+	prepareDialog("Day " + timePassed + "<br>", `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
 	obscureStage();
 	revealAroundUnit(playerX, playerY);
 }

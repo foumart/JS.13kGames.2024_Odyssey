@@ -46,23 +46,30 @@ function createUI() {
 	gameCanvas.style.pointerEvents = bgrCanvas.style.pointerEvents = uiDiv.style.pointerEvents = "none";
 	//gameCanvas.style.filter = "drop-shadow(0 1vh 0 #0002)";
 
-	infoTab = generateUIButton(uiDiv, 'v{VERSION}',
+	infoTab = generateUIButton(uiDiv, '© CREDITS',
 		() => {
 			if (battleIntro || autoBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
 			prepareDialog(
-				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "Day: " + timePassed : "",
+				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "<u>Day: " + timePassed + "</u>" : "",
 				"<br>" + (
 					state
 					? inBattle==1
 						? getDungeonStagesString()[0]
-						: getSpan("&#9881 Sail: " + moveLeft) + getSpan(`<br><br>${goldIcon} Gold: ${gold}`)
-					: "<br>Game by Noncho Savov") + "<br>",
+						: getSpan("<br>&#10039 Days left: " + (13 - timePassed)) +
+							getSpan("<br><br>&#9881 Sail points left: " + moveLeft) +
+							getSpan(`<br><br>Treasures: ${treasuresTaken}/${treasures} &nbsp; ${goldIcon} Gold: ${gold}`) +
+							getSpan(`<br><br>Forts: ${castles.length}/4 &nbsp; Dungeons: ${dungeon ? dungeon.length : 0}/7`)
+					: "Game by Noncho Savov<br><br>"+getSpan("Copyright © 2024", 0, "5vmin") + getSpan("<br><br>v{VERSION}", 0, "4vmin", "line-height:3vmin")),
 				displayDialog
 			);
+			let bitmap = offscreenBitmaps[38];
 			if (!state) {
-				let bitmap = offscreenBitmaps[38];
 				dialog.firstChild.prepend(bitmap);
-				bitmap.style.marginTop = "4vmin";
+				bitmap.style.marginTop = "2vmin";
+				bitmap.style.background = 0;
+				dialog.style.background = "#adfd";
+			} else {
+				bitmap.style.background = "#1166";
 			}
 		}
 	);
@@ -76,7 +83,7 @@ function createUI() {
 	}
 
 	if (!state) {
-		//titlePng = generateUIButton(uiDiv, "", switchState, "");
+		titlePng = generateUIButton(uiDiv, "", switchState, "");
 		titleText = generateUIButton(uiDiv, "", switchState, "");
 		bgrCanvas.style.opacity = .6;
 	} else {
@@ -98,7 +105,7 @@ function createUI() {
 	dialog = generateUIButton(uiDiv, '');
 
 	// Fullscreen and Sound buttons
-	//if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
+	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
 
 	soundButton = generateUIButton(uiDiv, '');
 	soundButton.addEventListener(interactionTap, toggleSound);
@@ -145,7 +152,7 @@ function addBitmapToScreen(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 }
 
 function addLabelToDialog(_dialog, _label, _label2) {
-	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") + '<br>' : ''}<b>${_label2}</b><br>`;
+	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") : ''}<b>${_label2}</b><br>`;
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
@@ -173,6 +180,7 @@ function prepareDialogButtons(_dialog, close, callback1, btn1, callback2, _btn2)
 	button1.style.background = '#fda';
 	let span1 = document.createElement('span');
 	span1.innerHTML = btn1 || 'Okay';
+	if (!btn1) button1.style.marginTop = "4vmin";
 	button1.appendChild(span1);
 	button1.addEventListener('click', callback1 || close);
 	_dialog.appendChild(button1);
@@ -231,14 +239,16 @@ function updateActionButton(event) {
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | "₪" "ϵ"
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
 
-	//unit = getUnit(playerX, playerY);
+	let unit = getUnit(playerX, playerY);
+	let apple = 0;
+	if (unit && unit.hasOwnProperty("apple")) apple = unit.apple;
 	if (dungeon || inBattle || battleIntro) {
 		actButton.innerHTML = "&#9876<br>" + getSpan("ATTACK", 0, "5vmin");
 	} else
 	if (
 		gamePlayer.overlay == UnitType.CASTLE ||
 		gamePlayer.overlay == UnitType.SHRINE ||
-		gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
+		apple && gamePlayer.overlay == UnitType.TREE && (playerHealth < playerHealthMax || crewHealth < crewHealthMax)
 	) {
 
 		actButton.innerHTML = `${
@@ -253,6 +263,7 @@ function updateActionButton(event) {
 		removeUnit(playerX, playerY);
 		SoundFXgetGold();
 		gold += 50;
+		treasuresTaken ++;
 		backFromDialog();
 	} else {
 		actButton.innerHTML = hasTutorial ? "?" : '<b>@</b>';//'&#187';
@@ -264,6 +275,8 @@ function updateActionButton(event) {
 function updateInfoTab() {
 	let _char = "&#9608";
 	let _html;
+	let _moveLimit = moveLimit > 26 ? 26 : moveLimit;
+	let _moveLeft = moveLeft > 26 ? 26 : moveLeft;
 	if (inBattle) {// dungeon, land, siege or marine battles
 		_html = getSpan(
 			inBattle==1
@@ -273,13 +286,13 @@ function updateInfoTab() {
 		);
 	} else {
 		_html = `${getSpan('&#9881', '#cef', '5vmin', 'vertical-align:bottom')} ${
-			getSpan(_char.repeat(moveLeft), moveLeft > 9 ? '#68f' : '#fd6', 0, '')
-		}&#9612${
-			getSpan(_char.repeat(moveLimit - moveLeft), '#57f8')
+			getSpan(_char.repeat(_moveLeft), moveLeft > 9 ? '#68f' : '#f83', 0, '') +
+			getSpan('&#9612', moveLeft > 9 ? '#cef' : '#ff3') +
+			getSpan(_char.repeat(_moveLimit - _moveLeft), '#57f8')
 		}<div style="font-size:3em;top:42%;left:16%">${
-			getSpan(moveLeft, '#8ff')
+			getSpan(moveLeft, moveLeft > 9 ? '#8ff' : '#ff8') +
+			(moveLeft > 9 ? "" : " &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" + (moveLeft > 6 ? "&nbsp; !" : moveLeft > 3 ? " !!" : "!!!"))
 		}</div>`
-		//`<span style="font-size:2em">${timePassed}</span>`
 	}
 	_html += `<div style="font-size:3.5em;${inBattle?`left:${dungeon?50:40}vmin;margin:-1vmin`:'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
 	infoTab.innerHTML = _html;
@@ -289,7 +302,6 @@ function backFromDialog() {
 	if (inDialog) displayDialog();
 	gameContainer.style.display = "block";
 	updateActionButton();
-	updateInfoTab();
 }
 
 function closeButtonClick(e) {
@@ -302,10 +314,10 @@ function infoButtonClick(id = 0, _hp, _att) {
 	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id == 12 ? 12 : id - 3)) + "<br>",
-		(id < 3 ? "Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp; " : '') +
+		(id < 3 ? "<br>Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp; " : '') +
 			"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id == 12 ? 12 : id - 3)) +
-			(id < 3 ? "" : " &nbsp; ") + `<br>${
+			(id < 3 ? "" : " &nbsp; ") + `<br><br>${
 				!id ? 'Exp: ' + experience + ` (${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]}) &nbsp; ` : ''
 			}Attack: ${getAttackDamage(id)}`,
 		displayDialog
@@ -313,14 +325,14 @@ function infoButtonClick(id = 0, _hp, _att) {
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmaps[8] : !id ? offscreenBitmaps[0]
 		: id == 12 ? offscreenBitmapsFlipped[5] : offscreenBitmaps[33 + id];
 
-	bmp.style.margin = "1vmin";
+	if (bmp) bmp.style.margin = "1vmin 1vmin 3vmin";
 	dialog.firstChild.append(bmp)
 }
 
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		prepareDialog("Revolt!", "<br>Crew demands:<br>", () => {
+		prepareDialog("Revolt!<br>", "<br>Crew demands:<br>", () => {
 			if (gold < crewHealthMax * crewPaid) {
 				completeGame("Fatal Mutiny");
 				return;
@@ -337,11 +349,11 @@ function checkCrewSailing() {
 }
 
 
-/*function debugBoard() {
+function debugBoard() {
 	if (_debug) console.log(
 		unitsData.map(arr => arr.map(num => (!num ? "0" + num.toString(16) : (num==7?"^":num>=1&&num<11?num<7?num<3?"█":"█":"█":num==11?"▀":" ") + num.toString(16)).toUpperCase())).join("\n")
 	);
-}*/
+}
 
 // debug visitedData
 /*if (_debug) console.log(
@@ -352,17 +364,17 @@ function checkCrewSailing() {
 	visitedData.map((arr,y) => arr.map((num,x) => (x==playerX&&y==playerY? "  " : num.toString(16).length == 1 ? "0" + num.toString(16) : num.toString(16)).toUpperCase())).join("\n")
 );*/
 
-/*function getIcon(size) {
+function getIcon(size) {
 	return `<img src=ico.png height=${size} width=${size}>`;
-}*/
+}
 
-/*function tryToShowInstallButton() {
+function tryToShowInstallButton() {
 	if (!state && installPrompt) {
-		installButton = generateUIButton(uiDiv, `Install`, e => displayInstallPrompt(), 'css_icon');
+		installButton = generateUIButton(uiDiv, `Install`, displayInstallPrompt, 'css_icon');
 	}
-}*/
+}
 
-/*async function displayInstallPrompt() {
+async function displayInstallPrompt() {
 	if (!installPrompt) {
 		return;
 	}
@@ -380,4 +392,4 @@ function checkCrewSailing() {
 function hideInstallButton() {
 	installButton.display = "none";
 	installPrompt = null;
-}*/
+}

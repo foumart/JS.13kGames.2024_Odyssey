@@ -27,20 +27,39 @@ function gameStop() {
 	cancelAnimationFrame(gameLoop);
 }
 
+function showTutorialText() {
+	prepareDialog(
+		"Ahoy Corsair!",
+		getSpan("<br><br style='line-height:8px'>In Odyssey, you control the<br><br>Captain, his Ship and its Crew.<br>", 0, "5.5vmin", "line-height:3.5vmin") +
+		getSpan("<br><br>On land, you fight with your units,<br><br>while at sea, you battle<br><br>with your Ship.<br>", 0, "5vmin", "line-height:3vmin"),
+		e => {
+			hasTutorial = '<br>Upgrade your Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Forts ';
+			for (let i = 2; i < 6; i++) {
+				hasTutorial += " " + getSpan('&#9873', colors[i]);
+			}
+			hasTutorial += " for recruits";
+			prepareDialog("", getSpan(hasTutorial + "<br><br><br><u style='font-size:6vmin'>Your mission</u>:<br><br><br style='line-height:4px'>Defeat <b style='font-size:6vmin'>Balrog</b> - a lethal foe lurking<br><br>on level 9 in the deepest Dungeon.<br><br><br style='line-height:9px'><b style='font-size:6vmin;line-height:5vmin'>You have 13 days to do that!</b>", 0, "5vmin", "line-height:3vmin"));
+		},
+		"Next",
+	);
+}
+
 function doAnimationFrame(timeStamp) {
 	if (state) {
 		// gameplay
 		step ++;
 		if (step == 1) {
 			gameContainer.style.display = "none";
-			
 			updateInfoTab();
 			// initial level zoom in (level zoom is hooked to tween.transitionZ)
 			tween.transitionZ = .3;
 			TweenFX.to(tween, 6, {transitionZ: 0.5}, e => doFrameAnimationMove(1), e => {
 				tween.transitionZ = 1;
 				TweenFX.to(tween, 6, {transitionZ: 1.2}, e => doFrameAnimationMove(0, 1), e => {
-					finalizeMove();
+					TweenFX.to(tween, 6, {transitionZ: 1}, e => doFrameAnimationMove(0, 1), e => {
+						finalizeMove();
+						showTutorialText();
+					}, 1);
 				}, 1);
 			});
 		} else if (step % 7 == 0) {

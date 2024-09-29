@@ -27,6 +27,8 @@ let boardPlayer,
 	boardShip,
 	enemies,
 	castles,
+	placedObjects,
+	treasures,
 	playerX,
 	playerY,
 	shipX,
@@ -56,8 +58,8 @@ function initBoard() {
 		e2=0,
 		e3=0,
 		g1=0,
-		g2=0,
-		treasures = [];
+		g2=0;
+
 	oddDirectionalArray = generateOddArray(renderedScreenSize);
 
 	visitedData = stageData.visited.map(row => [...row]);// 2d array of 0 (empty) and 1 (occupied) - will be mutated
@@ -68,6 +70,8 @@ function initBoard() {
 	unitsList = [];
 	enemies = [];
 	castles = [];
+	placedObjects = [];
+	treasures = 0;
 
 	// determine tiles and create some random units
 	for(y = 0; y < boardWidth; y++) {
@@ -228,20 +232,22 @@ function initBoard() {
 			// generate enemies and items
 			if (!unitsData[y][x]) {
 				if (isWalkable(x, y)) {
-					if (idsData[y][x] > 6 && idsData[y][x] < 13 && treasures.indexOf(-idsData[y][x]) == -1) {
+					if (idsData[y][x] > 6 && idsData[y][x] < 13 && placedObjects.indexOf(-idsData[y][x]) == -1) {
 						// place gold piles on isles 6-12
-						treasures.push(-idsData[y][x]);
+						placedObjects.push(-idsData[y][x]);
+						treasures ++;
 						unitsList.push(createUnit(x, y, UnitType.GOLD));
 						unitsData[y][x] = UnitType.GOLD;
 						//if (state) console.log("GOLD", x+"x"+y);
 						g1 ++;
 					} else
-					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && treasures.indexOf(idsData[y][x]) == -1) {
+					if (mapData[y][x] > TileType.RIFF2 && idsData[y][x] > 1 && placedObjects.indexOf(idsData[y][x]) == -1) {
 						// place knight (isles 2-6) or crab (isles 7-13)
 						unit = createUnit(x, y, idsData[y][x] > 6 ? UnitType.CRAB : UnitType.KNIGHT);
 						unit.origin = idsData[y][x];
 						enemies.push(unit);
-						treasures.push(idsData[y][x]);
+						placedObjects.push(idsData[y][x]);
+						treasures ++;
 						unitsList.push(unit);
 						unitsData[y][x] = idsData[y][x] >= 6 ? UnitType.CRAB : UnitType.KNIGHT;
 						//if (state) console.log(idsData[y][x] >= colors.length ? "CRAB" : "KNIGHT", x+"x"+y);
@@ -250,7 +256,7 @@ function initBoard() {
 				}
 			}
 
-			if (y > 13 && treasures.indexOf(-y) == -1) {
+			if (y > 13 && placedObjects.indexOf(-y) == -1) {
 				let _x = 9;
 				let _y = 9;
 				while (
@@ -268,7 +274,7 @@ function initBoard() {
 
 				unit = createUnit(_x, _y, g2 < 9 ? UnitType.WRECK : e1 < 9 ? UnitType.SERPENT : UnitType.SQUID)
 				enemies.push(unit);
-				treasures.push(-y);
+				placedObjects.push(-y);
 				unitsList.push(unit);
 				unitsData[_y][_x] = unit.type;
 				//if (state) console.log(g2 < 9 ? "WRECK" : e1 < 9 ? "SERPENT" : "SQUID", _x+"x"+_y);
@@ -285,7 +291,6 @@ function initBoard() {
 		"e1:"+e1,
 		"e2:"+e2,
 		"e3:"+e3
-		//treasures
 	);*/
 
 	// data initialization completed

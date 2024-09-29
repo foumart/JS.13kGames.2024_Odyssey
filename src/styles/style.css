@@ -2,6 +2,7 @@
 	padding: 0;
 	margin: 0;
 	/* box-sizing: content-box; */
+	-webkit-touch-callout: none;
 }
 
 body {
@@ -12,16 +13,18 @@ body {
 
 div, canvas {
 	position: absolute;
-	user-select: none;
 	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
 	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
 	image-rendering: pixelated;
 }
 
 button {
 	background: #afc;
 	padding: 2vmin 4vmin;
-	margin: 2vmin 2vmin 3vmin;
+	margin: 2vmin;
 	font-size: 1em;
 	font-weight: 900;
 	border-radius: 1em;

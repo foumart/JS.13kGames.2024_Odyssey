@@ -2,6 +2,10 @@ const keysHeld = [];
 function onKeyDown(event) {
 	//console.log(event.keyCode);
 
+
+	/*if (event.keyCode == 49) {
+		gainExperience(9)
+	}*/
 	/*if (event.keyCode == 49) {
 		SoundFXui();
 	} else
@@ -20,7 +24,7 @@ function onKeyDown(event) {
 	if (event.keyCode == 54) {
 		SoundFXhilight();
 	} else
-	if (event.keyCode == 55) {
+	if (event.keyCode == 49) {
 		debugBoard();
 	} else*/
 
@@ -48,7 +52,11 @@ function onKeyDown(event) {
 		if (!state) {
 			switchState();
 		} else {
-			action();
+			if (inDialog || inBattle) {
+				
+			} else {
+				action();
+			}
 		}
 	} else
 

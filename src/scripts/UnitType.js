@@ -32,24 +32,24 @@ class UnitType {
 	static get KNIGHT() {
 		return 9;
 	}
-	static get CRAB() {
+	static get CRAB() {// 0A
 		return 10;
 	}
 
 
-	static get CASTLE() {// 0A
+	static get CASTLE() {// 0B
 		return 11;
 	}
-	static get SHRINE() {// 0B
+	static get SHRINE() {// 0C
 		return 12;
 	}
-	static get TREE() {// 0C
+	static get TREE() {// 0D
 		return 13;
 	}
-	static get GOLD() {// 0D
+	static get GOLD() {// 0E
 		return 14;
 	}
-	static get WRECK() {// 0E
+	static get WRECK() {// 0F
 		return 15;
 	}
 
