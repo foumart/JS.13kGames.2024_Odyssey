@@ -22,8 +22,14 @@ function generateUIButton(div, code, handler, className = "css_icon css_space") 
 	return button;
 }
 
-function addHealthbar(_health, _max, _char = '&#9608', _num = 12) {
-	let str = '<br><br><br>';
+function addHealthbar(_health, _max, _att, _txt, _char = '&#9608', _num = 12) {
+	let str = '<br><br style="line-height:2px">' + (_txt ? getSpan(`<b>&#9829;&#8202;${_health} &#8202;${
+		generateSVGString([
+			["M0,3V9l8,6L6,18l3,3,3-3,3,3,3-3-3-3,3-3L15,9l-3,3L6,3Z", "fill:#013;opacity:0.5"],
+			["M0,0V6l8,6L6,15l3,3,3-3,3,3,3-3-3-3,3-3L15,6,12,9,6,1Z", "fill:#fff"]
+		], 3, 3.5, '0 0 18 20', 'transform:translateY(0.5vmin)')
+	}&#8202;${_att}</b>`, 0, '4vmin') + '<br><br><br>' : '<br>');
+
 	if (_max < _num) _num = _max;
 	const _step = _max / _num;
 	for (let i = 0; i < _num; i++) {
@@ -152,7 +158,7 @@ function addBitmapToScreen(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 }
 
 function addLabelToDialog(_dialog, _label, _label2) {
-	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") : ''}<b>${_label2}</b><br>`;
+	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") : ''}<b>${_label2}</b>`;
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
@@ -238,6 +244,7 @@ function updateActionButton(event) {
 	// ❩ ↜ 🗓 ⚿ ⍰ ◫ ⊞ ⊟ ⍞ ⍄ ⛋ ⏍⌻❏❑⧠❐⍈  ✠  ✡  ✢  ✣  ✤  ✥  ✦&#10022  ✧  ✰  ✱  ✲  ✳  ✴  ✵  ✶  ✷  ✸
 	// ᠅ &#6149; | ☒ &#9746 | ☑ ☐  | ⊡ &#8865 | ⚀ &#9856 | 🝕 &#128853 | ▣ &#9635 | "₪" "ϵ"
 	// ꖜ &#42396 | |Ꙭ 🕀 ○ | ● &#183; | ◯ | 〇 &#12295 | ⬤ ⊗ | ❂ &#10050 | ☉ &#9737 | ☼ &#9788 | ¤ &#164
+	// ♥ &#9829; | ❤ &#10084; |
 
 	let unit = getUnit(playerX, playerY);
 	let apple = 0;
@@ -314,12 +321,15 @@ function infoButtonClick(id = 0, _hp, _att) {
 	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
 	prepareDialog(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id == 12 ? 12 : id - 3)) + "<br>",
-		(id < 3 ? "<br>Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp; " : '') +
-			"HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
+		"<br>HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id == 12 ? 12 : id - 3)) +
-			(id < 3 ? "" : " &nbsp; ") + `<br><br>${
-				!id ? 'Exp: ' + experience + ` (${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]}) &nbsp; ` : ''
-			}Attack: ${getAttackDamage(id)}`,
+		` &nbsp; Attack: ${getAttackDamage(id)}` +
+		(id < 3 ? "<br><br>Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp;" : '') +
+		getSpan(
+			(!id ? 'Exp: ' + experience + `&#8202;/&#8202;${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]} &nbsp; `
+				: 'Cost: ' + goldIcon + shipPrices[shipLevel-1]
+			), 0, "5vmin"
+		) + "<br>",
 		displayDialog
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmaps[8] : !id ? offscreenBitmaps[0]
@@ -393,3 +403,32 @@ function hideInstallButton() {
 	installButton.display = "none";
 	installPrompt = null;
 }
+
+function generateSVGString(pathData, width, height, viewBox, style) {
+	let svgString = '';
+	pathData.forEach(pathEntry => {
+		svgString += `<path d="${pathEntry[0]}" style="${pathEntry[1]}"/>`;
+	});
+	return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}vmin" height="${height}vmin" viewBox="${viewBox}" style="${style}"><title>sword</title>${svgString}</svg>`;
+}
+
+/*function generateSVG(pathData) {
+	// Create an SVG namespace
+	const svgNS = "http://www.w3.org/2000/svg";
+
+	// Create the SVG element
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", "16");
+	svg.setAttribute("height", "16");
+	svg.setAttribute("viewBox", "0 0 20 20");
+
+	// Create the path element
+	const path = document.createElementNS(svgNS, "path");
+	path.setAttribute("d", pathData);
+	path.setAttribute("fill", "white");
+
+	// Append the path to the SVG
+	svg.appendChild(path);
+	
+	return svg;
+}*/

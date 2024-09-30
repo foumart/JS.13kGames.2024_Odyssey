@@ -29,6 +29,7 @@ let scale;
 let portrait;// orientation
 let screenOffsetX = 0;
 let screenOffsetY = 0;
+let displayStats = 1;
 
 // game state, 0: menu, 1: in-game
 let state = 0;
@@ -183,9 +184,9 @@ function resizeUI(event) {
 	}
 
 	if (playerButton) {
-		playerButton.innerHTML = addHealthbar(playerHealth, playerHealthMax);
-		shipButton.innerHTML = addHealthbar(shipHealth, shipHealthMax);
-		crewButton.innerHTML = addHealthbar(crewHealth, crewHealthMax);
+		playerButton.innerHTML = addHealthbar(playerHealth, playerHealthMax, playerAttack, displayStats);
+		shipButton.innerHTML = addHealthbar(shipHealth, shipHealthMax, shipAttack, displayStats);
+		crewButton.innerHTML = addHealthbar(crewHealth, crewHealthMax, crewAttack, displayStats);
 		playerBitmap = offscreenBitmapsFlipped[0];
 		shipBitmap = offscreenBitmapsFlipped[4];
 		crewBitmap = offscreenBitmaps[5];

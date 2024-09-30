@@ -29,19 +29,71 @@ function gameStop() {
 
 function showTutorialText() {
 	prepareDialog(
-		"Ahoy Corsair!",
-		getSpan("<br><br style='line-height:8px'>In Odyssey, you control the<br><br>Captain, his Ship and its Crew.<br>", 0, "5.5vmin", "line-height:3.5vmin") +
-		getSpan("<br><br>On land, you fight with your units,<br><br>while at sea, you battle<br><br>with your Ship.<br>", 0, "5vmin", "line-height:3vmin"),
+		"<u>Ahoy Corsair!</u>",
+		getSpan("<br><br style='line-height:2vmin'>Welcome to Isle-Hop Odyssey!<br><br><br style='line-height:4px'>Help Captain Redbrand &nbsp; &nbsp; &nbsp;,") +
+		getSpan("<br><br>his Ship &nbsp; </b><b>&nbsp; &nbsp;and its Crew &nbsp; &nbsp; &nbsp;</b><br><br style='line-height:5vmin'><b>defeat Balron &nbsp; &nbsp; &nbsp;</b><b>The Dread!<br><br style='line-height:9px'>", 0, "5.5vmin", "line-height:3.5vmin"),
+		displayDialog,
+		"Skip",
 		e => {
-			hasTutorial = '<br>Upgrade your Ship at Castle ' + getSpan('&#9873', colors[1]) + '<br><br>Conquer Forts ';
-			for (let i = 2; i < 6; i++) {
-				hasTutorial += " " + getSpan('&#9873', colors[i]);
-			}
-			hasTutorial += " for recruits";
-			prepareDialog("", getSpan(hasTutorial + "<br><br><br><u style='font-size:6vmin'>Your mission</u>:<br><br><br style='line-height:4px'>Defeat <b style='font-size:6vmin'>Balrog</b> - a lethal foe lurking<br><br>on level 9 in the deepest Dungeon.<br><br><br style='line-height:9px'><b style='font-size:6vmin;line-height:5vmin'>You have 13 days to do that!</b>", 0, "5vmin", "line-height:3vmin"));
+			prepareDialog(
+				"",
+				"<br>The Balron is a lethal foe,<br><br>lurking on level 9 in a deepest<br><br>dungeon, located on a remote<br><br>island in the Isle-Hop Ocean.<br><br><br style='line-height:1vmin'>Your own isle is in its center.<br><br style='line-height:2vmin'>",
+				e => {
+					hasTutorial = '<br>You can upgrade your Ship<br><br>at the Castle marked with ' + getSpan('&#9873', colors[1]) + ',<br><br>which is under your control.<br><br style="line-height:5vmin">Conquer the Forts ';
+					for (let i = 2; i < 6; i++) {
+						hasTutorial += " " + getSpan('&#9873', colors[i]);
+					}
+					hasTutorial += "<br><br>to recruit more Crew.<br><br style='line-height:2vmin'>";
+					prepareDialog("", hasTutorial,
+						e => {
+							prepareDialog("", getSpan("<br>But beware! The Balron grows<br><br>stronger each day. In 13 days,<br><br>he will become invulnerable,<br><br>and no Hero will be able to<br><br>stop his conquest...<br><br style='line-height:3vmin'>"),
+								e => {
+									prepareDialog("", getSpan("<br>Before you go on your quest,<br><br>know that on land you fight<br><br>with your units, while at sea,<br><br>you battle with your Ship,<br><br>allowing naval to land battles.<br><br style='line-height:3vmin'>"),
+										e => {
+											prepareDialog("", getSpan("<br>Also, pay attention to your<br><br>Sail Points bar &#9881 and ensure<br><br>your Crew rests well in an Inn,<br><br>or you risk suffering costly<br><br>outbreaks.<br><br style='line-height:3vmin'>"),
+												displayDialog,
+												"Got it"
+											);
+										},
+										"Next"
+									);
+								},
+								"Next"
+							);
+						},
+						"Next"
+					);
+				},
+				"Next"
+			);
 		},
 		"Next",
 	);
+
+	let bmpCaptain = cloneCanvas(offscreenBitmaps[0]);
+	bmpCaptain.style.width = "6vmin";
+	bmpCaptain.style.height = "6vmin";
+	bmpCaptain.style.margin = "-1vmin 0 0 -9vmin";
+	dialog.children[1].children[0].append(bmpCaptain);
+
+	let bmpShip = cloneCanvas(offscreenBitmaps[4]);
+	bmpShip.style.width = "6vmin";
+	bmpShip.style.height = "6vmin";
+	bmpShip.style.margin = "-0.5vmin 0 0 -3vmin";
+	dialog.children[1].children[1].append(bmpShip);
+
+	let bmpCrew = cloneCanvas(offscreenBitmaps[8]);
+	bmpCrew.style.width = "6vmin";
+	bmpCrew.style.height = "6vmin";
+	bmpCrew.style.margin = "-1vmin 0 0 -8vmin";
+	dialog.children[2].append(bmpCrew);
+
+	let bmpBalron = cloneCanvas(offscreenBitmaps[UnitType.BALROG + 16]);
+	bmpBalron.style.width = "6vmin";
+	bmpBalron.style.height = "6vmin";
+	bmpBalron.style.margin = "-1vmin 0 0 -8vmin";
+	dialog.children[5].append(bmpBalron);
+	//dialog.children[6].style = ""
 }
 
 function doAnimationFrame(timeStamp) {
