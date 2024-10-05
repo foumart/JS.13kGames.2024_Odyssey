@@ -96,7 +96,7 @@ function descendInDungeon(event, _skip) {
 		updateActionButton();
 		prepareDialog(
 			`<br>`,
-			`<br><br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
+			`<br><br>You see a${dungeonEnemy==3||dungeonEnemy==4?"n":""} ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br><br>`,
 			dungeonBattle, "Fight",
 			closeAllScreens, "Exit"
 		);
@@ -159,6 +159,7 @@ function closeAllScreens() {
 	fadeBackground(0);
 	if (inBattle) displayBattleScreen();// close the battle screen
 	if (inDialog) displayDialog();// close any visible dialogs
+	if (inWarning) displayWarning();// close any visible warnings
 	resizeUI();
 	updateInfoTab();
 	dungeon = 0;
@@ -428,7 +429,7 @@ function prepareSurfaceBattle(_unit, _siege) {
 		updateActionButton();
 		prepareDialog(
 			dungeonSiege ? `<br>Enemy Fort ${getSpan('&#9873', colors[dungeonEnemyUnit.origin])}<br><b>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}</b><br>` : `<br>`,
-			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br>`,
+			dungeonSiege ? `` : `<br>You see a ${getEnemyName(dungeonEnemy)}<br><br>${getSpan(`HP: ${dungeonEnemyHealth} Attack: ${dungeonEnemyAttack}`, 0, '5vmin')}<br><br>`,
 			dungeonBattle, dungeonSiege ? "Siege" : "Fight",
 			closeAllScreens, "Run"
 		);

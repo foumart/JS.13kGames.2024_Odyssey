@@ -6,9 +6,11 @@ let unit,
 	onFoot = true,// player starts on foot
 	holding,// is player holding a direction button for constant moving
 	inDialog,// is a dialog on screen
+	inWarning,// is a warning on screen (just an additional dialog)
 	inBattle,// is player in battle, battle types: 1:dungeon, 2:land, 3:sea
 	hardChoice,// make a dialog permanent non skippable
 	hasTutorial,// displays initial info with the "?" button
+	sailWarningShown,
 	autoBattle;// allows automatic battles
 
 const colors = [, "red", "#fff", "#0ff", "#ff0", "#f0f", "#0f0"];
@@ -82,8 +84,15 @@ function prepareToMove(dir) {
 			if (timePassed >= 13) {
 				finalBattle(2);
 			} else {
-				crewHealth -= shipHealthMax / 3 | 0;
-				moveLeft += moveLimit / 2 | 0;
+				moveLeft = 0;
+				prepareDialog(
+					"",
+					"<br>Alert: Sail points depleted!<br><br>The crew will take damage<br><br>sailing further. If Crew<br><br>Health drops to 0 there<br><br>will be revolts.",
+					e => {
+						crewHealth -= shipHealthMax / 3 | 0;
+						moveLeft += moveLimit / 2 | 0;
+					}
+				);
 			}
 		} else if (moveLeft < 9) {
 			// Pulse the sail left bar to highlight that it's emptying
@@ -112,6 +121,29 @@ function prepareToMove(dir) {
 		: dir == 2 ? UnitType.PLAYERRIGHT : UnitType.PLAYER;
 
 	performEnemyMoves();
+}
+
+function checkSailPoints(dir) {// the first time it happens we display a dialog
+	let shouldDisplayWarning = !sailWarningShown && moveLeft <= 0;
+	if (shouldDisplayWarning) {
+		prepareDialog(
+			"",
+			"<br>Alert: Sail points depleted!<br><br>Ship Crew will take damage<br><br>when sailing further. If Crew's<br><br>Health drops to zero expect<br><br>revolts. Try to avoid that!<br>",
+			e => {
+				sailWarningShown = true;
+				displayDialog();
+				action(dir);
+				//crewHealth -= shipHealthMax / 3 | 0;
+				//moveLeft += moveLimit / 2 | 0;
+			}
+		);
+	} else if (moveLeft <= 0) {
+		moveLeft ++;
+		crewHealth -= shipHealthMax / 9 | 0;
+		checkCrewHealth();
+	}
+
+	return shouldDisplayWarning;
 }
 
 function doFrameAnimationMove(_zoom, _scale) {

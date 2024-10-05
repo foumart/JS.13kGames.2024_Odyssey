@@ -161,3 +161,14 @@ for (let z,i,j,l,k = 0; k < offscreenPixelData.length; k++) {
 		`border:2vmin solid #1160;border-radius:1vmin;background:#1166;position:relative;width:12vmin`;
 }
 
+function cloneCanvas(originalCanvas) {
+	const clonedCanvas = document.createElement('canvas');
+	const context = clonedCanvas.getContext('2d');
+	
+	clonedCanvas.width = originalCanvas.width;
+	clonedCanvas.height = originalCanvas.height;
+	
+	context.drawImage(originalCanvas, 0, 0);
+	
+	return clonedCanvas;
+}
