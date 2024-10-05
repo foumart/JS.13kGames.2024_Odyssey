@@ -30,27 +30,31 @@ function gameStop() {
 function showTutorialText() {
 	prepareDialog(
 		"<u>Ahoy Corsair!</u>",
-		getSpan("<br><br style='line-height:2vmin'>Welcome to Isle-Hop Odyssey!<br><br><br style='line-height:4px'>Help Captain Redbrand &nbsp; &nbsp; &nbsp;,") +
-		getSpan("<br><br>his Ship &nbsp; </b><b>&nbsp; &nbsp;and its Crew &nbsp; &nbsp; &nbsp;</b><br><br style='line-height:5vmin'><b>defeat Balron &nbsp; &nbsp; &nbsp;</b><b>The Dread!<br><br style='line-height:9px'>", 0, "5.5vmin", "line-height:3.5vmin"),
-		displayDialog,
-		"Skip",
+		getSpan("<br><br style='line-height:2vmin'>Welcome to <i>Isle-Hop</i> Odyssey!<br><br><br style='line-height:6px'>Help Captain Redbrand &nbsp; &nbsp;&nbsp;,") +
+		getSpan("<br><br>&#8202;his Ship &nbsp; </b><b>&nbsp; &#8202;, and its Crew &nbsp; &nbsp; &nbsp;</b><br><br style='line-height:5vmin'><b>defeat <b>Balron</b> &nbsp; &nbsp; &nbsp;</b><b>The Dread!<br><br style='line-height:12px'>", 0, "5.5vmin", "line-height:3.5vmin"),
+		displayDialog, "Skip",
 		e => {
 			prepareDialog(
 				"",
-				"<br>The Balron is a lethal foe,<br><br>lurking on level 9 in a deepest<br><br>dungeon, located on a remote<br><br>island in the Isle-Hop Ocean.<br><br><br style='line-height:1vmin'>Your own isle is in its center.<br><br style='line-height:2vmin'>",
+				"<br>Balron is a lethal foe, lurking<br><br>on level 9 of the deepest<br><br>dungeon on a remote island.<br><br><br style='line-height:1vmin'>Your own isle lies at the<br><br>center of this Isle-Hop Sea.<br><br style='line-height:2vmin'>",
+				displayDialog, "Skip",
 				e => {
-					hasTutorial = '<br>You can upgrade your Ship<br><br>at the Castle marked with ' + getSpan('&#9873', colors[1]) + ',<br><br>which is under your control.<br><br style="line-height:5vmin">Conquer the Forts ';
+					let str = '<br>You control the Red Castle ' + getSpan('&#9873', colors[1]) + '<br><br>on your starting island. There<br><br>you can upgrade your Ship.<br><br style="line-height:5vmin">Conquer Forts&#8202;';
 					for (let i = 2; i < 6; i++) {
-						hasTutorial += " " + getSpan('&#9873', colors[i]);
+						str += "&#8202;" + getSpan('&#9873', colors[i]);
 					}
-					hasTutorial += "<br><br>to recruit more Crew.<br><br style='line-height:2vmin'>";
-					prepareDialog("", hasTutorial,
+					str += " to hire<br><br>more Crew on nearby islands.<br><br style='line-height:2vmin'>";
+					prepareDialog("", str,
+						displayDialog, "Skip",
 						e => {
 							prepareDialog("", getSpan("<br>But beware! The Balron grows<br><br>stronger each day. In 13 days,<br><br>he will become invulnerable,<br><br>and no Hero will be able to<br><br>stop his conquest...<br><br style='line-height:3vmin'>"),
+								displayDialog, "Skip",
 								e => {
-									prepareDialog("", getSpan("<br>Before you go on your quest,<br><br>know that on land you fight<br><br>with your units, while at sea,<br><br>you battle with your Ship,<br><br>allowing naval to land battles.<br><br style='line-height:3vmin'>"),
+									prepareDialog("", getSpan("<br><u>Combat overview</u>:<br><br>&#8226; on land you fight with both<br><br>the Captain and the Crew.<br><br>&#8226; at sea, you fight with your<br><br>Ship in naval battles.<br><br style='line-height:3vmin'>"),
+										displayDialog, "Skip",
 										e => {
-											prepareDialog("", getSpan("<br>Also, pay attention to your<br><br>Sail Points bar &#9881 and ensure<br><br>your Crew rests well in an Inn,<br><br>or you risk suffering costly<br><br>outbreaks.<br><br style='line-height:3vmin'>"),
+											prepareDialog("", getSpan("<br>Keep an eye on your Sail Points<br><br>bar &#9881 and ensure your Crew<br><br>rests well at the Castle Inns, or<br><br>you will face costly outbreaks<br><br>that will slow you down.<br><br style='line-height:3vmin'>"),
+												showTutorialText, "Repeat",
 												displayDialog,
 												"Got it"
 											);
@@ -73,7 +77,7 @@ function showTutorialText() {
 	let bmpCaptain = cloneCanvas(offscreenBitmaps[0]);
 	bmpCaptain.style.width = "6vmin";
 	bmpCaptain.style.height = "6vmin";
-	bmpCaptain.style.margin = "-1vmin 0 0 -9vmin";
+	bmpCaptain.style.margin = "-1vmin 0 0 -8.5vmin";
 	dialog.children[1].children[0].append(bmpCaptain);
 
 	let bmpShip = cloneCanvas(offscreenBitmaps[4]);
@@ -93,7 +97,6 @@ function showTutorialText() {
 	bmpBalron.style.height = "6vmin";
 	bmpBalron.style.margin = "-1vmin 0 0 -8vmin";
 	dialog.children[5].append(bmpBalron);
-	//dialog.children[6].style = ""
 }
 
 function doAnimationFrame(timeStamp) {

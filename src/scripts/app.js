@@ -37,7 +37,7 @@ let state = 0;
 let tween = { scale: 0, transitionZ: 0, transitionX: 0, transitionY: 0 };
 
 // ui stuff
-let controls, infoTab, dialog, battleScreen, titleText, titlePng;
+let controls, infoTab, dialog, warning, battleScreen, titleText, titlePng;
 let actButton, upButton, leftButton, rightButton, downButton;
 let playButton, soundButton, fullscreenButton;
 let closeButton, playerButton, shipButton, crewButton;
@@ -148,10 +148,22 @@ function resizeUI(event) {
 			!state ? portrait ? 88 : 80 : portrait ? inBattle ? 64 : 56 : inBattle ? 44 : 35
 		}%) translateX(-${
 			portrait || !state ? 50 : inBattle ? 47 : 44
-		}%)`, 60, 40//portrait ? 45 : 40
+		}%)`, 60, 40
 	);
 
 	// Resize the Dialog Menu
+	updateStyleUI(warning,
+		(inBattle ? inWarning ? 'opacity:.5;' : '' : 'display:none;') +
+		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
+			portrait ? width*.92 : width/2
+		}px;top:50%;left:50%;transform:translateY(-${
+			!state ? portrait ? 88 : 80 : portrait ? inBattle ? 64 : 56 : inBattle ? 44 : 35
+		}%) translateX(-${
+			portrait || !state ? 50 : inBattle ? 47 : 44
+		}%)`, 60, 40
+	);
+
+	// Resize the Battle screen Menu
 	updateStyleUI(battleScreen,
 		(inBattle ? inDialog ? 'opacity:.5;' : '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${

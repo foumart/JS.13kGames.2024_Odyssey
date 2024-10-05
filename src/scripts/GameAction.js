@@ -16,7 +16,7 @@ function action(direction) {
 	/*if (battleIntro && direction) {// equivalent to tapping Run
 		closeAllScreens();
 	}*/
-	
+
 	let _unit;
 	switch (direction) {
 		case 1: // Up
@@ -24,6 +24,7 @@ function action(direction) {
 			boarding = playerX == shipX && playerY-1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY-1, TileType.LAND);
 			if (isPassable(playerX, playerY-1) || boarding || landing) {
+				if (checkSailPoints(1)) return;
 				_unit = getUnit(playerX, playerY-1);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareSurfaceBattle(_unit, 1);
@@ -52,6 +53,7 @@ function action(direction) {
 			boarding = playerX+1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX+1, playerY, TileType.LAND);
 			if (isPassable(playerX+1, playerY) || boarding || landing) {
+				if (checkSailPoints(2)) return;
 				_unit = getUnit(playerX+1, playerY);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareSurfaceBattle(_unit, 1);
@@ -80,6 +82,7 @@ function action(direction) {
 			boarding = playerX == shipX && playerY+1 == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX, playerY+1, TileType.LAND);
 			if (isPassable(playerX, playerY+1) || boarding || landing) {
+				if (checkSailPoints(3)) return;
 				_unit = getUnit(playerX, playerY+1);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareSurfaceBattle(_unit, 1);
@@ -108,6 +111,7 @@ function action(direction) {
 			boarding = playerX-1 == shipX && playerY == shipY && onFoot;
 			landing = !onFoot && !isPassable(playerX-1, playerY, TileType.LAND);
 			if (isPassable(playerX-1, playerY) || boarding || landing) {
+				if (checkSailPoints(4)) return;
 				_unit = getUnit(playerX-1, playerY);
 				if (_unit && _unit.type == UnitType.CASTLE && _unit.origin > 1) {
 					prepareSurfaceBattle(_unit, 1);
@@ -134,7 +138,7 @@ function action(direction) {
 
 		default: // Action
 			_unit = getUnit(playerX, playerY);
-			if (hasTutorial) {
+			if (hasTutorial == 1) {
 				showTutorialText();
 			} else
 			if (gamePlayer.overlay == UnitType.CASTLE) {
@@ -161,12 +165,12 @@ function action(direction) {
 				prepareDialog(
 					// Label
 					(_castleId > 1 ? "Fort " + getSpan('&#9873', colors[_castleId]) : "&nbsp; <u>Castle</u> " + getSpan('&#9873', colors[1])),
-					"<br><br style='line-height:9px'>Rest in the Inn sparingly,<br><br>it advances time with 1 day!<br>",
+					"<br><br style='line-height:11px'>Restore Sail Points at the Inn<br><br>(will advance time with 1 day)<br><br>",
 					e => {
 						if (_rest || _hplost) {
 							prepareDialog(
 								"Inn<br>",
-								"<br>Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br>", "#ffd"),
+								"<br>Refresh Ship movement<br>" + getSpan("<br><u>Advances time by 1 day</u>!<br><br>", "#ffd"),
 								e => {
 									// Rest
 									if (spendGold(1 + _rest / 2 | 0)) return;
@@ -185,7 +189,7 @@ function action(direction) {
 							_amount = 1 + _hplost / 2 | 0;
 							prepareDialog(
 								"Healer<br>",
-								"<br>Restore Hero and Crew HP<br>",
+								"<br>Restore Hero and Crew HP<br><br>",
 								e => {
 									// Heal
 									if (spendGold(_amount)) return;
@@ -210,8 +214,8 @@ function action(direction) {
 							prepareDialog(
 								"<u style='line-height:60px'>Shipyard</u>",
 								_shiplost
-									? "<br><br>Repair Ship damage<br><br>"
-									: `<br><br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br><br>Ship Attack +2<br><br>Sail points +2<br>`,
+									? "<br><br>Repair Ship damage<br><br><br>"
+									: `<br><br>Upgrade Ship HP+${shipLevel != 2 ? 12 : 10}<br><br>Ship Attack +2<br><br>Sail points +2<br><br>`,
 								e => {
 									// Upgrade or Repair Ship
 									if (_shiplost) {
@@ -239,7 +243,7 @@ function action(direction) {
 							_amount = _crewMenu && !_crewUpgraded ? crewPrices[crewLevel-1] : 0;
 							prepareDialog(
 								"Barracks<br>",
-								`<br>Crew HP +12<br><br>Attack +1<br>`,
+								`<br>Crew HP +12<br><br>Attack +1<br><br>`,
 								e => {
 									// Upgrade Crew
 									if (spendGold(_amount)) return;
@@ -297,7 +301,7 @@ function startNewDay() {
 	timePassed ++;
 	updateInfoTab();
 	fadeBackground();
-	prepareDialog("Day " + timePassed + "<br>", `<br>${14 - timePassed} days to defeat the Balrog!<br>`, closeAllScreens);
+	prepareDialog("Day " + timePassed + "<br>", `<br>${14 - timePassed} days to defeat the Balrog!<br><br>`, closeAllScreens);
 	obscureStage();
 	revealAroundUnit(playerX, playerY);
 }

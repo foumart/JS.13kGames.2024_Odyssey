@@ -48,7 +48,7 @@ button {
 	background: #adfb;
 	filter: drop-shadow(1vmin 1vmin 0 #1267);
 	border-bottom: 1vmin solid #fff9;
-	transition: opacity 0.5s;
+	/*transition: opacity 0.5s;*/
 }
 
 .css_controls {
@@ -58,4 +58,17 @@ button {
 
 .css_space {
 	padding: 0 2vw 1vw;
+}
+
+.blinking {
+	animation: blink-animation 1.5s infinite;
+}
+
+@keyframes blink-animation {
+	0%, 100% {
+		opacity: 0;
+	}
+	25%, 75% {
+		opacity: 1;
+	}
 }

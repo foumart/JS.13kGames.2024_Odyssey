@@ -56,16 +56,17 @@ function createUI() {
 		() => {
 			if (battleIntro || autoBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
 			prepareDialog(
-				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "<u>Day: " + timePassed + "</u>" : "",
-				"<br>" + (
+				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "<u>Day: " + timePassed + "</u><br>" : "",
+				(
 					state
 					? inBattle==1
 						? getDungeonStagesString()[0]
 						: getSpan("<br>&#10039 Days left: " + (13 - timePassed)) +
 							getSpan("<br><br>&#9881 Sail points left: " + moveLeft) +
 							getSpan(`<br><br>Treasures: ${treasuresTaken}/${treasures} &nbsp; ${goldIcon} Gold: ${gold}`) +
-							getSpan(`<br><br>Forts: ${castles.length}/4 &nbsp; Dungeons: ${dungeon ? dungeon.length : 0}/7`)
-					: "Game by Noncho Savov<br><br>"+getSpan("Copyright © 2024", 0, "5vmin") + getSpan("<br><br>v{VERSION}", 0, "4vmin", "line-height:3vmin")),
+							getSpan(`<br><br>Forts: ${castles.length}/4 &nbsp; Dungeons: ${dungeon ? dungeon.length : 0}/7<br><br style='line-height:0.5vmin'>`)
+					: "<br>Game by Noncho Savov<br><br>"+getSpan("Copyright © 2024", 0, "5vmin") + getSpan("<br><br>v{VERSION}<br>", 0, "4vmin", "line-height:3vmin")
+				),
 				displayDialog
 			);
 			let bitmap = offscreenBitmaps[38];
@@ -110,8 +111,10 @@ function createUI() {
 
 	dialog = generateUIButton(uiDiv, '');
 
+	warning = generateUIButton(uiDiv, '');
+
 	// Fullscreen and Sound buttons
-	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9114', toggleFullscreen);
+	if (!_standalone) fullscreenButton = generateUIButton(uiDiv, '&#9974', toggleFullscreen);
 
 	soundButton = generateUIButton(uiDiv, '');
 	soundButton.addEventListener(interactionTap, toggleSound);
@@ -159,6 +162,13 @@ function addBitmapToScreen(_dialog, _bitmap, _name, _healthBar, _transform = "sc
 
 function addLabelToDialog(_dialog, _label, _label2) {
 	_dialog.innerHTML = `${_label ? getSpan(_label, 0, "6vmin", "line-height:9vmin") : ''}<b>${_label2}</b>`;
+}
+
+function prepareWarning(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
+	if (hardChoice) return;
+	addLabelToDialog(warning, _label, _label2);
+	prepareDialogButtons(warning, displayWarning, _callback1, _btn1, _callback2, _btn2);
+	if (!inWarning) displayWarning();
 }
 
 function prepareDialog(_label, _label2, _callback1, _btn1, _callback2, _btn2) {
@@ -211,6 +221,16 @@ function displayDialog() {
 	battleScreen.style.opacity = inDialog ? 0.5 : 1;
 }
 
+function displayWarning() {
+	inWarning = !inWarning;
+	SoundFXui();
+	warning.style.display = inWarning ? 'block' : 'none';
+	gameContainer.style.display = inWarning ? 'none' : 'block';
+	uiDiv.style.pointerEvents = inWarning ? 'auto' : 'none';
+	battleScreen.style.opacity = inWarning ? 0.5 : 1;
+	dialog.style.opacity = inWarning ? 0.5 : 1;
+}
+
 function displayBattleScreen(battleType) {
 	inBattle = battleType || !inBattle;
 	battleScreen.style.display = inBattle ? 'block' : 'none';
@@ -234,7 +254,7 @@ function displayNoFunds() {
 }
 
 function updateActionButton(event) {
-	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 |
+	// ⚔️⚔ '&#9876' | ⛏ '&#9935' | ☸ '&#9784' | 🛠️🛠 &#128736 | ⚙️⚙ &#9881 | ⎚ &#9114 | ⛶ &#9974;
 	// 🚢 &#128674 | 🛳 🛳️ | ⛵ &#9973 | 🛶 &#128758 | 🚤 | 🛥 &#128741 | 🛥️ | ⚓ &#9875 | 🔱 &#128305 |
 	// 🪓 &#129683 | 🔧 &#128295 | 💎 &#128142 | ⚒️ | 💣 | 🌎 | ⚐ &#9872 | ⚑ &#9873 | ⚰ &#9904 | ⚱ &#9905 |
 	// ♨ &#9832 | ⛓ &#9939 | ☄ &#9732 | ✖ &#10006 | × &#215 | 🗙 &#128473 | ✕ &#10005 | ❌ &#10060 | ⛝ &#9949 | ✕ &#x2715
@@ -250,7 +270,13 @@ function updateActionButton(event) {
 	let apple = 0;
 	if (unit && unit.hasOwnProperty("apple")) apple = unit.apple;
 	if (dungeon || inBattle || battleIntro) {
-		actButton.innerHTML = "&#9876<br>" + getSpan("ATTACK", 0, "5vmin");
+		actButton.innerHTML = "&#8202;" + generateSVGString([
+			["M2,2V8L15,18l-3,3,3,3,3-3,3,3,3-3-3-3,3-3-3-3-3,3L8,3Z", "fill:#013;opacity:0.4"],
+			["M2,0V6L15,16l-3,3,3,3,3-3,3,3,3-3-3-3,3-3-3-3-3,3L8,1Z", "fill:#fff"],
+			["M16,3,6,15,3,12,1,15l3,3L0,21l3,3,3-3,3,3,3-2L9,18,22,8V2Z", "fill:#013;opacity:0.4"],
+			["M16,1,6,13,3,10,1,13l3,3L0,19l3,3,3-3,3,3,3-2L9,16,22,6V0Z", "fill:#fff"]
+		], 3, 3.5, '0 0 24 24', 'transform:scale(5) translateY(-1vmin)'
+	) + "&#8202;<br>" + getSpan("ATTACK", 0, "4.5vmin");
 	} else
 	if (
 		gamePlayer.overlay == UnitType.CASTLE ||
@@ -259,8 +285,16 @@ function updateActionButton(event) {
 	) {
 
 		actButton.innerHTML = `${
-			gamePlayer.overlay==UnitType.TREE?'<div style="font-size:14vmin;color:#3f3">&nbsp;`</div>'+getSpan('&#11044','#f80','14vmin'):''
-		}<div style='font-size:6vmin;position:relative;margin:-1vmin 0'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
+			gamePlayer.overlay==UnitType.TREE
+			? "&nbsp;&#8202;&#8202;" + generateSVGString([
+					[9, 13, 9, "fill:#013;opacity:0.5"],
+					[9, 12, 9, "fill:#f80"],
+					["M14,7v9h1A6,6,0,0,0,14,7Z", "fill:#ff6"],
+					["M11,0,8,2A5,5,0,0,0,7,5H2S2,6,5,7H8s4,0,5-4A4,4,0,0,0,11,0Z", "fill:#3f3"],
+				], 3, 3.5, '0 0 18 22', 'transform:scale(5) translateY(-1vmin)'
+			) + "&#8202;&#8202;&nbsp;<br>"
+			: ''
+		}<div style='font-size:5vmin;position:relative;margin:-1vmin 0'>${gamePlayer.overlay==UnitType.TREE?'HEAL':'ENTER'}</div>`;
 		if (gamePlayer.overlay != UnitType.TREE) {
 			actButton.prepend(offscreenBitmaps[gamePlayer.overlay-1]);
 		}
@@ -273,7 +307,13 @@ function updateActionButton(event) {
 		treasuresTaken ++;
 		backFromDialog();
 	} else {
-		actButton.innerHTML = hasTutorial ? "?" : '<b>@</b>';//'&#187';
+		actButton.innerHTML = hasTutorial == 1 ? "?" : "&nbsp;&#8202;&#8202;" + generateSVGString([
+				["M10,2a9,9,0,1,0,9,9A9,9,0,0,0,10,2Zm0,16a7,7,0,1,1,7-7A7,7,0,0,1,10,18Z", "fill:#013;opacity:0.4"],
+				["M14,10H11V6H9v5h5Z", "fill:#013;opacity:0.4"],
+				["M10,1a9,9,0,1,0,9,9A9,9,0,0,0,10,1Zm0,16a7,7,0,1,1,7-7A7,7,0,0,1,10,17Z", "fill:#fff"],
+				["M14,9H11V5H9v5h5Z", "fill:#fff"]
+			], 3, 3.5, '0.4 0 19 20', 'transform:scale(5) translateY(-1vmin)'
+		) + "&#8202;&#8202;&nbsp;<div style='font-size:5vmin;position:relative;margin:-1vmin 0'>WAIT</div>";
 	}
 
 	resizeUI(event);
@@ -298,7 +338,7 @@ function updateInfoTab() {
 			getSpan(_char.repeat(_moveLimit - _moveLeft), '#57f8')
 		}<div style="font-size:3em;top:42%;left:16%">${
 			getSpan(moveLeft, moveLeft > 9 ? '#8ff' : '#ff8') +
-			(moveLeft > 9 ? "" : " &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" + (moveLeft > 6 ? "&nbsp; !" : moveLeft > 3 ? " !!" : "!!!"))
+			(moveLeft > 9 ? "" : " &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" + (moveLeft > 6 ? "&nbsp; !" : moveLeft > 3 ? " <span class='blinking'>!!</span>" : "<span class='blinking'>!!!</span>"))
 		}</div>`
 	}
 	_html += `<div style="font-size:3.5em;${inBattle?`left:${dungeon?50:40}vmin;margin:-1vmin`:'top:180%'}">${getSpan(goldIcon + gold, 'gold')}</div>`;
@@ -318,8 +358,8 @@ function closeButtonClick(e) {
 
 function infoButtonClick(id = 0, _hp, _att) {
 	if (paused || hardChoice || autoBattle) return;
-	if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
-	prepareDialog(
+	//if (battleIntro) return; // disallow info clicks when in the dungeon entrance (because dialog is being used)
+	prepareWarning(
 		(id == 1 ? "Ship" : id == 2 ? "Crew" : !id ? "Hero" : getEnemyName(id == 12 ? 12 : id - 3)) + "<br>",
 		"<br>HP: " + (id == 1 ? shipHealth : id == 2 ? crewHealth : !id ? playerHealth : _hp) +
 			"/" + (id == 1 ? shipHealthMax : id == 2 ? crewHealthMax : !id ? playerHealthMax : getEnemyHP(id == 12 ? 12 : id - 3)) +
@@ -327,22 +367,22 @@ function infoButtonClick(id = 0, _hp, _att) {
 		(id < 3 ? "<br><br>Level: " + (id == 1 ? shipLevel : id == 2 ? crewLevel : !id ? playerLevel : id == 12 ? 12 : id - 3) + " &nbsp;" : '') +
 		getSpan(
 			(!id ? 'Exp: ' + experience + `&#8202;/&#8202;${experience<expLevels[0]?expLevels[0]:experience<expLevels[1]?expLevels[1]:expLevels[2]} &nbsp; `
-				: 'Cost: ' + goldIcon + shipPrices[shipLevel-1]
+				: 'Cost: ' + goldIcon + (id == 1 ? shipPrices[shipLevel-1] : crewPrices[crewLevel-1])
 			), 0, "5vmin"
 		) + "<br>",
-		displayDialog
+		displayWarning
 	);
 	let bmp = id == 1 ? offscreenBitmapsFlipped[2] : id == 2 ? offscreenBitmaps[8] : !id ? offscreenBitmaps[0]
 		: id == 12 ? offscreenBitmapsFlipped[5] : offscreenBitmaps[33 + id];
 
 	if (bmp) bmp.style.margin = "1vmin 1vmin 3vmin";
-	dialog.firstChild.append(bmp)
+	warning.firstChild.append(bmp)
 }
 
 function checkCrewSailing() {
 	if (crewHealth < 1) {
 		resizeUI();
-		prepareDialog("Revolt!<br>", "<br>Crew demands:<br>", () => {
+		prepareDialog("Revolt!<br>", `<br>The Ship's Crew is not happy.<br><br>They want to rest in an Inn.<br><br>The Crew demands ${goldIcon + crewHealthMax * crewPaid}<br><br>`, () => {
 			if (gold < crewHealthMax * crewPaid) {
 				completeGame("Fatal Mutiny");
 				return;
@@ -407,7 +447,9 @@ function hideInstallButton() {
 function generateSVGString(pathData, width, height, viewBox, style) {
 	let svgString = '';
 	pathData.forEach(pathEntry => {
-		svgString += `<path d="${pathEntry[0]}" style="${pathEntry[1]}"/>`;
+		svgString += pathEntry.length == 2
+			? `<path d="${pathEntry[0]}" style="${pathEntry[1]}"/>`
+			: `<circle cx="${pathEntry[0]}" cy="${pathEntry[1]}" r="${pathEntry[2]}" style="${pathEntry[3]}"/>`;
 	});
 	return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}vmin" height="${height}vmin" viewBox="${viewBox}" style="${style}"><title>sword</title>${svgString}</svg>`;
 }
