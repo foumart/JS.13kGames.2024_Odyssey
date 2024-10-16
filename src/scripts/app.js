@@ -109,8 +109,6 @@ function setupUI() {
 
 function resizeUI(event) {
 	setupUI();
-	if (event-1) updateActionButton(event);
-	if (event-1) updateInfoTab();
 	// Set HTML positionings
 	mainDiv.style.width = uiDiv.style.width = width + 'px';
 	mainDiv.style.height = uiDiv.style.height = height + 'px';
@@ -139,9 +137,12 @@ function resizeUI(event) {
 		gameContainer.style.marginLeft = gameContainer.style.left = 0;
 	}
 
-	// Resize the Dialog Menu
-	updateStyleUI(dialog,
-		(inDialog ? '' : 'display:none;') +
+	if (event-1) updateActionButton(event);
+	if (event-1) updateInfoTab();
+
+	// Resize the other Dialog Menu
+	updateStyleUI(warning,
+		(inWarning ? '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${
@@ -152,8 +153,8 @@ function resizeUI(event) {
 	);
 
 	// Resize the Dialog Menu
-	updateStyleUI(warning,
-		(inBattle ? inWarning ? 'opacity:.5;' : '' : 'display:none;') +
+	updateStyleUI(dialog,
+		(inWarning ? (inDialog ? 'opacity:.5;' : 'display:none;') : inDialog ? '' : 'display:none;') +
 		`border:2vh solid #fff9;border-left:0;border-right:0;width:${
 			portrait ? width*.92 : width/2
 		}px;top:50%;left:50%;transform:translateY(-${

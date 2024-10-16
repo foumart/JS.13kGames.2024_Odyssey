@@ -54,31 +54,32 @@ function createUI() {
 
 	infoTab = generateUIButton(uiDiv, '© CREDITS',
 		() => {
-			if (battleIntro || autoBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
-			prepareDialog(
-				state ? inBattle==1 ? "<br>Dungeon floor " + dungeonStage : "<u>Day: " + timePassed + "</u><br>" : "",
-				(
-					state
-					? inBattle==1
-						? getDungeonStagesString()[0]
-						: getSpan("<br>&#10039 Days left: " + (13 - timePassed)) +
-							getSpan("<br><br>&#9881 Sail points left: " + moveLeft) +
+			//if (battleIntro || autoBattle) return; // disallow clicks when in the dungeon entrance (dialog is being used)
+			if (state) {
+				if (inBattle == 1) {
+					prepareDialog(
+						"<br>Dungeon floor " + dungeonStage,
+						getDungeonStagesString()[0],
+						displayDialog
+					);
+				} else {
+					prepareWarning(
+						"<u>Day: " + timePassed + "</u><br>",
+						getSpan("<br>&#10039 Days left: " + (13 - timePassed)) +
+							getSpan("<br><br>&#9881 Sail Points left: " + moveLeft) +
 							getSpan(`<br><br>Treasures: ${treasuresTaken}/${treasures} &nbsp; ${goldIcon} Gold: ${gold}`) +
-							getSpan(`<br><br>Forts: ${castles.length}/4 &nbsp; Dungeons: ${dungeon ? dungeon.length : 0}/7<br><br style='line-height:0.5vmin'>`)
-					: "<br>Game by Noncho Savov<br><br>"+getSpan("Copyright © 2024", 0, "5vmin") + getSpan("<br><br>v{VERSION}<br>", 0, "4vmin", "line-height:3vmin")
-				),
-				displayDialog
-			);
-			let bitmap = offscreenBitmaps[38];
-			if (!state) {
-				dialog.firstChild.prepend(bitmap);
-				bitmap.style.marginTop = "2vmin";
-				bitmap.style.background = 0;
-				dialog.style.background = "#adfd";
-			} else {
-				bitmap.style.background = "#1166";
+							getSpan(`<br><br>Forts: ${castles.length}/4 &nbsp; Dungeons: ${dungeon ? dungeon.length : 0}/7<br><br style='line-height:0.5vmin'>`),
+							displayWarning
+						);
+					}
+				} else {
+					prepareDialog(
+						"",
+						"<br>Game by Noncho Savov<br><br>"+getSpan("Copyright © 2024", 0, "5vmin") + getSpan("<br><br>v{VERSION}<br>", 0, "4vmin", "line-height:3vmin"),
+						displayDialog
+					);
+				}
 			}
-		}
 	);
 	
 	if (_debug) {
